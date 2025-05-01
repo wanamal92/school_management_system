@@ -10,6 +10,7 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     profile_image = models.ImageField(upload_to='profiles/', default='default.png')
+    must_change_password = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

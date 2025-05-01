@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
+from django.contrib.auth.forms import SetPasswordForm
 
 def user_login(request):
     if request.method == 'POST':
@@ -13,10 +14,13 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
+            if user.must_change_password:
+                return redirect('force_password_change')
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid username or password')
     return render(request, 'users/login.html')
+
 
 def user_logout(request):
     logout(request)
@@ -105,4 +109,21 @@ def profile_edit(request):
         'user_profile_image': request.user.profile_image
     })
 
+
+@login_required
+def force_password_change(request):
+    if not request.user.must_change_password:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = SetPasswordForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            request.user.must_change_password = False
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            return redirect('dashboard')
+    else:
+        form = SetPasswordForm(request.user)
+    return render(request, 'users/force_password_change.html', {'form': form})
 
