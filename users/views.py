@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth.forms import SetPasswordForm
+from .models import AuditLog
 
 
 from django.contrib import messages
@@ -59,13 +60,22 @@ def user_create(request):
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password('TempPass123')  # or use random password logic
-            user.must_change_password = True  # 🔴 FORCE password change
+            user.set_password('TempPass123')  # or generate random password
+            user.must_change_password = True
             user.save()
+
+            # 🔍 Create audit log
+            AuditLog.objects.create(
+                performed_by=request.user,
+                target_user=user,
+                action='create'
+            )
+
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
     return render(request, 'users/user_form.html', {'form': form, 'title': 'Add User'})
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -84,8 +94,22 @@ def user_edit(request, user_id):
 @user_passes_test(is_admin)
 def user_delete(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
+
+    if user == request.user:
+        messages.error(request, "You cannot delete your own account.")
+        return redirect('user_list')
+
+    # 🔍 Log before deletion
+    AuditLog.objects.create(
+        performed_by=request.user,
+        target_user=user,
+        action='delete'
+    )
+
     user.delete()
+    messages.success(request, "User deleted.")
     return redirect('user_list')
+
 
 @login_required
 def dashboard(request):
@@ -148,6 +172,8 @@ def force_password_change(request):
 
 from django.contrib import messages
 
+
+
 @login_required
 @user_passes_test(is_admin)
 def toggle_user_status(request, user_id):
@@ -159,6 +185,20 @@ def toggle_user_status(request, user_id):
 
     user.is_active = not user.is_active
     user.save()
+
+    # Create log entry
+    AuditLog.objects.create(
+        performed_by=request.user,
+        target_user=user,
+        action='reactivate' if user.is_active else 'deactivate'
+    )
+
     status = "activated" if user.is_active else "deactivated"
     messages.success(request, f"{user.username} has been {status}.")
     return redirect('user_list')
+
+@login_required
+@user_passes_test(is_admin)
+def audit_log_list(request):
+    logs = AuditLog.objects.select_related('performed_by', 'target_user').order_by('-timestamp')
+    return render(request, 'users/audit_log_list.html', {'logs': logs})

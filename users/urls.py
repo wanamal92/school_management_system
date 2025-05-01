@@ -18,4 +18,7 @@ urlpatterns = [
     path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('force-password-change/', views.force_password_change, name='force_password_change'),
 
+    path('audit-logs/', views.audit_log_list, name='audit_log_list'),
+
+
 ]

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/audit.css' %}">
+<script src="{% static 'js/audit.js' %}"></script>
+
+<div class="container mt-4">
+    <h3>Audit Log</h3>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="audit-search" class="form-control" placeholder="Search by username">
+        </div>
+        <div class="col-md-4">
+            <select id="action-filter" class="form-select">
+                <option value="">Filter by Action</option>
+                <option value="create">Created</option>
+                <option value="delete">Deleted</option>
+                <option value="deactivate">Deactivated</option>
+                <option value="reactivate">Reactivated</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="audit-table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Performed By</th>
+                    <th>Action</th>
+                    <th>Target User</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="by">{{ log.performed_by.username }}</td>
+                    <td>
+                        {% if log.action == 'create' %}
+                            <span class="text-success fw-bold">Created</span>
+                        {% elif log.action == 'delete' %}
+                            <span class="text-danger fw-bold">Deleted</span>
+                        {% elif log.action == 'deactivate' %}
+                            <span class="text-warning fw-bold">Deactivated</span>
+                        {% elif log.action == 'reactivate' %}
+                            <span class="text-primary fw-bold">Reactivated</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="target">{{ log.target_user.username }}</td>
+                    <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

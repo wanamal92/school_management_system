@@ -1,0 +1,16 @@
+form .form-control, form select {
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.card-header h5 i {
+    vertical-align: middle;
+}
+
+form label {
+    margin-bottom: 0.25rem;
+}
+
+button i {
+    vertical-align: middle;
+}
