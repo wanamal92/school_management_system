@@ -82,16 +82,27 @@ def dashboard(request):
 def profile_view(request):
     return render(request, 'users/profile_view.html')
 
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
 @login_required
 def profile_edit(request):
     if request.method == 'POST':
-        form = CustomUserChangeForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
+        image = request.FILES.get('profile_image')
+        if image:
+            request.user.profile_image = image
+            request.user.save()
+
+        password_form = PasswordChangeForm(user=request.user, data=request.POST)
+        if password_form.is_valid():
+            password_form.save()
+            update_session_auth_hash(request, request.user)  # Keep user logged in
             return redirect('profile_view')
     else:
-        form = CustomUserChangeForm(instance=request.user)
-    return render(request, 'users/profile_edit.html', {'form': form})
-
+        password_form = PasswordChangeForm(user=request.user)
+    return render(request, 'users/profile_edit.html', {
+        'password_form': password_form,
+        'user_profile_image': request.user.profile_image
+    })
 
 

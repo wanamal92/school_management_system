@@ -77,9 +77,9 @@
             <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             {% if request.user.role == 'admin' %}
                 <a href="{% url 'user_list' %}"><i class="fas fa-users"></i> Manage Users</a>
-                <!-- Add more admin links -->
+                <a href="{% url 'student_list' %}"><i class="fas fa-user-graduate"></i> Students</a>
             {% elif request.user.role == 'staff' %}
-                <a href="#"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="{% url 'student_list' %}"><i class="fas fa-user-graduate"></i> Students</a>
             {% elif request.user.role == 'guardian' %}
                 <a href="#"><i class="fas fa-child"></i> My Children</a>
             {% elif request.user.role == 'student' %}

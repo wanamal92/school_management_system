@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Student Details</h3>
+    <p><strong>Username:</strong> {{ student.user.username }}</p>
+    <p><strong>Email:</strong> {{ student.user.email }}</p>
+    <p><strong>Class:</strong> {{ student.class_level }}</p>
+    <p><strong>Date of Birth:</strong> {{ student.date_of_birth }}</p>
+    <p><strong>Admission Date:</strong> {{ student.admission_date }}</p>
+    <p><strong>Health Issues:</strong> {{ student.health_issues|default:"None" }}</p>
+    
+    <a href="{% url 'student_list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

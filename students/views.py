@@ -49,3 +49,10 @@ def student_delete(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     student.delete()
     return redirect('student_list')
+
+@login_required
+@user_passes_test(is_admin_or_staff)
+def student_detail(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    return render(request, 'students/student_detail.html', {'student': student})
+
