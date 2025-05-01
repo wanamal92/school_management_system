@@ -1,0 +1,14 @@
+from django.db import models
+from users.models import CustomUser
+
+class Student(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'student'})
+    guardian = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='wards', limit_choices_to={'role': 'guardian'})
+    date_of_birth = models.DateField()
+    admission_date = models.DateField(auto_now_add=True)
+    health_issues = models.TextField(blank=True)
+    class_level = models.CharField(max_length=50)
+    address = models.TextField()
+
+    def __str__(self):
+        return self.user.username

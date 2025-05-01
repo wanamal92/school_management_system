@@ -67,14 +67,31 @@ def user_delete(request, user_id):
 @login_required
 def dashboard(request):
     if request.user.role == 'admin':
-        return render(request, 'users/dashboards/admin.html')
+        return render(request, 'dashboards/admin.html')
     elif request.user.role == 'staff':
-        return render(request, 'users/dashboards/staff.html')
+        return render(request, 'dashboards/staff.html')
     elif request.user.role == 'guardian':
-        return render(request, 'users/dashboards/guardian.html')
+        return render(request, 'dashboards/guardian.html')
     elif request.user.role == 'student':
-        return render(request, 'users/dashboards/student.html')
+        return render(request, 'dashboards/student.html')
     else:
         return redirect('login')
+
+
+@login_required
+def profile_view(request):
+    return render(request, 'users/profile_view.html')
+
+@login_required
+def profile_edit(request):
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile_view')
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+    return render(request, 'users/profile_edit.html', {'form': form})
+
 
 

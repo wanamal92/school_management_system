@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Students</h3>
+        <div>
+            <form class="d-flex" method="get">
+                <input name="q" class="form-control me-2" placeholder="Search by username">
+                <select name="group_by" class="form-select me-2">
+                    <option value="">Group by</option>
+                    <option value="class_level">Class Level</option>
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+                <a href="?view=list" class="btn btn-outline-info ms-2">List</a>
+                <a href="?view=card" class="btn btn-outline-info">Card</a>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% if view_mode == "card" %}
+        <div class="row">
+            {% for student in students %}
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>{{ student.user.username }}</h5>
+                        <p>Class: {{ student.class_level }}</p>
+                        <a href="{% url 'student_edit' student.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'student_delete' student.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <table class="table table-bordered">
+            <tr>
+                <th>Username</th><th>Class</th><th>Actions</th>
+            </tr>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.user.username }}</td>
+                <td>{{ student.class_level }}</td>
+                <td>
+                    <a href="{% url 'student_edit' student.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'student_delete' student.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
