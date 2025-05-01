@@ -7,19 +7,28 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth.forms import SetPasswordForm
 
+
+from django.contrib import messages
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
+
         if user:
-            login(request, user)
-            if user.must_change_password:
-                return redirect('force_password_change')
-            return redirect('dashboard')
+            if user.is_active:
+                login(request, user)
+                if user.must_change_password:
+                    return redirect('force_password_change')
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Your account has been deactivated. Please contact admin.')
         else:
             messages.error(request, 'Invalid username or password')
+
     return render(request, 'users/login.html')
+
 
 
 def user_logout(request):
@@ -38,11 +47,21 @@ def user_list(request):
 
 @login_required
 @user_passes_test(is_admin)
+def user_detail(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    return render(request, 'users/user_detail.html', {'user': user})
+
+
+@login_required
+@user_passes_test(is_admin)
 def user_create(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.set_password('TempPass123')  # or use random password logic
+            user.must_change_password = True  # 🔴 FORCE password change
+            user.save()
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
@@ -127,3 +146,19 @@ def force_password_change(request):
         form = SetPasswordForm(request.user)
     return render(request, 'users/force_password_change.html', {'form': form})
 
+from django.contrib import messages
+
+@login_required
+@user_passes_test(is_admin)
+def toggle_user_status(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    if user == request.user:
+        messages.error(request, "You cannot deactivate your own account.")
+        return redirect('user_list')
+
+    user.is_active = not user.is_active
+    user.save()
+    status = "activated" if user.is_active else "deactivated"
+    messages.success(request, f"{user.username} has been {status}.")
+    return redirect('user_list')

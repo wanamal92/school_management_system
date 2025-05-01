@@ -1,0 +1,22 @@
+table th, table td {
+    vertical-align: middle !important;
+}
+
+.table thead th {
+    background-color: #343a40;
+    color: white;
+}
+
+.btn i {
+    margin-right: 4px;
+}
+#user-search {
+    border-radius: 4px;
+}
+
+#role-filter {
+    border-radius: 4px;
+}
+button i {
+    margin-right: 4px;
+}
