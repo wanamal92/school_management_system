@@ -4,4 +4,5 @@ from .models import Student
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = '__all__'
+        # Exclude the user field, since it's set automatically by the signal
+        exclude = ['user']

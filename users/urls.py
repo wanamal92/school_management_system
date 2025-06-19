@@ -20,5 +20,7 @@ urlpatterns = [
 
     path('audit-logs/', views.audit_log_list, name='audit_log_list'),
 
+    path('users/unlock/<int:user_id>/', views.unlock_user, name='unlock_user'),
+
 
 ]

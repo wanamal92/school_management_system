@@ -53,7 +53,8 @@
             </thead>
             <tbody>
                 {% for user in users %}
-                <tr>
+                <tr class="{% if user.is_locked %}table-warning{% endif %}">
+
                     <td class="username">{{ user.username }}</td>
                     <td class="email">{{ user.email }}</td>
                     <td class="role">{{ user.role }}</td>
@@ -81,6 +82,11 @@
                         {% else %}
                             <a href="{% url 'toggle_user_status' user.id %}" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-user-check"></i> Reactivate
+                            </a>
+                        {% endif %}
+                        {% if user.is_locked %}
+                            <a href="{% url 'unlock_user' user.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-unlock"></i> Unlock
                             </a>
                         {% endif %}
                     </td>

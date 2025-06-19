@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'students',
+
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +51,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'axes.middleware.AxesMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5                # Block after 5 failures
+AXES_COOLOFF_TIME = 1                 # Lockout time in hours
+AXES_LOCKOUT_CALLABLE = None          # Optional custom lock logic
+AXES_RESET_ON_SUCCESS = True          # Reset on successful login
+AXES_ONLY_USER_FAILURES = True 
+
+# store logs in the DB:
+AXES_ENABLED = True
+AXES_USE_USER_AGENT = True
+
 
 ROOT_URLCONF = 'schoolms.urls'
 
@@ -142,3 +162,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your_email@gmail.com'
 EMAIL_HOST_PASSWORD = 'your_app_password'  # Use app password, NOT your Gmail password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

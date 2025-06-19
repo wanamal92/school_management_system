@@ -7,6 +7,8 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth.forms import SetPasswordForm
 from .models import AuditLog
+from axes.handlers.proxy import AxesProxyHandler
+from axes.utils import reset
 
 
 from django.contrib import messages
@@ -17,6 +19,8 @@ def user_login(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
 
+        axes_handler = AxesProxyHandler()
+
         if user:
             if user.is_active:
                 login(request, user)
@@ -26,9 +30,15 @@ def user_login(request):
             else:
                 messages.error(request, 'Your account has been deactivated. Please contact admin.')
         else:
-            messages.error(request, 'Invalid username or password')
+            # ✅ Use proxy handler with request + credentials
+            is_locked = axes_handler.is_locked(request=request, credentials={'username': username})
+            if is_locked:
+                messages.error(request, 'Too many failed attempts. Account locked. Try again later.')
+            else:
+                messages.error(request, 'Invalid username or password')
 
     return render(request, 'users/login.html')
+
 
 
 
@@ -40,10 +50,21 @@ def user_logout(request):
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
 
+
+
+
+
+
+
 @login_required
 @user_passes_test(is_admin)
 def user_list(request):
     users = CustomUser.objects.all()
+    axes_handler = AxesProxyHandler()
+
+    for user in users:
+        user.is_locked = axes_handler.is_locked(request=request, credentials={'username': user.username})
+
     return render(request, 'users/user_list.html', {'users': users})
 
 @login_required
@@ -160,15 +181,26 @@ def force_password_change(request):
 
     if request.method == 'POST':
         form = SetPasswordForm(request.user, request.POST)
+        print(f"Form data: {request.POST}")
+        print(f"Form is valid: {form.is_valid()}")
+        print(f"Form Errors: {form.errors}")
+        
         if form.is_valid():
+            print("Form is valid")
             form.save()
             request.user.must_change_password = False
             request.user.save()
             update_session_auth_hash(request, request.user)
+            messages.success(request, "Your password has been successfully updated.")
             return redirect('dashboard')
+        else:
+            
+            messages.error(request, f"Error: {form.errors}")  # Display errors on the UI
     else:
         form = SetPasswordForm(request.user)
+
     return render(request, 'users/force_password_change.html', {'form': form})
+
 
 from django.contrib import messages
 
@@ -202,3 +234,20 @@ def toggle_user_status(request, user_id):
 def audit_log_list(request):
     logs = AuditLog.objects.select_related('performed_by', 'target_user').order_by('-timestamp')
     return render(request, 'users/audit_log_list.html', {'logs': logs})
+
+
+
+@login_required
+@user_passes_test(is_admin)
+def unlock_user(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    axes_handler = AxesProxyHandler()
+
+    if not axes_handler.is_locked(request=request, credentials={'username': user.username}):
+        messages.info(request, f"{user.username} is not currently locked.")
+        return redirect('user_list')
+
+
+    reset(username=user.username)
+    messages.success(request, f"{user.username} has been unlocked.")
+    return redirect('user_list')

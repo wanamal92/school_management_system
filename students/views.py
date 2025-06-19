@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Student
 from .forms import StudentForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-
+from django.db import IntegrityError
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
 
@@ -23,12 +23,32 @@ def student_list(request):
 def student_create(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
+
         if form.is_valid():
-            form.save()
-            return redirect('student_list')
+            try:
+                student = form.save(commit=False)  # Save but don't commit to the database
+
+                # Save the student to trigger the signal for creating the user
+                student.save()  # This will trigger the signal that creates the user
+
+                return redirect('student_list')
+            except IntegrityError as e:
+                # Catch any IntegrityError (e.g., username already taken)
+                form.add_error(None, "There was an error with the database. Please try again.")
+                print(e)  # Log the error for debugging purposes
+            except Exception as e:
+                # Catch other errors and show a generic error message
+                form.add_error(None, f"An unexpected error occurred: {e}")
+                print(e)  # Log the error for debugging purposes
+        else:
+            # If form is not valid, it will automatically handle field-specific errors
+            pass
     else:
         form = StudentForm()
+
     return render(request, 'students/student_form.html', {'form': form})
+
+
 
 @login_required
 @user_passes_test(is_admin_or_staff)
