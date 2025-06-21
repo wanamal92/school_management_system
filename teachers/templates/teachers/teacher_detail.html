@@ -1,0 +1,30 @@
+<!-- teachers/templates/teachers/teacher_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ teacher.full_name }}'s Profile</h1>
+    
+    <a href="{% url 'teacher_list' %}" class="btn btn-secondary mb-3">Back</a>
+    <a href="{% url 'edit_teacher' teacher.pk %}" class="btn btn-warning mb-3">Edit</a>
+
+    <div class="card mb-3">
+        {% if teacher.profile_photo %}
+            <img src="{{ teacher.profile_photo.url }}" class="card-img-top" alt="Profile Photo" style="height: 300px; object-fit: cover;">
+        {% else %}
+            <img src="/media/default.png" class="card-img-top" alt="Default Profile Photo" style="height: 300px; object-fit: cover;">
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ teacher.full_name }}</h5>
+            <p><strong>Shortcode:</strong> {{ teacher.shortcode }} <br>
+                <strong>Gender:</strong> {{ teacher.gender }} <br>
+                <strong>Phone:</strong> {{ teacher.phone }} <br>
+                <strong>Mobile:</strong> {{ teacher.mobile }} <br>
+                <strong>Section:</strong> {{ teacher.section }} <br>
+                <strong>Birthdate:</strong> {{ teacher.birthdate }} <br>
+                <strong>Nationality:</strong> {{ teacher.nationality }} <br>
+                <strong>Emergency Contact:</strong> {{ teacher.emergency_contact }} <br>
+                <strong>Address:</strong> {{ teacher.address }}
+            </p>
+        </div>
+    </div>
+{% endblock %}

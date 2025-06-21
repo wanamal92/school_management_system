@@ -18,6 +18,9 @@ class Student(models.Model):
     telephone_number = models.CharField(max_length=15, blank=True)
     whatsapp_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
+    # In your models.py
+    profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
+
 
 
 

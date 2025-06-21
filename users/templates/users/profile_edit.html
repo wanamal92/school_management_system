@@ -1,15 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h3>Edit Profile</h3>
+    
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="mb-3">
-            <label>Change Profile Picture:</label>
-            <input type="file" name="profile_image" class="form-control">
-            <p class="mt-2">Current Image:</p>
-            <img src="{{ user_profile_image.url }}" width="100">
-        </div>
+        
         <hr>
         <h4>Change Password</h4>
         {{ password_form.as_p }}

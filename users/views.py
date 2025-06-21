@@ -10,9 +10,6 @@ from .models import AuditLog
 from axes.handlers.proxy import AxesProxyHandler
 from axes.utils import reset
 
-
-from django.contrib import messages
-
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -132,18 +129,6 @@ def user_delete(request, user_id):
     return redirect('user_list')
 
 
-@login_required
-def dashboard(request):
-    if request.user.role == 'admin':
-        return render(request, 'dashboards/admin.html')
-    elif request.user.role == 'staff':
-        return render(request, 'dashboards/staff.html')
-    elif request.user.role == 'guardian':
-        return render(request, 'dashboards/guardian.html')
-    elif request.user.role == 'student':
-        return render(request, 'dashboards/student.html')
-    else:
-        return redirect('login')
 
 
 @login_required

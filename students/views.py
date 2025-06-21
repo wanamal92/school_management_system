@@ -76,3 +76,12 @@ def student_detail(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     return render(request, 'students/student_detail.html', {'student': student})
 
+@login_required
+def student_profile(request):
+    # Fetch the student's profile related to the logged-in user
+    try:
+        student_profile = Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        student_profile = None  # or handle if the profile does not exist
+
+    return render(request, 'students/student_profile.html', {'student_profile': student_profile})

@@ -1,0 +1,52 @@
+
+#listView .list-group-item {
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+/* Card view styles */
+.card {
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.d-none {
+    display: none;
+}
+
+.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Add hover effect to the table rows */
+.teacher-row {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.teacher-row:hover {
+    transform: scale(1.02); /* Slightly scale the row */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+/* Style the card with hover effect */
+.teacher-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.teacher-card:hover {
+    transform: scale(1.05); /* Slightly scale the card */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+/* Ensure the card images have consistent height */
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+

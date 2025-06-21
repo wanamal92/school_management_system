@@ -6,6 +6,6 @@
     <p><strong>Email:</strong> {{ request.user.email }}</p>
     <p><strong>Role:</strong> {{ request.user.get_role_display }}</p>
     <p><img src="{{ request.user.profile_image.url }}" width="100"></p>
-    <a href="{% url 'profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+    <a href="{% url 'profile_edit' %}" class="btn btn-primary">Change Password</a>
 </div>
 {% endblock %}
