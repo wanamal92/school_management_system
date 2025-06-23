@@ -15,6 +15,7 @@ class Teacher(models.Model):
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
     phone = models.CharField(max_length=15)
     mobile = models.CharField(max_length=15)
+    email = models.EmailField(blank=True)
 
     # Personal Information
     birthdate = models.DateField()

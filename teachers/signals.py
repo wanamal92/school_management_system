@@ -1,8 +1,8 @@
-# students/signals.py
+# teachers/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
-from .models import Student  
+from .models import Teacher  
 from users.models import AuditLog
 import secrets
 import string
@@ -13,12 +13,12 @@ def generate_random_password():
     password = ''.join(secrets.choice(alphabet) for i in range(12))  # Generates a 12-character random password
     return password
 
-@receiver(post_save, sender=Student)
-def create_user_for_student(sender, instance, created, **kwargs):
-    if created and not instance.user:  # Only create user if it's a new student and no user is linked
+@receiver(post_save, sender=Teacher)
+def create_user_for_teacher(sender, instance, created, **kwargs):
+    if created and not instance.user:  # Only create user if it's a new teacher and no user is linked
         # Generate the initial username using the first letter of first name and the first letter of last name
         base_username = instance.first_name.lower() + instance.last_name[0].lower()
-
+        print("==============================================")
         # Check if the username already exists in the database
         User = get_user_model()
         username = base_username
@@ -43,8 +43,8 @@ def create_user_for_student(sender, instance, created, **kwargs):
             username=username,
             first_name=instance.first_name,
             last_name=instance.last_name,
-            role='student',  # Automatically set role to 'student'
-            email=instance.email,  # Link email from student
+            role='staff',  # Automatically set role to 'teacher'
+            email=instance.email,  # Link email from teacher
             password=temp_password  # Set a temporary password
         )
 
@@ -54,13 +54,13 @@ def create_user_for_student(sender, instance, created, **kwargs):
             user.profile_image = instance.profile_photo
         user.save()  # Save the user with must_change_password = True
 
-        # Link the user to the student
+        # Link the user to the teacher
         instance.user = user
-        instance.save()  # Save the student with the new user
+        instance.save()  # Save the teacher with the new user
 
         # Create an audit log entry for user creation
         AuditLog.objects.create(
-            performed_by=instance.user,  # The user who performed the action (the created student)
+            performed_by=instance.user,  # The user who performed the action (the created teacher)
             target_user=user,  # The user that was created
             action='create'
         )

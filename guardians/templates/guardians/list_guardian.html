@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/guardian_styles.css' %}">
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Guardians</h3>
+        {% if request.user.role in 'admin staff' %}
+        <a href="{% url 'add_guardian' %}" class="btn btn-success me-2">
+            <i class="fas fa-user-plus"></i> Add Guardian
+        </a>
+        {% endif %}
+        <div>
+            <form class="d-flex" method="get">
+                <input name="q" class="form-control me-2" placeholder="Search by username">
+                <select name="group_by" class="form-select me-2">
+                    <option value="">Group by</option>
+                    <option value="section">Section</option>
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+                <a href="?view=list" class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
+                <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card View</a>
+            </form>
+        </div>
+    </div>
+    <hr>
+
+    <!-- List View -->
+    {% if view_mode == "list" %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Section</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guardian in guardians %}
+            <tr class="guardian-row" style="cursor: pointer;" onclick="window.location.href='{% url 'detail_guardian' guardian.pk %}'">
+                <td>{{ guardian.full_name }}</td>
+                <td>{{ guardian.section }}</td>
+                <td>
+                    <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_guardian' guardian.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    <a href="{% url 'detail_guardian' guardian.pk %}" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Card View (hidden by default) -->
+    {% if view_mode == "card" %}
+    <div class="row">
+        {% for guardian in guardians %}
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'detail_guardian' guardian.pk %}" class="text-decoration-none">
+                <div class="card guardian-card">
+                    {% if guardian.profile_photo %}
+                        <img src="{{ guardian.profile_photo.url }}" class="card-img-top" alt="Profile Photo" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="/media/default.png" class="card-img-top" alt="Default Profile Photo" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ guardian.full_name }}</h5>
+                        <p class="card-text">
+                            <strong>Shortcode:</strong> {{ guardian.shortcode }} <br>
+                            <strong>Gender:</strong> {{ guardian.gender }} <br>
+                            <strong>Section:</strong> {{ guardian.section }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+

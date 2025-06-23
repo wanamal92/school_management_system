@@ -66,3 +66,13 @@ def delete_teacher(request, pk):
 def teacher_detail(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     return render(request, 'teachers/teacher_detail.html', {'teacher': teacher})
+
+@login_required
+def profile_teacher(request):
+    # Fetch the teacher's profile related to the logged-in user
+    try:
+        teacher_profile = Teacher.objects.get(user=request.user)
+    except Teacher.DoesNotExist:
+        teacher_profile = None  # or handle if the profile does not exist
+
+    return render(request, 'teachers/profile_teacher.html', {'teacher_profile': teacher_profile})

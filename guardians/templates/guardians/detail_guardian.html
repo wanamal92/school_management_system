@@ -1,0 +1,25 @@
+<!-- guardians/templates/guardians/guardian_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ guardian.full_name }}'s Profile</h1>
+    
+    <a href="{% url 'list_guardian' %}" class="btn btn-secondary mb-3">Back</a>
+    <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning mb-3">Edit</a>
+
+    <div class="card mb-3">
+        {% if guardian.profile_photo %}
+            <img src="{{ guardian.profile_photo.url }}" class="card-img-top" alt="Profile Photo" style="height: 300px; object-fit: cover;">
+        {% else %}
+            <img src="/media/default.png" class="card-img-top" alt="Default Profile Photo" style="height: 300px; object-fit: cover;">
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ guardian.full_name }}</h5>
+                <strong>Gender:</strong> {{ guardian.gender }} <br>
+                <strong>Phone:</strong> {{ guardian.phone }} <br>
+                <strong>Mobile:</strong> {{ guardian.mobile }} <br>
+                <strong>Address:</strong> {{ guardian.address }}
+            </p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if teacher_profile %}
+        <div class="row">
+            <div class="col-md-4">
+                {% if teacher_profile.profile_photo %}
+                    <img src="{{ teacher_profile.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo">
+                {% else %}
+                    <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo">
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <h1>{{ teacher_profile.title }} {{ teacher_profile.full_name }}</h1>
+                <p><strong>Full Name:</strong> {{ teacher_profile.full_name }}</p>
+                <p><strong>Short Code:</strong> {{ teacher_profile.shortcode }}</p>
+                <p><strong>Section:</strong> {{ teacher_profile.section }}</p>
+                <p><strong>Birthdate:</strong> {{ teacher_profile.birthdate }}</p>
+                <p><strong>Email:</strong> {{ teacher_profile.email }}</p>
+                <p><strong>Telephone:</strong> {{ teacher_profile.telephone }}</p>
+                <p><strong>Mobile:</strong> {{ teacher_profile.mobile }}</p>
+                <p><strong>Address:</strong> {{ teacher_profile.address }}</p>
+                <p><strong>Nationality:</strong> {{ teacher_profile.nationality }}</p>
+                <p><strong>Emergency Contact:</strong> {{ teacher_profile.emergency_contact }}</p>
+            </div>
+        </div>
+    {% else %}
+        <p>No profile found for this teacher.</p>
+    {% endif %}
+</div>
+{% endblock %}
+    birthdate = models.DateField()
+    nationality = models.CharField(max_length=100)
+    emergency_contact = models.CharField(max_length=15)
+    section = models.CharField(max_length=50, choices=[('Primary Section', 'Primary Section'), ('Oriental Section', 'Oriental Section'), ('Primary and Oriental Section', 'Primary and Oriental Section')])
+    address = models.TextField()

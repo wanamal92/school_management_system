@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if guardian_profile %}
+        <div class="row">
+            <div class="col-md-4">
+                {% if guardian_profile.profile_photo %}
+                    <img src="{{ guardian_profile.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo">
+                {% else %}
+                    <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo">
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <h1>{{ guardian_profile.first_name }} {{ guardian_profile.last_name }}</h1>
+                <p><strong>Email:</strong> {{ guardian_profile.email }}</p>
+                <p><strong>Telephone:</strong> {{ guardian_profile.telephone_number }}</p>
+                <p><strong>Mobile:</strong> {{ guardian_profile.telephone_number }}</p>
+                <p><strong>Address:</strong> {{ guardian_profile.address }}</p>
+            </div>
+        </div>
+    {% else %}
+        <p>No profile found for this guardian.</p>
+    {% endif %}
+</div>
+{% endblock %}

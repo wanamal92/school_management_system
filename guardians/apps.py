@@ -1,9 +1,10 @@
 from django.apps import AppConfig
 
 
-class TeachersConfig(AppConfig):
+class GuardiansConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'teachers'
+    name = 'guardians'
+
 
     def ready(self):
-        import teachers.signals
+        import guardians.signals

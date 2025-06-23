@@ -2,8 +2,9 @@
 {% block content %}
 <div class="container mt-4">
     <h3>Student Details</h3>
+    <p><strong>Full Name:</strong> {{ student.full_name }}</p>
     <p><strong>Username:</strong> {{ student.user.username }}</p>
-    <p><strong>Email:</strong> {{ student.user.email }}</p>
+    <p><strong>Email:</strong> {{ student.email }}</p>
     <p><strong>Class:</strong> {{ student.class_level }}</p>
     <p><strong>Date of Birth:</strong> {{ student.date_of_birth }}</p>
     <p><strong>Admission Date:</strong> {{ student.admission_date }}</p>
