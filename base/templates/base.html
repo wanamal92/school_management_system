@@ -43,6 +43,7 @@
                         <a href="{% url 'student_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-graduate"></i> Students</a>
                         <a href="{% url 'teacher_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
                         <a href="{% url 'list_guardian' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-shield"></i> Guardians</a>
+                        <a href="{% url 'list_class' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-chalkboard"></i> Classes</a>
                     {% elif request.user.role == 'staff' %}
                         <a href="{% url 'student_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-graduate"></i> Students</a>
                         <a href="{% url 'profile_teacher' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user"></i> My Profile</a>
