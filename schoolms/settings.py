@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'sections',
     'subjects',
     'exams',
+    'leaves',
 
     'axes',
 ]

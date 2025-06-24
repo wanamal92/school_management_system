@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>All Leave Requests</h1>
+    <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Leave Type</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in leave_requests %}
+                <tr>
+                    <td>{{ request.teacher.full_name }}</td>
+                    <td>{{ request.leave_type.name }}</td>
+                    <td>{{ request.from_date }}</td>
+                    <td>{{ request.to_date }}</td>
+                    <td>{{ request.duration }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>
+                        {% if request.status == 'Pending' %}
+                            <a href="{% url 'approve_reject_leave' request.id %}?status=Approved" class="btn btn-success btn-sm">Approve</a>
+                            <a href="{% url 'approve_reject_leave' request.id %}?status=Rejected" class="btn btn-danger btn-sm">Reject</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

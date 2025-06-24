@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Leave Requests and Leave Balance</h1>
+
+    <!-- Display leave balance -->
+    <h3>Your Leave Balance</h3>
+    <p>Casual Leave: {{ leave_allocation.casual_leave }} days</p>
+    <p>Sick Leave: {{ leave_allocation.sick_leave }} days</p>
+
+    <h3>Your Leave Requests</h3>
+    <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Leave Type</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in leave_requests %}
+                <tr>
+                    <td>{{ request.leave_type.name }}</td>
+                    <td>{{ request.from_date }}</td>
+                    <td>{{ request.to_date }}</td>
+                    <td>{{ request.duration }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>
+                        {% if request.status == 'Pending' %}
+                            <a href="{% url 'create_leave_request' %}?edit={{ request.id }}" class="btn btn-warning btn-sm">Edit</a>
+                            
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

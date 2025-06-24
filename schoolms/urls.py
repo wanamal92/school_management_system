@@ -35,6 +35,7 @@ urlpatterns = [
     path('sections/', include('sections.urls')),
     path('subjects/', include('subjects.urls')),
     path('exams/', include('exams.urls')),
+    path('leaves/', include('leaves.urls')),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

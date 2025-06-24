@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Leave Allocation Management</h1>
+    <a href="{% url 'create_leave_allocation' %}" class="btn btn-success mb-3">Add New Leave Allocation</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Casual Leave</th>
+                <th>Sick Leave</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for allocation in leave_allocations %}
+                <tr>
+                    <td>{{ allocation.teacher.full_name }}</td>
+                    <td>{{ allocation.casual_leave }}</td>
+                    <td>{{ allocation.sick_leave }}</td>
+                    <td>
+                        <a href="{% url 'update_leave_allocation' allocation.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
