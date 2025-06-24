@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Exam Details</h3>
+    <p><strong>Exam Session:</strong> {{ exam.exam_session }}</p>
+    <p><strong>Exam Name:</strong> {{ exam.user.exam_name }}</p>
+    <p><strong>Start Time:</strong> {{ exam.start_time }}</p>
+    <p><strong>End Time:</strong> {{ exam.end_time }}</p>
+    <p><strong>Responsible Teacher:</strong> {{ exam.responsible_teacher }}</p>
+    
+    <a href="{% url 'list_exam' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

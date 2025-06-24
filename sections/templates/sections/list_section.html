@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Sectiones</h1>
+    <a href="{% url 'create_section' %}" section="btn btn-primary mb-3">Add New Section</a>
+    <table section="table table-bordered">
+        <thead>
+            <tr>
+                <th>Section Name</th>
+                <th>Section Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cls in sections %}
+                <tr>
+                    <td>{{ cls.section_name }}</td>
+                    <td>{{ cls.section_code }}</td>
+                    <td>
+                        <a href="{% url 'detail_section' cls.pk %}" section="btn btn-info btn-sm">View</a>
+                        <a href="{% url 'edit_section' cls.pk %}" section="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_section' cls.pk %}" section="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

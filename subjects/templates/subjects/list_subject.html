@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Subjects</h1>
+    <a href="{% url 'create_subject' %}" class="btn btn-primary mb-3">Add New Subject</a>
+    <a href="{% url 'list_subject_teacher' %}" class="btn btn-primary mb-3">subject Teachers</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Subject Code</th>
+                <th>Class</th>
+                <th>Teachers</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ subject.subject_code }}</td>
+                    <td>{{ subject.class_assigned }}</td>
+                    <td>
+                        {% for ts in subject.teachersubject_set.all %}
+                            {{ ts.teacher }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <em>No teachers assigned.</em>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_subject' subject.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_subject' subject.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{% url 'detail_subject' subject.pk %}" class="btn btn-info btn-sm">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

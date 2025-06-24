@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ cls.section_name }} Details</h1>
+    <ul>
+        <li><strong>Section Code:</strong> {{ cls.section_code }}</li>
+        <li><strong>Section:</strong> {{ cls.section }}</li>
+    </ul>
+    <a href="{% url 'edit_section' cls.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'list_section' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}

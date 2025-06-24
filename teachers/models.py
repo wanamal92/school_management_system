@@ -1,6 +1,7 @@
 # teachers/models.py
 from django.db import models
 from users.models import CustomUser
+from sections.models import Section
 
 class Teacher(models.Model):
     # Linking to User model with a one-to-one relationship
@@ -21,7 +22,7 @@ class Teacher(models.Model):
     birthdate = models.DateField()
     nationality = models.CharField(max_length=100)
     emergency_contact = models.CharField(max_length=15)
-    section = models.CharField(max_length=50, choices=[('Primary Section', 'Primary Section'), ('Oriental Section', 'Oriental Section'), ('Primary and Oriental Section', 'Primary and Oriental Section')])
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.TextField()
 
     # Profile photo field

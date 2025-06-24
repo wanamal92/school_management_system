@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Subject</h1>
+
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <h4>Assign Teachers</h4>
+  <table class="table table-bordered" id="teacher-table">
+    <thead>
+      <tr>
+        <th>Teacher</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ formset.management_form }}
+      {% for form in formset %}
+      <tr class="form-row">
+        <td>
+          {{ form.teacher }}
+          {{ form.id }}
+        </td>
+        <td>
+          <button type="button" class="btn btn-danger btn-sm delete-row">❌</button>
+          {{ form.DELETE }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="button" id="add-row" class="btn btn-outline-secondary">+ Add a line</button>
+  <br><br>
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<script>
+  const addButton = document.getElementById('add-row');
+  const tableBody = document.querySelector('#teacher-table tbody');
+  const totalForms = document.getElementById('id_teachersubject_set-TOTAL_FORMS');
+
+  // DELETE button action
+  tableBody.addEventListener('click', function (e) {
+    if (e.target.classList.contains('delete-row')) {
+      const row = e.target.closest('tr');
+      const deleteCheckbox = row.querySelector('input[type=checkbox][name$="-DELETE"]');
+      if (deleteCheckbox) {
+        deleteCheckbox.checked = true;
+        row.style.display = 'none';
+      } else {
+        row.remove();
+        totalForms.value = parseInt(totalForms.value) - 1;
+      }
+    }
+  });
+
+  // ADD button action
+  addButton.addEventListener('click', () => {
+    const formCount = parseInt(totalForms.value);
+    const emptyRow = document.querySelector('.form-row');
+    const newRow = emptyRow.cloneNode(true);
+
+    newRow.querySelectorAll('input, select').forEach(input => {
+      if (input.name) input.name = input.name.replace(/-\d+-/, `-${formCount}-`);
+      if (input.id) input.id = input.id.replace(/-\d+-/, `-${formCount}-`);
+      if (input.type === 'checkbox') {
+        input.checked = false;
+        if (input.name.includes('DELETE')) {
+          input.style.display = 'none'; // hide delete checkbox
+        }
+      } else {
+        input.value = '';
+      }
+    });
+
+    tableBody.appendChild(newRow);
+    totalForms.value = formCount + 1;
+  });
+</script>
+{% endblock %}

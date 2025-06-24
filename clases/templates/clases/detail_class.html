@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ cls.class_name }} Details</h1>
+    <ul>
+        <li><strong>Class Code:</strong> {{ cls.class_code }}</li>
+        <li><strong>class in Charge:</strong> {{ cls.class_in_charge }}</li>
+    </ul>
+    <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'list_class' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}

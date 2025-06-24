@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Exam Attendees</h1>
+    {% if request.user.role in 'admin staff' %}
+        <a href="{% url 'create_exam_attendee' %}" class="btn btn-success me-2">
+            <i class="fas fa-user-plus"></i> Add Exam Attendee
+        </a>
+    {% endif %}
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Exam</th>
+                <th>Status</th>
+                <th>Exam Marks</th>
+                <th>Grade</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam_attendee in exam_attendees %}
+                <tr>
+                    <td>{{ exam_attendee.student }}</td>
+                    <td>{{ exam_attendee.exam }}</td>
+                    <td>{{ exam_attendee.status }}</td>
+                    <td>{{ exam_attendee.exam_marks }}</td>
+                    <td>{{ exam_attendee.grade }}</td>
+                    <td>
+                        <a href="{% url 'edit_exam_attendee' exam_attendee.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_exam_attendee' exam_attendee.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{% url 'detail_exam_attendee' exam_attendee.pk %}" class="btn btn-info btn-sm">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

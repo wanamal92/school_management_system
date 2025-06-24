@@ -43,7 +43,32 @@
                         <a href="{% url 'student_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-graduate"></i> Students</a>
                         <a href="{% url 'teacher_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
                         <a href="{% url 'list_guardian' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-shield"></i> Guardians</a>
+                        <a href="{% url 'list_section' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-columns"></i> Sections</a>
                         <a href="{% url 'list_class' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-chalkboard"></i> Classes</a>
+                        <a href="{% url 'list_subject' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-book"></i> Subjects</a>
+                        <div class="accordion-item bg-dark border-0">
+                            <a class="list-group-item list-group-item-action bg-dark text-white d-flex justify-content-between align-items-center"
+                            data-bs-toggle="collapse" href="#examsSubmenu" role="button" aria-expanded="false" aria-controls="examsSubmenu">
+                                <span><i class="fas fa-users me-2"></i>Exams</span>
+                                <i class="fas fa-chevron-down small"></i>
+                            </a>
+                            <div class="collapse ps-4 {% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}show{% endif %}" id="examsSubmenu">
+
+                                <a href="{% url 'list_exam_session' %}" class="list-group-item list-group-item-action bg-dark text-white">
+                                    <i class="fas fa-list me-2"></i> Exam Sessions
+                                </a>
+                                <a href="{% url 'list_exam' %}" class="list-group-item list-group-item-action bg-dark text-white">
+                                    <i class="fas fa-clipboard-list me-2"></i> Exams
+                                </a>
+                                <a href="{% url 'list_exam_attendee' %}" class="list-group-item list-group-item-action bg-dark text-white">
+                                    <i class="fas fa-clipboard-list me-2"></i> Exam Attendees
+                                </a>
+                            </div>
+                        </div>
+                    
+                    
+                    
+                    
                     {% elif request.user.role == 'staff' %}
                         <a href="{% url 'student_list' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user-graduate"></i> Students</a>
                         <a href="{% url 'profile_teacher' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user"></i> My Profile</a>
@@ -54,6 +79,8 @@
                         <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-book"></i> My Marks</a>
                         <a href="{% url 'student_profile' %}" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-user"></i> My Profile</a>
                     {% endif %}
+
+
                     
                 {% endif %}
             </div>

@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'students',
     'teachers',
     'guardians',
-    'classes',
+    'clases',
+    'sections',
+    'subjects',
+    'exams',
 
     'axes',
 ]

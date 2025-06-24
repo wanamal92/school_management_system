@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ subject.subject_name }} - {{ subject.subject_code }}</h1>
+    <p><strong>Class:</strong> {{ subject.class_assigned }}</p>
+    <p><strong>Teachers:</strong>
+        {% for ts in subject.teachersubject_set.all %}
+            {{ ts.teacher }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            <em>No teachers assigned.</em>
+        {% endfor %}
+    </p>
+    <a href="{% url 'list_subject' %}" class="btn btn-secondary">Back</a>
+{% endblock %}
