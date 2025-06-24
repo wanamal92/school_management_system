@@ -21,3 +21,6 @@ class ExamAttendeeForm(forms.ModelForm):
     class Meta:
         model = ExamAttendee
         fields = ['student','exam', 'status', 'exam_marks']
+
+class ExcelUploadForm(forms.Form):
+    excel_file = forms.FileField()

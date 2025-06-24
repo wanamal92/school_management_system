@@ -20,5 +20,7 @@ urlpatterns = [
     path('edit_exam_attendee/<int:pk>/', views.edit_exam_attendee, name='edit_exam_attendee'),
     path('delete_exam_attendee/<int:pk>/', views.delete_exam_attendee, name='delete_exam_attendee'),
     path('detail_exam_attendee/<int:pk>/', views.detail_exam_attendee, name='detail_exam_attendee'),
+
+    path('upload_exam_session_excel/', views.upload_exam_session_excel, name='upload_exam_session_excel'),
     
 ]

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h3>Exam Session Detail</h3>
+    <h3>Exam Session Details</h3>
     <p><strong>Exam Session:</strong> {{ exam_session.exam_session_name }}</p>
     <p><strong>Exam Session Code:</strong> {{ exam_session.exam_session_code }}</p>
     <p><strong>Start Date:</strong> {{ exam_session.start_date }}</p>
@@ -13,3 +13,4 @@
     <a href="{% url 'list_exam_session' %}" class="btn btn-secondary">Back to List</a>
 </div>
 {% endblock %}
+
