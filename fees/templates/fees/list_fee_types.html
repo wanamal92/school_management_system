@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Fee Types</h2>
+    <a href="{% url 'create_fee_type' %}" class="btn btn-success mb-3">Add Fee Type</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fee Type Name</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fee_type in fee_types %}
+                <tr>
+                    <td>{{ fee_type.name }}</td>
+                    <td>{{ fee_type.amount }}</td>
+                    <td>
+                        <a href="{% url 'edit_fee_type' fee_type.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_fee_type' fee_type.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

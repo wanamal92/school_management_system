@@ -567,6 +567,22 @@
 
                         <div class="accordion-nav">
                             <button class="accordion-header"
+                            data-bs-toggle="collapse" data-bs-target="#feesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' or request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-certificate accordion-icon"></i>Fees & Payments</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' or request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}show{% endif %}" id="feesSubmenu">
+
+                                <a href="{% url 'list_fee_types' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' %}active{% endif %}">
+                                    Fee Types
+                                </a>
+                                <a href="{% url 'list_fee_payments' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}active{% endif %}">
+                                    Fee Payments
+                                </a>
+                            </div>
+                        </div>
+                        <div class="accordion-nav">
+                            <button class="accordion-header"
                             data-bs-toggle="collapse" data-bs-target="#qualificationsSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}true{% else %}false{% endif %}" >
                                 <span><i class="fas fa-certificate accordion-icon"></i>Qualifications</span>
                                 <i class="fas fa-chevron-down chevron"></i>
