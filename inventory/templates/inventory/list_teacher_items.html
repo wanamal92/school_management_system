@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Assigned Items to Teachers</h2>
+    <a href="{% url 'create_teacher_item' %}" class="btn btn-success mb-3">Assign Item</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher_item in teacher_items %}
+                <tr>
+                    <td>{{ teacher_item.teacher.full_name }}</td>
+                    <td>{{ teacher_item.item.name }}</td>
+                    <td>{{ teacher_item.quantity }}</td>
+                    <td>
+                        <a href="{% url 'edit_teacher_item' teacher_item.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_teacher_item' teacher_item.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

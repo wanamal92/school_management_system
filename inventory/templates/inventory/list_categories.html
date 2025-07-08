@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Inventory Items</h2>
+    <a href="{% url 'create_category' %}" class="btn btn-success mb-3">Add Category</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>
+                        <a href="{% url 'edit_item' category.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_item' category.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

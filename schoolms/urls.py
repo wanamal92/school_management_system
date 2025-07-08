@@ -42,6 +42,7 @@ urlpatterns = [
     path('fees/', include('fees.urls')),
     path('competitions/', include('competitions.urls')),
     path('duties/', include('duties.urls')),
+    path('inventory/', include('inventory.urls')),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

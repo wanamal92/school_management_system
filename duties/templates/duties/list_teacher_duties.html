@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2>Teacher Duties</h2>
-    <a href="{% url 'dutymanagement:create_teacher_duty' %}" class="btn btn-success mb-3">Assign Duty</a>
+    <a href="{% url 'create_teacher_duty' %}" class="btn btn-success mb-3">Assign Duty</a>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -19,8 +19,8 @@
                     <td>{{ teacher_duty.duty.name }}</td>
                     <td>{{ teacher_duty.year }}</td>
                     <td>
-                        <a href="{% url 'dutymanagement:edit_teacher_duty' teacher_duty.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'dutymanagement:delete_teacher_duty' teacher_duty.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="{% url 'edit_teacher_duty' teacher_duty.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_teacher_duty' teacher_duty.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
             {% endfor %}

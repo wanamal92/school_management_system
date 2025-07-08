@@ -567,17 +567,17 @@
 
                         <div class="accordion-nav">
                             <button class="accordion-header"
-                            data-bs-toggle="collapse" data-bs-target="#dutiesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}true{% else %}false{% endif %}" >
-                                <span><i class="fas fa-trophy accordion-icon"></i>Duties</span>
+                            data-bs-toggle="collapse" data-bs-target="#dutiesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_duties' or request.resolver_match.url_name == 'create_duty' or request.resolver_match.url_name == 'edit_duty' or request.resolver_match.url_name == 'delete_duty' or request.resolver_match.url_name == 'list_teacher_duties' or request.resolver_match.url_name == 'create_teacher_duty' or request.resolver_match.url_name == 'edit_teacher_duty' or request.resolver_match.url_name == 'delete_teacher_duty' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-tasks accordion-icon"></i>Duties</span>
                                 <i class="fas fa-chevron-down chevron"></i>
                             </button>
-                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}show{% endif %}" id="dutiesSubmenu">
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_duties' or request.resolver_match.url_name == 'create_duty' or request.resolver_match.url_name == 'edit_duty' or request.resolver_match.url_name == 'delete_duty' or request.resolver_match.url_name == 'list_teacher_duties' or request.resolver_match.url_name == 'create_teacher_duty' or request.resolver_match.url_name == 'edit_teacher_duty' or request.resolver_match.url_name == 'delete_teacher_duty' %}show{% endif %}" id="dutiesSubmenu">
 
-                                <a href="{% url 'list_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' %}active{% endif %}">
+                                <a href="{% url 'list_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_duties' or request.resolver_match.url_name == 'create_duty' or request.resolver_match.url_name == 'edit_duty' or request.resolver_match.url_name == 'delete_duty' %}active{% endif %}">
                                     Duties
                                 </a>
-                                <a href="{% url 'list_teacher_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}active{% endif %}">
-                                    Competition Results
+                                <a href="{% url 'list_teacher_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_teacher_duties' or request.resolver_match.url_name == 'create_teacher_duty' or request.resolver_match.url_name == 'edit_teacher_duty' or request.resolver_match.url_name == 'delete_teacher_duty' %}active{% endif %}">
+                                    Teacher Duties
                                 </a>
                             </div>
                         </div>
@@ -664,6 +664,25 @@
                                 </a>
                                 <a href="{% url 'list_leave_types' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_leave_types' %}active{% endif %}">
                                     Leaves Types
+                                </a>
+                            </div>
+                        </div> 
+                        <div class="accordion-nav">
+                            <button class="accordion-header"
+                            data-bs-toggle="collapse" data-bs-target="#inventorySubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'teacher_leave_requests' or request.resolver_match.url_name == 'create_leave_request' or request.resolver_match.url_name == 'admin_leave_requests' or request.resolver_match.url_name == 'approve_reject_leave' or request.resolver_match.url_name == 'leave_allocation' or request.resolver_match.url_name == 'create_leave_allocation' or request.resolver_match.url_name == 'update_leave_allocation' or request.resolver_match.url_name == 'list_leave_types' or request.resolver_match.url_name == 'create_leave_type' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-calendar-alt accordion-icon"></i>Leaves</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'teacher_leave_requests' or request.resolver_match.url_name == 'create_leave_request' or request.resolver_match.url_name == 'admin_leave_requests' or request.resolver_match.url_name == 'approve_reject_leave' or request.resolver_match.url_name == 'leave_allocation' or request.resolver_match.url_name == 'create_leave_allocation' or request.resolver_match.url_name == 'update_leave_allocation' or request.resolver_match.url_name == 'list_leave_types' or request.resolver_match.url_name == 'create_leave_type' %}show{% endif %}" id="inventorySubmenu">
+
+                                <a href="{% url 'list_categories' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'admin_leave_requests' %}active{% endif %}">
+                                    Categories
+                                </a>
+                                <a href="{% url 'list_items' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'leave_allocation' %}active{% endif %}">
+                                    Items
+                                </a>
+                                <a href="{% url 'list_teacher_items' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_leave_types' %}active{% endif %}">
+                                    Teacher Items
                                 </a>
                             </div>
                         </div> 
