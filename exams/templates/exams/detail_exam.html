@@ -1,7 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <h3>Exam Details</h3>
+    <a href="{% url 'schedule_exam_attendees' exam.id %}" class="btn btn-success me-2">
+            <i class="fas fa-user-plus"></i> schedule Exam
+    </a>
     <p><strong>Exam Session:</strong> {{ exam.exam_session }}</p>
     <p><strong>Exam Name:</strong> {{ exam.user.exam_name }}</p>
     <p><strong>Start Time:</strong> {{ exam.start_time }}</p>

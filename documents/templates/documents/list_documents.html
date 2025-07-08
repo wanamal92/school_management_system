@@ -1,0 +1,79 @@
+<!-- list_documents.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Document List</h2>
+
+<!-- Filter Form -->
+<form method="GET" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="teacher" placeholder="Teacher Name" value="{{ request.GET.teacher }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="student" placeholder="Student Name" value="{{ request.GET.student }}">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="user_type">
+                <option value="">All Types</option>
+                <option value="teacher" {% if request.GET.user_type == 'teacher' %}selected{% endif %}>Teacher</option>
+                <option value="student" {% if request.GET.user_type == 'student' %}selected{% endif %}>Student</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="document_type">
+                <option value="">All Types</option>
+                <option value="NIC" {% if request.GET.document_type == 'NIC' %}selected{% endif %}>NIC</option>
+                <option value="Passport" {% if request.GET.document_type == 'Passport' %}selected{% endif %}>Passport</option>
+                <option value="Birth Certificate" {% if request.GET.document_type == 'Birth Certificate' %}selected{% endif %}>Birth Certificate</option>
+                <option value="Samanera Certificate" {% if request.GET.document_type == 'Samanera Certificate' %}selected{% endif %}>Samanera Certificate</option>
+                <option value="Upasampada Certificate" {% if request.GET.document_type == 'Upasampada Certificate' %}selected{% endif %}>Upasampada Certificate</option>
+                <option value="School Leaving Certificate" {% if request.GET.document_type == 'School Leaving Certificate' %}selected{% endif %}>School Leaving Certificate</option>
+                <option value="Competition Certificate" {% if request.GET.document_type == 'Competition Certificate' %}selected{% endif %}>Competition Certificate</option>
+
+            </select>
+        </div>
+        <div class="col-md-12 mt-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+<!-- Add Document Button -->
+<a href="{% url 'create_document' %}" class="btn btn-success mb-3">Add Document</a>
+
+<!-- Documents Table -->
+<table class="table table-striped document-table">
+    <thead>
+        <tr>
+            <th>User Type</th>
+            <th>User Name</th>
+            <th>Document Type</th>
+            <th>Expire Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for document in documents %}
+        <tr>
+            <td>>{{ document.get_user_type_display }}</td>
+            <td>{% if document.user_type == 'student' %}
+                    {{ document.student }}
+                {% else %}
+                    {{ document.teacher }}
+                {% endif %}</td>
+            <td>{{ document.document_type }}</td>
+            <td>{{ document.expire_date }}</td>
+            <td>
+                <a href="{% url 'edit_document' document.pk %}" class="btn btn-warning btn-action">Edit</a>
+                <a href="{% url 'delete_document' document.pk %}" class="btn btn-danger btn-action" onclick="return confirm('Are you sure you want to delete this document?');">Delete</a>
+                <a href="{% url 'download_document' document.pk %}" class="btn btn-success btn-sm">Download</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+

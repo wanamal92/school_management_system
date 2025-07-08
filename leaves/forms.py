@@ -30,4 +30,4 @@ class LeaveRequestForm(forms.ModelForm):
 class LeaveAllocationForm(forms.ModelForm):
     class Meta:
         model = LeaveAllocation
-        fields = ['teacher', 'casual_leave', 'sick_leave']
+        fields = ['teacher', 'casual_leave', 'sick_leave','year']

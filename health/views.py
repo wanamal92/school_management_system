@@ -19,13 +19,10 @@ def create_health_record(request):
             form.save()
             messages.success(request, 'Health record created successfully!')
             return redirect('list_health_records')  # Adjust URL name as needed
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
-        # Handle GET request with record_type parameter for initial form display
-        record_type = request.GET.get('record_type')
-        initial_data = {}
-        if record_type:
-            initial_data['record_type'] = record_type
-        form = HealthRecordForm(initial=initial_data)
+        form = HealthRecordForm()
     
     return render(request, 'health/create_health_record.html', {'form': form})
 

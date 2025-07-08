@@ -9,4 +9,7 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_teacher, name='delete_teacher'),
     path('detail/<int:pk>/', views.teacher_detail, name='teacher_detail'),
     path('profile/', views.profile_teacher, name='profile_teacher'),
+    path('export/leave-records/', views.export_teacher_leave_excel, name='export_leave_excel'),
+    path('export/leave-report-pdf/', views.export_teacher_leave_pdf, name='export_teacher_leave_pdf'),
+
 ]

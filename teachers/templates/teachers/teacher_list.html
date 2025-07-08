@@ -10,6 +10,8 @@
         <a href="{% url 'add_teacher' %}" class="btn btn-success me-2">
             <i class="fas fa-user-plus"></i> Add Teacher
         </a>
+        <a href="{% url 'export_leave_excel' %}" class="btn btn-success">Download Leave Excel</a>
+        <a href="{% url 'export_teacher_leave_pdf' %}" class="btn btn-danger">Download PDF Report</a>
         {% endif %}
         <div>
             <form class="d-flex" method="get">

@@ -2,6 +2,11 @@
 {% block content %}
 <div class="container mt-4">
     <h3>Exam Session Details</h3>
+    <a href="{% url 'export_exam_session_excel' exam_session.id %}" class="btn btn-success">
+    Download Exam Report
+    </a>
+    <a href="{% url 'export_exam_session_pdf' exam_session.id %}" class="btn btn-danger">Download PDF Report</a>
+
     <p><strong>Exam Session:</strong> {{ exam_session.exam_session_name }}</p>
     <p><strong>Exam Session Code:</strong> {{ exam_session.exam_session_code }}</p>
     <p><strong>Start Date:</strong> {{ exam_session.start_date }}</p>

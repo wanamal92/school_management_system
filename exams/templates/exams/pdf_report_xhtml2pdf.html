@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Exam Report</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        h1, h2 { text-align: center; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .fail { background-color: #ffdddd; }
+        .pass-low { background-color: #ffffcc; }
+        img.logo { float: left; width: 60px; height: 60px; margin-right: 15px; }
+        .header { overflow: hidden; margin-bottom: 20px; }
+        .chart { margin-top: 25px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="file://{{ logo_path }}" class="logo" alt="Logo" />
+        <h1>{{ pirivena_name }}</h1>
+    </div>
+    <h2>{{ session_title }}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                {% for exam in exams %}
+                    <th>{{ exam.exam_name.subject_name }}</th>
+                {% endfor %}
+                <th>Total</th>
+                <th>Average</th>
+                <th>Rank</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.name }}</td>
+                {% for mark in student.marks %}
+                    <td class="{% if '(W)' in mark %}fail{% elif '(S)' in mark %}pass-low{% endif %}">
+                        {{ mark }}
+                    </td>
+                {% endfor %}
+                <td>{{ student.total }}</td>
+                <td>{{ student.average }}</td>
+                <td>{{ student.rank }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="chart">
+        <img src="file://{{ chart_path }}" alt="Total Marks Chart" style="max-width: 90%; height: auto;" />
+    </div>
+</body>
+</html>

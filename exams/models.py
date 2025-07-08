@@ -51,13 +51,16 @@ class ExamAttendee(models.Model):
     exam_marks = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=2, null=True, blank=True)
 
+    class Meta:
+        unique_together = ('student', 'exam')
+
     def save(self, *args, **kwargs):
         if self.exam_marks is not None:
             if self.exam_marks >= 75:
                 self.grade = 'A'
             elif self.exam_marks >= 65:
                 self.grade = 'B'
-            elif self.exam_marks >= 55:
+            elif self.exam_marks >= 50:
                 self.grade = 'C'
             elif self.exam_marks >= 35:
                 self.grade = 'S'

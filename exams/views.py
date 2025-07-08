@@ -4,9 +4,20 @@ from .models import ExamSession, Exam, ExamAttendee
 from .forms import ExamSessionForm, ExamForm, ExamAttendeeForm, ExcelUploadForm
 import pandas as pd
 from clases.models import Class
+from students.models import Student
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from zipfile import BadZipFile
+import openpyxl
+from django.http import HttpResponse
+
+from io import BytesIO
+
+from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.chart import BarChart, Reference
+from openpyxl.utils import get_column_letter
+from django.db import IntegrityError
+from django.contrib import messages
 
 # Exam sessions
 def list_exam_session(request):
@@ -187,3 +198,320 @@ def upload_exam_session_excel(request):
         form = ExcelUploadForm()
 
     return render(request, 'exams/upload_exam_session_excel.html', {'form': form})
+
+
+
+
+
+
+
+
+from django.http import HttpResponse
+from django.conf import settings
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.chart import BarChart, Reference
+from openpyxl.chart.label import DataLabelList
+from openpyxl.drawing.image import Image as XLImage
+from openpyxl.formatting import Rule
+from openpyxl.styles.differential import DifferentialStyle
+from io import BytesIO
+import os
+
+from .models import ExamSession, Exam, ExamAttendee, Student
+
+def get_grade(marks):
+    if marks >= 75:
+        return 'A'
+    elif marks >= 65:
+        return 'B'
+    elif marks >= 50:
+        return 'C'
+    elif marks >= 35:
+        return 'S'
+    else:
+        return 'W'
+
+def export_exam_session_excel(request, session_id):
+    session = ExamSession.objects.get(id=session_id)
+    exams = Exam.objects.filter(exam_session=session).select_related('exam_name')
+    students = Student.objects.filter(class_level=session.class_assigned)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Exam Report"
+
+    total_columns = 1 + exams.count() + 3  # Student + subjects + Total, Avg, Rank
+
+    # Add logo
+    logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
+    if os.path.exists(logo_path):
+        logo_img = XLImage(logo_path)
+        logo_img.width = 50
+        logo_img.height = 50
+        ws.add_image(logo_img, "A1")
+
+    # Heading
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_columns)
+    title_cell = ws.cell(row=1, column=1, value="Sri Gnanalankara Maha Pirivena - Peradeniya")
+    title_cell.font = Font(size=14, bold=True)
+    title_cell.alignment = Alignment(horizontal='center')
+
+    # Session info
+    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=total_columns)
+    session_title = f"Exam Session: {session.exam_session_name} ({session.academic_year}) "
+    session_cell = ws.cell(row=2, column=1, value=session_title)
+    session_cell.font = Font(size=12, bold=True)
+    session_cell.alignment = Alignment(horizontal='center')
+
+    # Table headers
+    headers = ['Student Name'] + [exam.exam_name.subject_name for exam in exams] + ['Total Marks', 'Average', 'Rank']
+    ws.append(headers)
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=3, column=col_num)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill(start_color="C0C0C0", end_color="C0C0C0", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center')
+
+    # Max marks row
+    max_marks_row = ['Max Marks'] + ['100'] * exams.count() + [100*exams.count(), '', '']
+    ws.append(max_marks_row)
+    for col_num, val in enumerate(max_marks_row, 1):
+        cell = ws.cell(row=4, column=col_num)
+        cell.font = Font(italic=True)
+        cell.alignment = Alignment(horizontal='center')
+        cell.fill = PatternFill(start_color="E0F7FA", end_color="E0F7FA", fill_type="solid")
+
+    # Student rows
+    data_rows = []
+    for student in students:
+        row = [student.full_name]
+        total = 0
+        count = 0
+        for exam in exams:
+            attendee = ExamAttendee.objects.filter(student=student, exam=exam).first()
+            if attendee and attendee.status == 'present':
+                mark = attendee.exam_marks
+                grade = get_grade(mark)
+                row.append(f"{mark} ({grade})")
+                total += mark
+                count += 1
+            elif attendee:
+                row.append("Absent")
+            else:
+                row.append("N/A")
+        avg = total / count if count else 0
+        row.append(total)
+        row.append(round(avg, 2))
+        row.append(0)  # Rank placeholder
+        data_rows.append(row)
+
+    data_rows.sort(key=lambda x: x[-3], reverse=True)
+    for idx, row in enumerate(data_rows):
+        row[-1] = idx + 1
+        ws.append(row)
+
+    # Adjust column widths
+    for col_idx, col_cells in enumerate(ws.iter_cols(min_row=1, max_row=ws.max_row), start=1):
+        max_length = 0
+        for cell in col_cells:
+            if cell.value:
+                try:
+                    length = len(str(cell.value))
+                    if length > max_length:
+                        max_length = length
+                except:
+                    pass
+        ws.column_dimensions[get_column_letter(col_idx)].width = max_length + 2
+
+    # Conditional formatting
+    red_fill = PatternFill(start_color="FFCDD2", end_color="FFCDD2", fill_type="solid")
+    yellow_fill = PatternFill(start_color="FFF9C4", end_color="FFF9C4", fill_type="solid")
+    red_style = DifferentialStyle(fill=red_fill)
+    yellow_style = DifferentialStyle(fill=yellow_fill)
+    start_row = 5
+    end_row = 4 + len(data_rows)
+    for col in range(2, 2 + len(exams)):
+        col_letter = get_column_letter(col)
+        red_rule = Rule(type="containsText", operator="containsText", text="(W)", dxf=red_style)
+        yellow_rule = Rule(type="containsText", operator="containsText", text="(S)", dxf=yellow_style)
+        ws.conditional_formatting.add(f"{col_letter}{start_row}:{col_letter}{end_row}", red_rule)
+        ws.conditional_formatting.add(f"{col_letter}{start_row}:{col_letter}{end_row}", yellow_rule)
+
+    # Chart
+    chart = BarChart()
+    chart.title = "Total Marks by Student"
+    chart.y_axis.title = "Total Marks"
+    chart.x_axis.title = "Students"
+    chart.style = 12
+    chart.height = 10
+    chart.width = 20
+    data_ref = Reference(ws, min_col=len(headers)-2, max_col=len(headers)-2, min_row=5, max_row=4+len(data_rows))
+    cats_ref = Reference(ws, min_col=1, max_col=1, min_row=5, max_row=4+len(data_rows))
+    chart.add_data(data_ref, titles_from_data=False)
+    chart.set_categories(cats_ref)
+    chart.dataLabels = DataLabelList()
+    chart.dataLabels.showVal = True
+    ws.add_chart(chart, f"A{len(data_rows) + 7}")
+
+    # Save to buffer
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{session.exam_session_name}_report.xlsx"'
+    return response
+
+
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from django.http import HttpResponse
+from .models import ExamSession, Exam, ExamAttendee, Student
+from reportlab.lib.utils import ImageReader
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+
+
+
+def export_exam_session_pdf(request, session_id):
+    session = ExamSession.objects.get(id=session_id)
+    exams = Exam.objects.filter(exam_session=session).select_related('exam_name')
+    students = Student.objects.filter(class_level=session.class_assigned)
+
+    # Headers: subject names + total, average, rank
+    headers = ['Student Name'] + [exam.exam_name.subject_name for exam in exams] + ['Total', 'Average', 'Rank']
+    data_rows = []
+
+    for student in students:
+        row = [student.full_name]
+        total = 0
+        count = 0
+        for exam in exams:
+            attendee = ExamAttendee.objects.filter(student=student, exam=exam).first()
+            if attendee and attendee.status == 'present':
+                row.append(attendee.exam_marks)
+                total += attendee.exam_marks
+                count += 1
+            elif attendee:
+                row.append("Absent")
+            else:
+                row.append("N/A")
+        avg = total / count if count else 0
+        row.append(total)
+        row.append(round(avg, 2))
+        row.append(0)  # Temporary rank
+        data_rows.append(row)
+
+    # Sort and rank
+    data_rows.sort(key=lambda x: x[-3], reverse=True)
+    for i, row in enumerate(data_rows):
+        row[-1] = i + 1
+
+    table_data = [headers] + data_rows
+
+    # Generate PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{session.exam_session_name}_report.pdf"'
+    c = canvas.Canvas(response, pagesize=landscape(A4))
+    width, height = landscape(A4)
+
+    # Title
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 40, f"Exam Report - {session.exam_session_name} ({session.academic_year})")
+
+    # Draw Table
+    table = Table(table_data, repeatRows=1)
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ])
+    table.setStyle(style)
+
+    # Position the table
+    table_width, table_height = table.wrap(0, 0)
+    x = (width - table_width) / 2
+    y = height - 100 - table_height
+    table.wrapOn(c, width, height)
+    table.drawOn(c, x, y)
+
+    # ===== CHART GENERATION =====
+    student_names = [row[0] for row in data_rows]
+    total_marks = [row[-3] for row in data_rows]
+
+    plt.figure(figsize=(10, 4))
+    bars = plt.bar(student_names, total_marks, color='skyblue')
+    plt.xlabel("Students")
+    plt.ylabel("Total Marks")
+    plt.title("Total Marks by Student")
+    plt.xticks(rotation=45, ha='right')
+
+    # Add value labels on top of bars
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height + 1, f'{height}', ha='center', va='bottom', fontsize=8)
+
+    # Save chart to in-memory image
+    img_buffer = BytesIO()
+    plt.tight_layout()
+    plt.savefig(img_buffer, format='PNG')
+    plt.close()
+    img_buffer.seek(0)
+    chart_img = ImageReader(img_buffer)
+
+    # Draw chart image below the table
+    chart_width = 500
+    chart_height = 250
+    c.drawImage(chart_img, x=50, y=50, width=chart_width, height=chart_height)
+
+    # Finalize PDF
+    c.showPage()
+    c.save()
+    return response
+
+
+
+from django.db import IntegrityError
+
+def schedule_exam_attendees(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)
+    exam_session = exam.exam_session
+    assigned_class = exam_session.class_assigned
+    students = Student.objects.filter(class_level=assigned_class)
+
+    created_count = 0
+    skipped_count = 0
+
+    for student in students:
+        try:
+            obj, created = ExamAttendee.objects.get_or_create(
+                student=student,
+                exam=exam,
+                defaults={'exam_marks': 0, 'status': 'present'}
+            )
+            if created:
+                created_count += 1
+            else:
+                skipped_count += 1
+        except IntegrityError:
+            skipped_count += 1  # just in case race condition or violation
+
+    if created_count == len(students):
+        messages.success(request, f"Successfully scheduled all {created_count} students for the exam.")
+    elif created_count > 0:
+        messages.warning(request, f"Scheduled {created_count} students. {skipped_count} students were already scheduled.")
+    else:
+        messages.info(request, "All students were already scheduled for this exam.")
+
+    return redirect('detail_exam', pk=exam.id)
+

@@ -1,0 +1,12 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Delete Document</h1>
+    <p>Are you sure you want to delete the Document: {{ document.document_type }}?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <a href="{% url 'list_documents' %}" class="btn btn-secondary">Cancel</a>
+{% endblock %}

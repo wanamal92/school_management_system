@@ -31,7 +31,7 @@ def create_leave_allocation(request):
         form = LeaveAllocationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('list_leave_types')  # Redirect after creating leave allocation
+            return redirect('leave_allocation')  # Redirect after creating leave allocation
     else:
         form = LeaveAllocationForm()
     return render(request, 'leaves/create_leave_allocation.html', {'form': form})

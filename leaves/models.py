@@ -9,12 +9,17 @@ class LeaveType(models.Model):
         return self.name
 
 class LeaveAllocation(models.Model):
-    teacher = models.OneToOneField(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     casual_leave = models.IntegerField(default=14)  # 14 days casual leave annually
     sick_leave = models.IntegerField(default=7)  # 7 days sick leave annually
+    year=models.CharField(max_length=4)
+
+    class Meta:
+        unique_together = ('teacher', 'year')
 
     def __str__(self):
         return f"Leave Allocation for {self.teacher.full_name}"
+    
 
 class LeaveRequest(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
