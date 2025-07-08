@@ -3,6 +3,7 @@ from .models import Student
 from .forms import StudentForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
+
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
 

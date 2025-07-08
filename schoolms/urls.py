@@ -40,6 +40,7 @@ urlpatterns = [
     path('documents/', include('documents.urls')),
     path('qualifications/', include('qualifications.urls')),
     path('fees/', include('fees.urls')),
+    path('competitions/', include('competitions.urls')),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

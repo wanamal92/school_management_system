@@ -568,7 +568,7 @@
                         <div class="accordion-nav">
                             <button class="accordion-header"
                             data-bs-toggle="collapse" data-bs-target="#feesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' or request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}true{% else %}false{% endif %}" >
-                                <span><i class="fas fa-certificate accordion-icon"></i>Fees & Payments</span>
+                                <span><i class="fas fa-money-check accordion-icon"></i>Fees & Payments</span>
                                 <i class="fas fa-chevron-down chevron"></i>
                             </button>
                             <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' or request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}show{% endif %}" id="feesSubmenu">

@@ -25,8 +25,16 @@
                     <td>{{ payment.status }}</td>
                     <td>{{ payment.year }}</td>
                     <td>
-                        <a href="{% url 'edit_fee_payment' payment.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_fee_payment' payment.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="{% url 'edit_fee_payment' payment.pk %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-2"></i>Edit
+                        </a>
+                        <a href="{% url 'delete_fee_payment' payment.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash-alt me-2"></i>Delete
+                        </a>
+                        <!-- Download PDF Button -->
+                        <a href="{% url 'generate_invoice_pdf' payment.pk %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-download me-2"></i>Download Invoice
+                        </a>
                     </td>
                 </tr>
             {% endfor %}

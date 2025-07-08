@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Competitions</h2>
+    <a href="{% url 'competitions:create_competition' %}" class="btn btn-success mb-3">Add Competition</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Competition Name</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for competition in competitions %}
+                <tr>
+                    <td>{{ competition.name }}</td>
+                    <td>{{ competition.get_competition_type_display }}</td>
+                    <td>
+                        <a href="{% url 'competitions:edit_competition' competition.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'competitions:delete_competition' competition.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
