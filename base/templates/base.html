@@ -567,6 +567,38 @@
 
                         <div class="accordion-nav">
                             <button class="accordion-header"
+                            data-bs-toggle="collapse" data-bs-target="#dutiesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-trophy accordion-icon"></i>Duties</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}show{% endif %}" id="dutiesSubmenu">
+
+                                <a href="{% url 'list_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' %}active{% endif %}">
+                                    Duties
+                                </a>
+                                <a href="{% url 'list_teacher_duties' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}active{% endif %}">
+                                    Competition Results
+                                </a>
+                            </div>
+                        </div>
+                        <div class="accordion-nav">
+                            <button class="accordion-header"
+                            data-bs-toggle="collapse" data-bs-target="#competitionsSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-trophy accordion-icon"></i>Competitions</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}show{% endif %}" id="competitionsSubmenu">
+
+                                <a href="{% url 'list_competitions' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' %}active{% endif %}">
+                                    Competitions
+                                </a>
+                                <a href="{% url 'list_competition_results' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}active{% endif %}">
+                                    Competition Results
+                                </a>
+                            </div>
+                        </div>
+                        <div class="accordion-nav">
+                            <button class="accordion-header"
                             data-bs-toggle="collapse" data-bs-target="#feesSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_fee_types' or request.resolver_match.url_name == 'create_fee_type' or request.resolver_match.url_name == 'edit_fee_type' or request.resolver_match.url_name == 'delete_fee_type' or request.resolver_match.url_name == 'list_fee_payments' or request.resolver_match.url_name == 'create_fee_payment' or request.resolver_match.url_name == 'edit_fee_payment' or request.resolver_match.url_name == 'delete_fee_payment' %}true{% else %}false{% endif %}" >
                                 <span><i class="fas fa-money-check accordion-icon"></i>Fees & Payments</span>
                                 <i class="fas fa-chevron-down chevron"></i>

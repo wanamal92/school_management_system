@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2>Competition Results</h2>
-    <a href="{% url 'competitions:create_competition_result' %}" class="btn btn-success mb-3">Add Result</a>
+    <a href="{% url 'create_competition_result' %}" class="btn btn-success mb-3">Add Result</a>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -21,8 +21,8 @@
                     <td>{{ result.year }}</td>
                     <td>{{ result.get_result_display }}</td>
                     <td>
-                        <a href="{% url 'competitions:edit_competition_result' result.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'competitions:delete_competition_result' result.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a href="{% url 'edit_competition_result' result.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_competition_result' result.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
             {% endfor %}

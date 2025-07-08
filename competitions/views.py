@@ -16,7 +16,7 @@ def create_competition(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Competition created successfully.")
-            return redirect('competitions:list_competitions')
+            return redirect('list_competitions')
     else:
         form = CompetitionForm()
     return render(request, 'competitions/create_competition.html', {'form': form})
@@ -29,7 +29,7 @@ def edit_competition(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Competition updated successfully.")
-            return redirect('competitions:list_competitions')
+            return redirect('list_competitions')
     else:
         form = CompetitionForm(instance=competition)
     return render(request, 'competitions/edit_competition.html', {'form': form})
@@ -39,7 +39,7 @@ def delete_competition(request, pk):
     competition = get_object_or_404(Competition, pk=pk)
     competition.delete()
     messages.success(request, "Competition deleted successfully.")
-    return redirect('competitions:list_competitions')
+    return redirect('list_competitions')
 
 # View to list all competition results
 def list_competition_results(request):
@@ -53,7 +53,7 @@ def create_competition_result(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Competition result added successfully.")
-            return redirect('competitions:list_competition_results')
+            return redirect('list_competition_results')
     else:
         form = CompetitionResultForm()
     return render(request, 'competitions/create_competition_result.html', {'form': form})
@@ -66,7 +66,7 @@ def edit_competition_result(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Competition result updated successfully.")
-            return redirect('competitions:list_competition_results')
+            return redirect('list_competition_results')
     else:
         form = CompetitionResultForm(instance=result)
     return render(request, 'competitions/edit_competition_result.html', {'form': form})
@@ -76,4 +76,4 @@ def delete_competition_result(request, pk):
     result = get_object_or_404(CompetitionResult, pk=pk)
     result.delete()
     messages.success(request, "Competition result deleted successfully.")
-    return redirect('competitions:list_competition_results')
+    return redirect('list_competition_results')
