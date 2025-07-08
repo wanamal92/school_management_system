@@ -19,7 +19,7 @@ def create_category(request):
         form = CategoryForm()
     return render(request, 'inventory/create_category.html', {'form': form})
 
-def edit_item(request, pk):
+def edit_category(request, pk):
     category = get_object_or_404(Item, pk=pk)
     if request.method == 'POST':
         form = CategoryForm(request.POST, instance=category)
@@ -31,7 +31,7 @@ def edit_item(request, pk):
         form = CategoryForm(instance=category)
     return render(request, 'inventory/edit_category.html', {'form': form})
 
-def delete_item(request, pk):
+def delete_category(request, pk):
     category = get_object_or_404(Item, pk=pk)
     category.delete()
     messages.success(request, "category deleted successfully.")
