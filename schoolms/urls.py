@@ -38,6 +38,7 @@ urlpatterns = [
     path('leaves/', include('leaves.urls')),
     path('health/', include('health.urls')),
     path('documents/', include('documents.urls')),
+    path('qualifications/', include('qualifications.urls')),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

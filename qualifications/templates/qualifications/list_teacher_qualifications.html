@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Teacher Qualifications</h2>
+    
+    <form method="GET" class="form-inline mb-3">
+        <div class="form-group">
+            <label for="teacher_name">Teacher Name</label>
+            <input type="text" name="teacher" id="teacher_name" class="form-control" value="{{ teacher_name }}">
+        </div>
+        <div class="form-group">
+            <label for="qualification_name">Qualification</label>
+            <input type="text" name="qualification" id="qualification_name" class="form-control" value="{{ qualification_name }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <a href="{% url 'create_teacher_qualification' %}" class="btn btn-success mb-3">Add Teacher Qualification</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Qualification</th>
+                <th>Institute</th>
+                <th>Date Obtained</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for qualification in qualifications %}
+            <tr>
+                <td>{{ qualification.teacher.full_name }}</td>
+                <td>{{ qualification.qualification.name }}</td>
+                <td>{{ qualification.institute }}</td>
+                <td>{{ qualification.date_obtained }}</td>
+                <td>
+                    <a href="{% url 'edit_teacher_qualification' qualification.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_teacher_qualification' qualification.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

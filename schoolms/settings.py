@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'leaves',
     'health',
     'documents',
+    'qualifications',
 
     'axes',
 ]

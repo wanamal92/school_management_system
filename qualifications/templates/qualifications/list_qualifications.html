@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Qualifications</h2>
+    
+    <form method="GET" class="form-inline mb-3">
+        <div class="form-group">
+            <label for="qualification_name">Qualification</label>
+            <input type="text" name="qualification_name" id="qualification_name" class="form-control" value="{{ qualification_name }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <a href="{% url 'create_qualification' %}" class="btn btn-success mb-3">Add Qualification</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Qualification</th>
+                <th>Short Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for qualification in qualifications %}
+            <tr>
+                <td>{{ qualification.name }}</td>
+                <td>{{ qualification.short_code }}</td>
+                <td>
+                    <a href="{% url 'edit_qualification' qualification.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_qualification' qualification.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

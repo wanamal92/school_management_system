@@ -567,6 +567,22 @@
 
                         <div class="accordion-nav">
                             <button class="accordion-header"
+                            data-bs-toggle="collapse" data-bs-target="#qualificationsSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}true{% else %}false{% endif %}" >
+                                <span><i class="fas fa-certificate accordion-icon"></i>Qualifications</span>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </button>
+                            <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_teacher_qualifications' or request.resolver_match.url_name == 'list_qualifications' or request.resolver_match.url_name == 'create_qualification' or request.resolver_match.url_name == 'edit_qualification' or request.resolver_match.url_name == 'delete_qualification' or request.resolver_match.url_name == 'create_teacher_qualification' or request.resolver_match.url_name == 'edit_teacher_qualification' or request.resolver_match.url_name == 'delete_teacher_qualification' %}show{% endif %}" id="qualificationsSubmenu">
+
+                                <a href="{% url 'list_qualifications' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_qualifications' or request.resolver_match.url_name == 'create_qualifications' or request.resolver_match.url_name == 'edit_qualification' or request.resolver_match.url_name == 'delete_qualification' %}active{% endif %}">
+                                    Qualifications
+                                </a>
+                                <a href="{% url 'list_teacher_qualifications' %}" class="sub-nav-link {% if request.resolver_match.url_name == 'list_teacher_qualifications' or request.resolver_match.url_name == 'create_teacher_qualification' or request.resolver_match.url_name == 'edit_teacher_qualification' or request.resolver_match.url_name == 'delete_teacher_qualification' %}active{% endif %}">
+                                    Teacher Qualifications
+                                </a>
+                            </div>
+                        </div>
+                        <div class="accordion-nav">
+                            <button class="accordion-header"
                             data-bs-toggle="collapse" data-bs-target="#examsSubmenu"  aria-expanded="{% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}true{% else %}false{% endif %}" >
                                 <span><i class="fas fa-clipboard-check accordion-icon"></i>Exams</span>
                                 <i class="fas fa-chevron-down chevron"></i>
