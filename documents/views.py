@@ -3,11 +3,14 @@ from django.http import HttpResponse, FileResponse,  Http404
 from .models import Document
 from .forms import DocumentForm
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 import os
+from django.core.paginator import Paginator
 
 # Create Document
+
+
 @login_required
 def create_document(request):
     if request.method == 'POST':
@@ -20,31 +23,42 @@ def create_document(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         form = DocumentForm()
-    
+
     return render(request, 'documents/create_document.html', {'form': form})
 
 # List Documents (with filtering and searching)
+
+
 @login_required
 def list_documents(request):
-    documents = Document.objects.all()
-    
+    documents = Document.objects.all().order_by('document_type')
+
     teacher_name = request.GET.get('teacher')
     student_name = request.GET.get('student')
     document_type = request.GET.get('document_type')
     user_type = request.GET.get('user_type')
-    
+
     if teacher_name:
-        documents = documents.filter(teacher__full_name__icontains=teacher_name)
+        documents = documents.filter(
+            teacher__full_name__icontains=teacher_name)
     if student_name:
-        documents = documents.filter(student__full_name__icontains=student_name)
+        documents = documents.filter(
+            student__full_name__icontains=student_name)
     if document_type:
         documents = documents.filter(document_type=document_type)
     if user_type:
         documents = documents.filter(user_type=user_type)
-    
-    return render(request, 'documents/list_documents.html', {'documents': documents})
+
+    # Pagination setup
+    paginator = Paginator(documents, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    documents_page = paginator.get_page(page_number)
+
+    return render(request, 'documents/list_documents.html', {'documents': documents_page})
 
 # Edit Document
+
+
 @login_required
 def edit_document(request, pk):
     document = get_object_or_404(Document, pk=pk)
@@ -58,7 +72,7 @@ def edit_document(request, pk):
     return render(request, 'documents/edit_document.html', {'form': form, 'document': document})
 
 # Delete Document
-@login_required
+
 
 @login_required
 def delete_document(request, pk):
@@ -66,11 +80,10 @@ def delete_document(request, pk):
     if request.method == 'POST':
         document.delete()
         return redirect('list_documents')
-    return render(request, 'documents/delete_document.html', {'document': document})
+    return redirect('list_documents')
 
 
-
-
+@login_required
 def download_document(request, pk):
     # Get the document object using the primary key (pk)
     document = get_object_or_404(Document, pk=pk)
@@ -82,13 +95,15 @@ def download_document(request, pk):
     if os.path.exists(file_path):
         try:
             # Return the file as a response for download
-                        # Generate the custom filename
+            # Generate the custom filename
             if document.teacher:
-                filename = f"{document.teacher.full_name}_{document.document_type}.pdf"  # Example format
+                # Example format
+                filename = f"{document.teacher.full_name}_{document.document_type}.pdf"
             elif document.student:
-                filename = f"{document.student.full_name}_{document.document_type}.pdf"  # Example format
+                # Example format
+                filename = f"{document.student.full_name}_{document.document_type}.pdf"
             else:
-                filename = f"{document.document_type}.pdf" 
+                filename = f"{document.document_type}.pdf"
             return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
         except Exception as e:
             print(f"Error opening file: {e}")

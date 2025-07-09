@@ -5,13 +5,14 @@ from subjects.models import Subject  # Assuming you have a Subject model
 from teachers.models import Teacher
 from students.models import Student
 
+
 class ExamSession(models.Model):
     EXAM_TYPE_CHOICES = [
         ('first_term', 'First Term'),
         ('mid_term', 'Mid Term'),
         ('final_term', 'Final Term')
     ]
-    
+
     exam_session_name = models.CharField(max_length=255)
     exam_session_code = models.CharField(max_length=100, unique=True)
     start_date = models.DateField()
@@ -23,6 +24,7 @@ class ExamSession(models.Model):
     def __str__(self):
         return f"{self.exam_session_name} ({self.exam_session_code})"
 
+
 class Exam(models.Model):
     exam_session = models.ForeignKey(ExamSession, on_delete=models.CASCADE)
     exam_name = models.ForeignKey(Subject, on_delete=models.CASCADE)
@@ -33,11 +35,13 @@ class Exam(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.subject_code:
-            self.subject_code = self.exam_name.subject_code  # Automatically generate the subject code
+            # Automatically generate the subject code
+            self.subject_code = self.exam_name.subject_code
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.exam_name} ({self.subject_code})"
+
 
 class ExamAttendee(models.Model):
     STATUS_CHOICES = [
@@ -47,7 +51,8 @@ class ExamAttendee(models.Model):
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='absent')
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='absent')
     exam_marks = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=2, null=True, blank=True)
 

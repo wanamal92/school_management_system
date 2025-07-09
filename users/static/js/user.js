@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         win.document.write('<html><head><title>User List</title>');
         win.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
         win.document.write('</head><body><h3 class="text-center my-3">User List</h3><table class="table table-bordered"><thead><tr><th>Username</th><th>Email</th><th>Role</th></tr></thead><tbody>');
-        
+
         visibleRows.forEach(row => {
             const username = row.querySelector(".username").textContent;
             const email = row.querySelector(".email").textContent;

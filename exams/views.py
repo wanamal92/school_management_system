@@ -1,4 +1,5 @@
 # exams/views.py
+import matplotlib.pyplot as plt
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import ExamSession, Exam, ExamAttendee
 from .forms import ExamSessionForm, ExamForm, ExamAttendeeForm, ExcelUploadForm
@@ -8,22 +9,48 @@ from students.models import Student
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from zipfile import BadZipFile
-import openpyxl
 from django.http import HttpResponse
-
 from io import BytesIO
-
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.chart import BarChart, Reference
 from openpyxl.utils import get_column_letter
 from django.db import IntegrityError
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponse
+from django.conf import settings
+from openpyxl import Workbook
+from openpyxl.chart.label import DataLabelList
+from openpyxl.drawing.image import Image as XLImage
+from openpyxl.formatting import Rule
+from openpyxl.styles.differential import DifferentialStyle
+import os
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from django.http import HttpResponse
+from .models import ExamSession, Exam, ExamAttendee, Student
+from reportlab.lib.utils import ImageReader
+import matplotlib
+matplotlib.use('Agg')
+
 
 # Exam sessions
+@login_required
 def list_exam_session(request):
-    exam_sessions = ExamSession.objects.all()
-    return render(request, 'exams/list_exam_session.html', {'exam_sessions': exam_sessions})
+    exam_sessions = ExamSession.objects.all().order_by('exam_session_name')
 
+    # Pagination setup
+    paginator = Paginator(exam_sessions, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    exam_sessions_page = paginator.get_page(page_number)
+
+    return render(request, 'exams/list_exam_session.html', {'exam_sessions': exam_sessions_page})
+
+
+@login_required
 def create_exam_session(request):
     if request.method == 'POST':
         form = ExamSessionForm(request.POST)
@@ -34,6 +61,8 @@ def create_exam_session(request):
         form = ExamSessionForm()
     return render(request, 'exams/create_exam_session.html', {'form': form})
 
+
+@login_required
 def edit_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
     if request.method == 'POST':
@@ -45,23 +74,36 @@ def edit_exam_session(request, pk):
         form = ExamSessionForm(instance=exam_session)
     return render(request, 'exams/create_exam_session.html', {'form': form})
 
+
+@login_required
 def delete_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
     if request.method == 'POST':
         exam_session.delete()
         return redirect('list_exam_session')
-    return render(request, 'exams/delete_exam_session.html', {'exam_session': exam_session})
+    return redirect('list_exam_session')
 
+
+@login_required
 def detail_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
     return render(request, 'exams/detail_exam_session.html', {'exam_session': exam_session})
 
 
-# Exams 
+# Exams
+@login_required
 def list_exam(request):
-    exams = Exam.objects.all()
-    return render(request, 'exams/list_exam.html', {'exams': exams})
+    exams = Exam.objects.all().order_by('exam_name')
 
+    # Pagination setup
+    paginator = Paginator(exams, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    exams_page = paginator.get_page(page_number)
+
+    return render(request, 'exams/list_exam.html', {'exams': exams_page})
+
+
+@login_required
 def create_exam(request):
     if request.method == 'POST':
         form = ExamForm(request.POST)
@@ -72,6 +114,8 @@ def create_exam(request):
         form = ExamForm()
     return render(request, 'exams/create_exam.html', {'form': form})
 
+
+@login_required
 def edit_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
     if request.method == 'POST':
@@ -83,24 +127,36 @@ def edit_exam(request, pk):
         form = ExamForm(instance=exam)
     return render(request, 'exams/create_exam.html', {'form': form})
 
+
+@login_required
 def delete_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
     if request.method == 'POST':
         exam.delete()
         return redirect('list_exam')
-    return render(request, 'exams/delete_exam.html', {'exam': exam})
+    return redirect('list_exam')
 
+
+@login_required
 def detail_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
     return render(request, 'exams/detail_exam.html', {'exam': exam})
 
 
-
-# Exam Attendees 
+# Exam Attendees
+@login_required
 def list_exam_attendee(request):
-    exam_attendees = ExamAttendee.objects.all()
-    return render(request, 'exams/list_exam_attendee.html', {'exam_attendees': exam_attendees})
+    exam_attendees = ExamAttendee.objects.all().order_by('student__full_name')
 
+    # Pagination setup
+    paginator = Paginator(exam_attendees, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    exam_attendees_page = paginator.get_page(page_number)
+
+    return render(request, 'exams/list_exam_attendee.html', {'exam_attendees': exam_attendees_page})
+
+
+@login_required
 def create_exam_attendee(request):
     if request.method == 'POST':
         form = ExamAttendeeForm(request.POST)
@@ -111,6 +167,8 @@ def create_exam_attendee(request):
         form = ExamAttendeeForm()
     return render(request, 'exams/create_exam_attendee.html', {'form': form})
 
+
+@login_required
 def edit_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
     if request.method == 'POST':
@@ -122,30 +180,37 @@ def edit_exam_attendee(request, pk):
         form = ExamAttendeeForm(instance=exam_attendee)
     return render(request, 'exams/create_exam_attendee.html', {'form': form})
 
+
+@login_required
 def delete_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
     if request.method == 'POST':
         exam_attendee.delete()
         return redirect('list_exam_attendee')
-    return render(request, 'exams/delete_exam_attendee.html', {'exam_attendee': exam_attendee})
+    return redirect('list_exam_attendee')
 
+
+@login_required
 def detail_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
 
     return render(request, 'exams/detail_exam_attendee.html', {'exam_attendee': exam_attendee})
 
+
+@login_required
 def upload_exam_session_excel(request):
     if request.method == 'POST' and request.FILES['excel_file']:
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
             # Get the uploaded Excel file
             excel_file = request.FILES['excel_file']
-            
+
             # Check if the file is a valid Excel file (by trying to read it)
             try:
                 # Try reading the Excel file (forcing pandas to use the right engine for .xlsx)
-                df = pd.read_excel(excel_file, engine='openpyxl')  # Specify engine for .xlsx files
-                
+                # Specify engine for .xlsx files
+                df = pd.read_excel(excel_file, engine='openpyxl')
+
             except BadZipFile:
                 # Handle the error for invalid Excel files (not a valid ZIP/Excel file)
                 return render(request, 'exams/upload_exam_session_excel.html', {
@@ -164,7 +229,8 @@ def upload_exam_session_excel(request):
             for index, row in df.iterrows():
                 # Fetch the Class instance based on the class name (e.g., 'Grade 1')
                 try:
-                    class_assigned = Class.objects.get(class_name=row['class_assigned'])
+                    class_assigned = Class.objects.get(
+                        class_name=row['class_assigned'])
                 except Class.DoesNotExist:
                     class_assigned = None  # Handle case where class doesn't exist
 
@@ -172,7 +238,7 @@ def upload_exam_session_excel(request):
                 if ExamSession.objects.filter(exam_session_code=row['exam_session_code']).exists():
                     # Return error if the session code already exists
                     return render(request, 'exams/upload_exam_session_excel.html', {
-                        'form': form, 
+                        'form': form,
                         'error': f"Error: Exam session code '{row['exam_session_code']}' already exists!"
                     })
 
@@ -192,34 +258,14 @@ def upload_exam_session_excel(request):
                         'form': form,
                         'error': f"Error: Integrity error occurred for row {index + 1}. Please check your data."
                     })
-            
-            return redirect('list_exam_sessions')  # Redirect after successful upload
+
+            # Redirect after successful upload
+            return redirect('list_exam_sessions')
     else:
         form = ExcelUploadForm()
 
     return render(request, 'exams/upload_exam_session_excel.html', {'form': form})
 
-
-
-
-
-
-
-
-from django.http import HttpResponse
-from django.conf import settings
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, Alignment, PatternFill
-from openpyxl.chart import BarChart, Reference
-from openpyxl.chart.label import DataLabelList
-from openpyxl.drawing.image import Image as XLImage
-from openpyxl.formatting import Rule
-from openpyxl.styles.differential import DifferentialStyle
-from io import BytesIO
-import os
-
-from .models import ExamSession, Exam, ExamAttendee, Student
 
 def get_grade(marks):
     if marks >= 75:
@@ -233,9 +279,12 @@ def get_grade(marks):
     else:
         return 'W'
 
+
+@login_required
 def export_exam_session_excel(request, session_id):
     session = ExamSession.objects.get(id=session_id)
-    exams = Exam.objects.filter(exam_session=session).select_related('exam_name')
+    exams = Exam.objects.filter(
+        exam_session=session).select_related('exam_name')
     students = Student.objects.filter(class_level=session.class_assigned)
 
     wb = Workbook()
@@ -253,35 +302,42 @@ def export_exam_session_excel(request, session_id):
         ws.add_image(logo_img, "A1")
 
     # Heading
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_columns)
-    title_cell = ws.cell(row=1, column=1, value="Sri Gnanalankara Maha Pirivena - Peradeniya")
+    ws.merge_cells(start_row=1, start_column=1,
+                   end_row=1, end_column=total_columns)
+    title_cell = ws.cell(
+        row=1, column=1, value="Sri Gnanalankara Maha Pirivena - Peradeniya")
     title_cell.font = Font(size=14, bold=True)
     title_cell.alignment = Alignment(horizontal='center')
 
     # Session info
-    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=total_columns)
+    ws.merge_cells(start_row=2, start_column=1,
+                   end_row=2, end_column=total_columns)
     session_title = f"Exam Session: {session.exam_session_name} ({session.academic_year}) "
     session_cell = ws.cell(row=2, column=1, value=session_title)
     session_cell.font = Font(size=12, bold=True)
     session_cell.alignment = Alignment(horizontal='center')
 
     # Table headers
-    headers = ['Student Name'] + [exam.exam_name.subject_name for exam in exams] + ['Total Marks', 'Average', 'Rank']
+    headers = ['Student Name'] + [exam.exam_name.subject_name for exam in exams] + \
+        ['Total Marks', 'Average', 'Rank']
     ws.append(headers)
     for col_num, header in enumerate(headers, 1):
         cell = ws.cell(row=3, column=col_num)
         cell.font = Font(bold=True)
-        cell.fill = PatternFill(start_color="C0C0C0", end_color="C0C0C0", fill_type="solid")
+        cell.fill = PatternFill(start_color="C0C0C0",
+                                end_color="C0C0C0", fill_type="solid")
         cell.alignment = Alignment(horizontal='center')
 
     # Max marks row
-    max_marks_row = ['Max Marks'] + ['100'] * exams.count() + [100*exams.count(), '', '']
+    max_marks_row = ['Max Marks'] + ['100'] * \
+        exams.count() + [100*exams.count(), '', '']
     ws.append(max_marks_row)
     for col_num, val in enumerate(max_marks_row, 1):
         cell = ws.cell(row=4, column=col_num)
         cell.font = Font(italic=True)
         cell.alignment = Alignment(horizontal='center')
-        cell.fill = PatternFill(start_color="E0F7FA", end_color="E0F7FA", fill_type="solid")
+        cell.fill = PatternFill(start_color="E0F7FA",
+                                end_color="E0F7FA", fill_type="solid")
 
     # Student rows
     data_rows = []
@@ -290,7 +346,8 @@ def export_exam_session_excel(request, session_id):
         total = 0
         count = 0
         for exam in exams:
-            attendee = ExamAttendee.objects.filter(student=student, exam=exam).first()
+            attendee = ExamAttendee.objects.filter(
+                student=student, exam=exam).first()
             if attendee and attendee.status == 'present':
                 mark = attendee.exam_marks
                 grade = get_grade(mark)
@@ -326,18 +383,24 @@ def export_exam_session_excel(request, session_id):
         ws.column_dimensions[get_column_letter(col_idx)].width = max_length + 2
 
     # Conditional formatting
-    red_fill = PatternFill(start_color="FFCDD2", end_color="FFCDD2", fill_type="solid")
-    yellow_fill = PatternFill(start_color="FFF9C4", end_color="FFF9C4", fill_type="solid")
+    red_fill = PatternFill(start_color="FFCDD2",
+                           end_color="FFCDD2", fill_type="solid")
+    yellow_fill = PatternFill(start_color="FFF9C4",
+                              end_color="FFF9C4", fill_type="solid")
     red_style = DifferentialStyle(fill=red_fill)
     yellow_style = DifferentialStyle(fill=yellow_fill)
     start_row = 5
     end_row = 4 + len(data_rows)
     for col in range(2, 2 + len(exams)):
         col_letter = get_column_letter(col)
-        red_rule = Rule(type="containsText", operator="containsText", text="(W)", dxf=red_style)
-        yellow_rule = Rule(type="containsText", operator="containsText", text="(S)", dxf=yellow_style)
-        ws.conditional_formatting.add(f"{col_letter}{start_row}:{col_letter}{end_row}", red_rule)
-        ws.conditional_formatting.add(f"{col_letter}{start_row}:{col_letter}{end_row}", yellow_rule)
+        red_rule = Rule(type="containsText",
+                        operator="containsText", text="(W)", dxf=red_style)
+        yellow_rule = Rule(
+            type="containsText", operator="containsText", text="(S)", dxf=yellow_style)
+        ws.conditional_formatting.add(
+            f"{col_letter}{start_row}:{col_letter}{end_row}", red_rule)
+        ws.conditional_formatting.add(
+            f"{col_letter}{start_row}:{col_letter}{end_row}", yellow_rule)
 
     # Chart
     chart = BarChart()
@@ -347,8 +410,10 @@ def export_exam_session_excel(request, session_id):
     chart.style = 12
     chart.height = 10
     chart.width = 20
-    data_ref = Reference(ws, min_col=len(headers)-2, max_col=len(headers)-2, min_row=5, max_row=4+len(data_rows))
-    cats_ref = Reference(ws, min_col=1, max_col=1, min_row=5, max_row=4+len(data_rows))
+    data_ref = Reference(ws, min_col=len(
+        headers)-2, max_col=len(headers)-2, min_row=5, max_row=4+len(data_rows))
+    cats_ref = Reference(ws, min_col=1, max_col=1,
+                         min_row=5, max_row=4+len(data_rows))
     chart.add_data(data_ref, titles_from_data=False)
     chart.set_categories(cats_ref)
     chart.dataLabels = DataLabelList()
@@ -367,27 +432,17 @@ def export_exam_session_excel(request, session_id):
     return response
 
 
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
-from django.http import HttpResponse
-from .models import ExamSession, Exam, ExamAttendee, Student
-from reportlab.lib.utils import ImageReader
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-
-
-
+@login_required
 def export_exam_session_pdf(request, session_id):
     session = ExamSession.objects.get(id=session_id)
-    exams = Exam.objects.filter(exam_session=session).select_related('exam_name')
+    exams = Exam.objects.filter(
+        exam_session=session).select_related('exam_name')
     students = Student.objects.filter(class_level=session.class_assigned)
 
     # Headers: subject names + total, average, rank
-    headers = ['Student Name'] + [exam.exam_name.subject_name for exam in exams] + ['Total', 'Average', 'Rank']
+    headers = ['Student Name'] + \
+        [exam.exam_name.subject_name for exam in exams] + \
+        ['Total', 'Average', 'Rank']
     data_rows = []
 
     for student in students:
@@ -395,7 +450,8 @@ def export_exam_session_pdf(request, session_id):
         total = 0
         count = 0
         for exam in exams:
-            attendee = ExamAttendee.objects.filter(student=student, exam=exam).first()
+            attendee = ExamAttendee.objects.filter(
+                student=student, exam=exam).first()
             if attendee and attendee.status == 'present':
                 row.append(attendee.exam_marks)
                 total += attendee.exam_marks
@@ -425,7 +481,8 @@ def export_exam_session_pdf(request, session_id):
 
     # Title
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 40, f"Exam Report - {session.exam_session_name} ({session.academic_year})")
+    c.drawCentredString(width / 2, height - 40,
+                        f"Exam Report - {session.exam_session_name} ({session.academic_year})")
 
     # Draw Table
     table = Table(table_data, repeatRows=1)
@@ -459,7 +516,8 @@ def export_exam_session_pdf(request, session_id):
     # Add value labels on top of bars
     for bar in bars:
         height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height + 1, f'{height}', ha='center', va='bottom', fontsize=8)
+        plt.text(bar.get_x() + bar.get_width()/2., height + 1,
+                 f'{height}', ha='center', va='bottom', fontsize=8)
 
     # Save chart to in-memory image
     img_buffer = BytesIO()
@@ -480,9 +538,7 @@ def export_exam_session_pdf(request, session_id):
     return response
 
 
-
-from django.db import IntegrityError
-
+@login_required
 def schedule_exam_attendees(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
     exam_session = exam.exam_session
@@ -507,11 +563,13 @@ def schedule_exam_attendees(request, exam_id):
             skipped_count += 1  # just in case race condition or violation
 
     if created_count == len(students):
-        messages.success(request, f"Successfully scheduled all {created_count} students for the exam.")
+        messages.success(
+            request, f"Successfully scheduled all {created_count} students for the exam.")
     elif created_count > 0:
-        messages.warning(request, f"Scheduled {created_count} students. {skipped_count} students were already scheduled.")
+        messages.warning(
+            request, f"Scheduled {created_count} students. {skipped_count} students were already scheduled.")
     else:
-        messages.info(request, "All students were already scheduled for this exam.")
+        messages.info(
+            request, "All students were already scheduled for this exam.")
 
     return redirect('detail_exam', pk=exam.id)
-

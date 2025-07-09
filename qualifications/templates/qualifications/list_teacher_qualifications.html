@@ -1,44 +1,97 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Teacher Qualifications</h2>
-    
-    <form method="GET" class="form-inline mb-3">
-        <div class="form-group">
-            <label for="teacher_name">Teacher Name</label>
-            <input type="text" name="teacher" id="teacher_name" class="form-control" value="{{ teacher_name }}">
-        </div>
-        <div class="form-group">
-            <label for="qualification_name">Qualification</label>
-            <input type="text" name="qualification" id="qualification_name" class="form-control" value="{{ qualification_name }}">
-        </div>
-        <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
-    <a href="{% url 'create_teacher_qualification' %}" class="btn btn-success mb-3">Add Teacher Qualification</a>
+<h2>Teacher Qualifications</h2>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Teacher</th>
-                <th>Qualification</th>
-                <th>Institute</th>
-                <th>Date Obtained</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for qualification in qualifications %}
-            <tr>
-                <td>{{ qualification.teacher.full_name }}</td>
-                <td>{{ qualification.qualification.name }}</td>
-                <td>{{ qualification.institute }}</td>
-                <td>{{ qualification.date_obtained }}</td>
-                <td>
-                    <a href="{% url 'edit_teacher_qualification' qualification.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{% url 'delete_teacher_qualification' qualification.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<form method="GET" class="form-inline mb-3">
+    <div class="form-group">
+        <label for="teacher_name">Teacher Name</label>
+        <input type="text" name="teacher" id="teacher_name" class="form-control" value="{{ teacher_name }}">
+    </div>
+    <div class="form-group">
+        <label for="qualification_name">Qualification</label>
+        <input type="text" name="qualification" id="qualification_name" class="form-control"
+            value="{{ qualification_name }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+<a href="{% url 'create_teacher_qualification' %}" class="btn btn-success mb-3">Add Teacher Qualification</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Teacher</th>
+            <th>Qualification</th>
+            <th>Institute</th>
+            <th>Date Obtained</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for qualification in qualifications %}
+        <tr>
+            <td>{{ qualification.teacher.full_name }}</td>
+            <td>{{ qualification.qualification.name }}</td>
+            <td>{{ qualification.institute }}</td>
+            <td>{{ qualification.date_obtained }}</td>
+            <td>
+                <a href="{% url 'edit_teacher_qualification' qualification.pk %}"
+                    class="btn btn-warning btn-sm">Edit</a>
+                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ qualification.id }}"
+                    data-item-name="{{ qualification.teacher.full_name }} - {{ qualification.qualification.name }}"
+                    data-delete-url="{% url 'delete_teacher_qualification' qualification.id %}">
+                    <i class="fas fa-trash me-2"></i> Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if qualifications.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ qualifications.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ qualifications.number }} of {{ qualifications.paginator.num_pages }}.
+        </span>
+
+        {% if qualifications.has_next %}
+        <a href="?page={{ qualifications.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ qualifications.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
+<!--  Modal Template (For Deletion) -->
+<div id="confirmModal" class="confirm-modal" style="display:none;">
+    <div class="confirm-modal-content">
+        <div class="confirm-modal-header">
+            <h4>Confirm Delete</h4>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="confirm-modal-body">
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <p style="color: #666; font-size: 0.9em;">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-modal-footer">
+            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger confirm-btn">Delete</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

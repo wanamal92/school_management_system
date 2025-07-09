@@ -1,5 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from students.models import Student
+
 
 class StudentModelTest(TestCase):
     def test_full_name(self):
@@ -9,11 +11,9 @@ class StudentModelTest(TestCase):
             student_number='S12345',
             date_of_birth='2005-06-15'
         )
-        self.assertEqual(str(student), 'John Doe')  # Ensure full name is correct
+        # Ensure full name is correct
+        self.assertEqual(str(student), 'John Doe')
 
-from django.test import TestCase
-from students.models import Student
-from django.contrib.auth import get_user_model
 
 class StudentSignalTest(TestCase):
     def test_student_creation_creates_user(self):

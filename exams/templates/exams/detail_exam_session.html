@@ -3,7 +3,7 @@
 <div class="container mt-4">
     <h3>Exam Session Details</h3>
     <a href="{% url 'export_exam_session_excel' exam_session.id %}" class="btn btn-success">
-    Download Exam Report
+        Download Exam Report
     </a>
     <a href="{% url 'export_exam_session_pdf' exam_session.id %}" class="btn btn-danger">Download PDF Report</a>
 
@@ -14,8 +14,7 @@
     <p><strong>Exam Type:</strong> {{ exam_session.exam_type }}</p>
     <p><strong>Academic Year:</strong> {{ exam_session.academic_year }}</p>
     <p><strong>Assigned Class:</strong> {{ exam_session.class_assigned }}</p>
-    
+
     <a href="{% url 'list_exam_session' %}" class="btn btn-secondary">Back to List</a>
 </div>
 {% endblock %}
-

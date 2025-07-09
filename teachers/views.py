@@ -3,80 +3,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Teacher
 from .forms import TeacherForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-
-
-def is_admin(user):
-    return user.is_authenticated and user.role == 'admin'
-
-# List all teachers
-@user_passes_test(is_admin)
-@login_required
-def teacher_list(request):
-    # Get the view mode from the URL parameter (default is 'list')
-    view_mode = request.GET.get('view', 'list')
-    
-    # Fetch all the teachers (you can modify this query based on your needs)
-    teachers = Teacher.objects.all()
-    
-    # Pass the teachers and view_mode to the template
-    return render(request, 'teachers/teacher_list.html', {
-        'teachers': teachers,
-        'view_mode': view_mode,
-    })
-
-# Add a new teacher
-@user_passes_test(is_admin)
-@login_required
-def add_teacher(request):
-    if request.method == 'POST':
-        form = TeacherForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('teacher_list')
-    else:
-        form = TeacherForm()
-    return render(request, 'teachers/add_teacher.html', {'form': form})
-
-# Edit an existing teacher
-@user_passes_test(is_admin)
-@login_required
-def edit_teacher(request, pk):
-    teacher = get_object_or_404(Teacher, pk=pk)
-    if request.method == 'POST':
-        form = TeacherForm(request.POST, instance=teacher)
-        if form.is_valid():
-            form.save()
-            return redirect('teacher_list')
-    else:
-        form = TeacherForm(instance=teacher)
-    return render(request, 'teachers/edit_teacher.html', {'form': form})
-
-# Delete a teacher
-@user_passes_test(is_admin)
-@login_required
-def delete_teacher(request, pk):
-    teacher = get_object_or_404(Teacher, pk=pk)
-    if request.method == 'POST':
-        teacher.delete()
-        return redirect('teacher_list')
-    return render(request, 'teachers/delete_teacher.html', {'teacher': teacher})
-
-@user_passes_test(is_admin)
-@login_required
-def teacher_detail(request, pk):
-    teacher = get_object_or_404(Teacher, pk=pk)
-    return render(request, 'teachers/teacher_detail.html', {'teacher': teacher})
-
-@login_required
-def profile_teacher(request):
-    # Fetch the teacher's profile related to the logged-in user
-    try:
-        teacher_profile = Teacher.objects.get(user=request.user)
-    except Teacher.DoesNotExist:
-        teacher_profile = None  # or handle if the profile does not exist
-
-    return render(request, 'teachers/profile_teacher.html', {'teacher_profile': teacher_profile})
-
 from io import BytesIO
 from django.http import HttpResponse
 from django.conf import settings
@@ -89,18 +15,129 @@ from openpyxl.chart.series import DataPoint
 from openpyxl.drawing.image import Image as XLImage
 import os
 from django.db import models
-
-from .models import Teacher
 from leaves.models import LeaveType, LeaveRequest, LeaveAllocation
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.contrib import messages
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.utils import ImageReader
+from django.http import HttpResponse
+from io import BytesIO
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+# List all teachers
+
+
+@user_passes_test(is_admin)
+@login_required
+def list_teachers(request):
+    # Get the view mode from the URL parameter (default is 'list')
+    view_mode = request.GET.get('view', 'list')
+
+    # Fetch all the teachers (you can modify this query based on your needs)
+    teachers = Teacher.objects.all().order_by('full_name')
+
+    # Pagination setup
+    paginator = Paginator(teachers, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    teachers_page = paginator.get_page(page_number)
+
+    # Pass the teachers and view_mode to the template
+    return render(request, 'teachers/list_teachers.html', {
+        'teachers': teachers_page,
+        'view_mode': view_mode,
+    })
+
+# Add a new teacher
+
+
+@user_passes_test(is_admin)
+@login_required
+def add_teacher(request):
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('list_teachers')
+    else:
+        form = TeacherForm()
+    return render(request, 'teachers/add_teacher.html', {'form': form})
+
+# Edit an existing teacher
+
+
+@user_passes_test(is_admin)
+@login_required
+def edit_teacher(request, pk):
+    teacher = get_object_or_404(Teacher, pk=pk)
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, instance=teacher)
+        if form.is_valid():
+            form.save()
+            return redirect('list_teachers')
+    else:
+        form = TeacherForm(instance=teacher)
+    return render(request, 'teachers/edit_teacher.html', {'form': form})
+
+# Delete a teacher
+
+
+@user_passes_test(is_admin)
+@login_required
+def delete_teacher(request, pk):
+    teacher = get_object_or_404(Teacher, pk=pk)
+    try:
+        if request.method == 'POST':
+            teacher.delete()
+            return redirect('list_teachers')
+    except IntegrityError as e:
+        # Handling IntegrityError (ForeignKey constraint violation)
+        if 'foreign key' in str(e).lower():
+            messages.error(
+                request, "Cannot delete this user because they are referenced in other records (e.g., as class in charge).")
+        else:
+            messages.error(request, f"A database error occurred: {str(e)}")
+        return redirect('list_teachers')
+
+    return redirect('list_teachers')
+
+
+@user_passes_test(is_admin)
+@login_required
+def detail_teacher(request, pk):
+    teacher = get_object_or_404(Teacher, pk=pk)
+    return render(request, 'teachers/detail_teacher.html', {'teacher': teacher})
+
+
+@login_required
+def profile_teacher(request):
+    # Fetch the teacher's profile related to the logged-in user
+    try:
+        teacher_profile = Teacher.objects.get(user=request.user)
+    except Teacher.DoesNotExist:
+        teacher_profile = None  # or handle if the profile does not exist
+
+    return render(request, 'teachers/profile_teacher.html', {'teacher_profile': teacher_profile})
+
+
+@login_required
 def export_teacher_leave_excel(request):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Leave Report"
 
     leave_types = LeaveType.objects.all()
-    total_columns = 1 + leave_types.count() * 2  # Name + (Used + Remaining) per leave type
+    # Name + (Used + Remaining) per leave type
+    total_columns = 1 + leave_types.count() * 2
 
     # === Logo ===
     logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
@@ -111,13 +148,16 @@ def export_teacher_leave_excel(request):
         ws.add_image(logo_img, "A1")
 
     # === Main Heading ===
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_columns)
-    main_title_cell = ws.cell(row=1, column=1, value="Sri Gnanalankara Maha Pirivena - Peradeniya")
+    ws.merge_cells(start_row=1, start_column=1,
+                   end_row=1, end_column=total_columns)
+    main_title_cell = ws.cell(
+        row=1, column=1, value="Sri Gnanalankara Maha Pirivena - Peradeniya")
     main_title_cell.font = Font(size=16, bold=True)
     main_title_cell.alignment = Alignment(horizontal='center')
 
     # === Sub Heading ===
-    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=total_columns)
+    ws.merge_cells(start_row=2, start_column=1,
+                   end_row=2, end_column=total_columns)
     sub_title_cell = ws.cell(row=2, column=1, value="Teachers' Leaves Records")
     sub_title_cell.font = Font(size=14, bold=True)
     sub_title_cell.alignment = Alignment(horizontal='center')
@@ -133,7 +173,8 @@ def export_teacher_leave_excel(request):
     for col_num in range(1, len(headers) + 1):
         cell = ws.cell(row=3, column=col_num)
         cell.font = Font(bold=True)
-        cell.fill = PatternFill(start_color="C0C0C0", end_color="C0C0C0", fill_type="solid")
+        cell.fill = PatternFill(start_color="C0C0C0",
+                                end_color="C0C0C0", fill_type="solid")
         cell.alignment = Alignment(horizontal='center')
 
     # === Fill Data and track total used leaves per teacher ===
@@ -162,8 +203,10 @@ def export_teacher_leave_excel(request):
 
     # === Adjust column widths ===
     for col in ws.columns:
-        max_length = max(len(str(cell.value)) if cell.value else 0 for cell in col)
-        ws.column_dimensions[get_column_letter(col[0].column)].width = max_length + 2
+        max_length = max(len(str(cell.value))
+                         if cell.value else 0 for cell in col)
+        ws.column_dimensions[get_column_letter(
+            col[0].column)].width = max_length + 2
 
     # === Add Bar Chart for Total Used Leaves per Teacher ===
     chart = BarChart()
@@ -180,7 +223,8 @@ def export_teacher_leave_excel(request):
 
     # Add 'Total Used' column after existing columns for chart source
     total_used_col = total_columns + 1
-    ws.cell(row=3, column=total_used_col, value='Total Used').font = Font(bold=True)
+    ws.cell(row=3, column=total_used_col,
+            value='Total Used').font = Font(bold=True)
     ws.column_dimensions[get_column_letter(total_used_col)].width = 14
 
     for row_num, total_used in teacher_rows:
@@ -191,8 +235,6 @@ def export_teacher_leave_excel(request):
     cats_ref = Reference(ws, min_col=1, max_col=1,
                          min_row=start_data_row, max_row=start_data_row + num_teachers - 1)
 
-
-
     # === Save and Return Excel Response ===
     buffer = BytesIO()
     wb.save(buffer)
@@ -201,27 +243,12 @@ def export_teacher_leave_excel(request):
     return HttpResponse(
         buffer.getvalue(),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        headers={'Content-Disposition': 'attachment; filename="teachers_leave_records.xlsx"'}
+        headers={
+            'Content-Disposition': 'attachment; filename="teachers_leave_records.xlsx"'}
     )
 
 
-
-
-
-
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
-from reportlab.lib.utils import ImageReader
-from django.http import HttpResponse
-from io import BytesIO
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-rcParams.update({'figure.autolayout': True})
-
-from leaves.models import LeaveAllocation, LeaveRequest
-
+@login_required
 def export_teacher_leave_pdf(request):
     # Gather teacher leave data
     allocations = LeaveAllocation.objects.select_related('teacher')
@@ -230,8 +257,10 @@ def export_teacher_leave_pdf(request):
     data_rows = []
     for allocation in allocations:
         teacher = allocation.teacher
-        casual_taken = leave_requests.filter(teacher=teacher, leave_type__name='Casual Leave').aggregate(total=models.Sum('duration'))['total'] or 0
-        sick_taken = leave_requests.filter(teacher=teacher, leave_type__name='Sick Leave').aggregate(total=models.Sum('duration'))['total'] or 0
+        casual_taken = leave_requests.filter(teacher=teacher, leave_type__name='Casual Leave').aggregate(
+            total=models.Sum('duration'))['total'] or 0
+        sick_taken = leave_requests.filter(teacher=teacher, leave_type__name='Sick Leave').aggregate(
+            total=models.Sum('duration'))['total'] or 0
 
         data_rows.append([
             teacher.full_name,
@@ -253,12 +282,14 @@ def export_teacher_leave_pdf(request):
 
     # Title
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 40, "Sri Gnanalankara Maha Pirivena - Peradeniya")
+    c.drawCentredString(width / 2, height - 40,
+                        "Sri Gnanalankara Maha Pirivena - Peradeniya")
     c.setFont("Helvetica-Bold", 14)
     c.drawCentredString(width / 2, height - 65, "Teachers' Leaves Records")
 
     # Table headers
-    headers = ['Teacher Name', 'Casual Taken', 'Casual Left', 'Sick Taken', 'Sick Left', 'Total Taken']
+    headers = ['Teacher Name', 'Casual Taken', 'Casual Left',
+               'Sick Taken', 'Sick Left', 'Total Taken']
     table_data = [headers] + data_rows
 
     # Table
@@ -290,7 +321,8 @@ def export_teacher_leave_pdf(request):
 
     for bar in bars:
         height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height + 0.5, f'{height}', ha='center', va='bottom', fontsize=7)
+        plt.text(bar.get_x() + bar.get_width()/2., height + 0.5,
+                 f'{height}', ha='center', va='bottom', fontsize=7)
 
     img_buffer = BytesIO()
     plt.savefig(img_buffer, format='PNG')
@@ -304,5 +336,3 @@ def export_teacher_leave_pdf(request):
     c.showPage()
     c.save()
     return response
-
-

@@ -2,6 +2,7 @@ from django.db import models
 from students.models import Student  # Assuming you have a Student model
 from teachers.models import Teacher  # Assuming you have a Teacher model
 
+
 class HealthRecord(models.Model):
     # Define choices for the type of record (Student or Teacher)
     TYPE_CHOICES = [
@@ -11,10 +12,12 @@ class HealthRecord(models.Model):
 
     # Type of record (Student or Teacher)
     record_type = models.CharField(max_length=7, choices=TYPE_CHOICES)
-    
+
     # Dynamically link to either a student or teacher based on the record type
-    student = models.OneToOneField(Student, on_delete=models.CASCADE, null=True, blank=True)
-    teacher = models.OneToOneField(Teacher, on_delete=models.CASCADE, null=True, blank=True)
+    student = models.OneToOneField(
+        Student, on_delete=models.CASCADE, null=True, blank=True)
+    teacher = models.OneToOneField(
+        Teacher, on_delete=models.CASCADE, null=True, blank=True)
 
     # Health fields
     height_cm = models.FloatField()

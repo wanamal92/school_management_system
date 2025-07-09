@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
+
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
@@ -12,7 +13,8 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ['username', 'email', 'role', 'is_active']
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('full_name','role', 'profile_image')}),
+        (None, {'fields': ('full_name', 'role', 'profile_image')}),
     )
+
 
 admin.site.register(CustomUser, CustomUserAdmin)

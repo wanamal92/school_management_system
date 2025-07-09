@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Approve or Reject Leave Request</h1>
+<h1>Approve or Reject Leave Request</h1>
 
-    <h3>Leave Request from {{ leave_request.teacher.full_name }}</h3>
-    <p><strong>Leave Type:</strong> {{ leave_request.leave_type.name }}</p>
-    <p><strong>From Date:</strong> {{ leave_request.from_date }}</p>
-    <p><strong>To Date:</strong> {{ leave_request.to_date }}</p>
-    <p><strong>Description:</strong> {{ leave_request.description }}</p>
+<h3>Leave Request from {{ leave_request.teacher.full_name }}</h3>
+<p><strong>Leave Type:</strong> {{ leave_request.leave_type.name }}</p>
+<p><strong>From Date:</strong> {{ leave_request.from_date }}</p>
+<p><strong>To Date:</strong> {{ leave_request.to_date }}</p>
+<p><strong>Description:</strong> {{ leave_request.description }}</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <label for="status">Select Status:</label>
-        <select name="status" id="status" class="form-control">
-            <option value="Approved">Approve</option>
-            <option value="Rejected">Reject</option>
-        </select>
-        <button type="submit" class="btn btn-primary mt-3">Submit</button>
-    </form>
+<form method="POST">
+    {% csrf_token %}
+    <label for="status">Select Status:</label>
+    <select name="status" id="status" class="form-control">
+        <option value="Approved">Approve</option>
+        <option value="Rejected">Reject</option>
+    </select>
+    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+</form>
 
 {% endblock %}

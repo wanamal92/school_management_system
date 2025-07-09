@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/teacher_styles.css' %}">
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Teachers</h3>
+        {% if request.user.role in 'admin staff' %}
+        <a href="{% url 'add_teacher' %}" class="btn btn-success me-2">
+            <i class="fas fa-user-plus"></i> Add Teacher
+        </a>
+        <a href="{% url 'export_leave_excel' %}" class="btn btn-success">Download Leave Excel</a>
+        <a href="{% url 'export_teacher_leave_pdf' %}" class="btn btn-danger">Download PDF Report</a>
+        {% endif %}
+        <div>
+            <form class="d-flex" method="get">
+                <input name="q" class="form-control me-2" placeholder="Search by username">
+                <select name="group_by" class="form-select me-2">
+                    <option value="">Group by</option>
+                    <option value="section">Section</option>
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+                <a href="?view=list"
+                    class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
+                <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card
+                    View</a>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- List View -->
+    {% if view_mode == "list" %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Section</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr class="teacher-row" style="cursor: pointer;"
+                onclick="window.location.href='{% url 'detail_teacher' teacher.pk %}'">
+                <td>{{ teacher.full_name }}</td>
+                <td>{{ teacher.section }}</td>
+                <td>
+                    <a href="{% url 'edit_teacher' teacher.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ teacher.id }}"
+                        data-item-name="{{ teacher.full_name }}"
+                        data-delete-url="{% url 'delete_teacher' teacher.id %}">
+                        <i class="fas fa-trash me-2"></i> Delete
+                    </button>
+                    <a href="{% url 'detail_teacher' teacher.pk %}" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Card View (hidden by default) -->
+    {% if view_mode == "card" %}
+    <div class="row">
+        {% for teacher in teachers %}
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'detail_teacher' teacher.pk %}" class="text-decoration-none">
+                <div class="card teacher-card">
+                    {% if teacher.profile_photo %}
+                    <img src="{{ teacher.profile_photo.url }}" class="card-img-top" alt="Profile Photo"
+                        style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <img src="/media/default.png" class="card-img-top" alt="Default Profile Photo"
+                        style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ teacher.full_name }}</h5>
+                        <p class="card-text">
+                            <strong>Shortcode:</strong> {{ teacher.shortcode }} <br>
+                            <strong>Gender:</strong> {{ teacher.gender }} <br>
+                            <strong>Section:</strong> {{ teacher.section }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if teachers.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ teachers.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ teachers.number }} of {{ teachers.paginator.num_pages }}.
+        </span>
+
+        {% if teachers.has_next %}
+        <a href="?page={{ teachers.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ teachers.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
+<!--  Modal Template (For Deletion) -->
+<div id="confirmModal" class="confirm-modal" style="display:none;">
+    <div class="confirm-modal-content">
+        <div class="confirm-modal-header">
+            <h4>Confirm Delete</h4>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="confirm-modal-body">
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <p style="color: #666; font-size: 0.9em;">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-modal-footer">
+            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger confirm-btn">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

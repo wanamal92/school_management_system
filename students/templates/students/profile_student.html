@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if profile_student %}
+    <div class="row">
+        <div class="col-md-4">
+            {% if profile_student.profile_photo %}
+            <img src="{{ profile_student.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo">
+            {% else %}
+            <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo">
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1>{{ profile_student.first_name }} {{ profile_student.last_name }}</h1>
+            <p><strong>Student Number:</strong> {{ profile_student.student_number }}</p>
+            <p><strong>Email:</strong> {{ profile_student.email }}</p>
+            <p><strong>Telephone:</strong> {{ profile_student.telephone_number }}</p>
+            <p><strong>Class Level:</strong> {{ profile_student.class_level }}</p>
+            <p><strong>Health Issues:</strong> {{ profile_student.health_issues }}</p>
+            <p><strong>Guardian:</strong> {{ profile_student.guardian.first_name }} {{
+                profile_student.guardian.last_name }}</p>
+            <p><strong>Address:</strong> {{ profile_student.address }}</p>
+        </div>
+    </div>
+    {% else %}
+    <p>No profile found for this student.</p>
+    {% endif %}
+</div>
+{% endblock %}

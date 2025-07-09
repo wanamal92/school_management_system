@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Edit Fee Type</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="name" class="form-label">Fee Type Name</label>
-            <input type="text" name="name" id="name" class="form-control" value="{{ fee_type.name }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="amount" class="form-label">Amount</label>
-            <input type="number" name="amount" id="amount" class="form-control" value="{{ fee_type.amount }}" required step="0.01">
-        </div>
-        <button type="submit" class="btn btn-primary">Update Fee Type</button>
-    </form>
+<h2>Edit Fee Type</h2>
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="name" class="form-label">Fee Type Name</label>
+        <input type="text" name="name" id="name" class="form-control" value="{{ fee_type.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="amount" class="form-label">Amount</label>
+        <input type="number" name="amount" id="amount" class="form-control" value="{{ fee_type.amount }}" required
+            step="0.01">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Fee Type</button>
+</form>
 {% endblock %}

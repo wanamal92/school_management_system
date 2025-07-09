@@ -3,13 +3,25 @@ from django.http import HttpResponse
 from django.contrib import messages
 from .models import Competition, CompetitionResult
 from .forms import CompetitionForm, CompetitionResultForm
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # View to list all competitions
+
+
+@login_required
 def list_competitions(request):
-    competitions = Competition.objects.all()
-    return render(request, 'competitions/list_competitions.html', {'competitions': competitions})
+    competitions = Competition.objects.all().order_by('name')
+    # Pagination setup
+    paginator = Paginator(competitions, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    competitions_page = paginator.get_page(page_number)
+    return render(request, 'competitions/list_competitions.html', {'competitions': competitions_page})
 
 # View to create a new competition
+
+
+@login_required
 def create_competition(request):
     if request.method == 'POST':
         form = CompetitionForm(request.POST)
@@ -22,6 +34,9 @@ def create_competition(request):
     return render(request, 'competitions/create_competition.html', {'form': form})
 
 # View to update an existing competition
+
+
+@login_required
 def edit_competition(request, pk):
     competition = get_object_or_404(Competition, pk=pk)
     if request.method == 'POST':
@@ -35,18 +50,32 @@ def edit_competition(request, pk):
     return render(request, 'competitions/edit_competition.html', {'form': form})
 
 # View to delete a competition
+
+
+@login_required
 def delete_competition(request, pk):
     competition = get_object_or_404(Competition, pk=pk)
-    competition.delete()
-    messages.success(request, "Competition deleted successfully.")
+    if request.method == 'POST':
+        competition.delete()
+        messages.success(request, "Competition deleted successfully.")
+        return redirect('list_competitions')
     return redirect('list_competitions')
 
+
 # View to list all competition results
+@login_required
 def list_competition_results(request):
-    results = CompetitionResult.objects.all()
-    return render(request, 'competitions/list_competition_results.html', {'results': results})
+    results = CompetitionResult.objects.all().order_by('student__full_name')
+    # Pagination setup
+    paginator = Paginator(results, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    results_page = paginator.get_page(page_number)
+    return render(request, 'competitions/list_competition_results.html', {'results': results_page})
 
 # View to create a new competition result
+
+
+@login_required
 def create_competition_result(request):
     if request.method == 'POST':
         form = CompetitionResultForm(request.POST)
@@ -59,21 +88,30 @@ def create_competition_result(request):
     return render(request, 'competitions/create_competition_result.html', {'form': form})
 
 # View to edit an existing competition result
+
+
+@login_required
 def edit_competition_result(request, pk):
     result = get_object_or_404(CompetitionResult, pk=pk)
     if request.method == 'POST':
         form = CompetitionResultForm(request.POST, instance=result)
         if form.is_valid():
             form.save()
-            messages.success(request, "Competition result updated successfully.")
+            messages.success(
+                request, "Competition result updated successfully.")
             return redirect('list_competition_results')
     else:
         form = CompetitionResultForm(instance=result)
     return render(request, 'competitions/edit_competition_result.html', {'form': form})
 
 # View to delete a competition result
+
+
+@login_required
 def delete_competition_result(request, pk):
     result = get_object_or_404(CompetitionResult, pk=pk)
-    result.delete()
-    messages.success(request, "Competition result deleted successfully.")
+    if request.method == 'POST':
+        result.delete()
+        messages.success(request, "Competition result deleted successfully.")
+        return redirect('list_competition_results')
     return redirect('list_competition_results')

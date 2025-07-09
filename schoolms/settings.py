@@ -81,7 +81,7 @@ AXES_FAILURE_LIMIT = 5                # Block after 5 failures
 AXES_COOLOFF_TIME = 1                 # Lockout time in hours
 AXES_LOCKOUT_CALLABLE = None          # Optional custom lock logic
 AXES_RESET_ON_SUCCESS = True          # Reset on successful login
-AXES_ONLY_USER_FAILURES = True 
+AXES_ONLY_USER_FAILURES = True
 
 # store logs in the DB:
 AXES_ENABLED = True
@@ -157,12 +157,11 @@ USE_TZ = True
 AUTH_USER_MODEL = 'users.CustomUser'
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ BASE_DIR / 'static' ]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -177,7 +176,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'  # Use app password, NOT your Gmail password
+# Use app password, NOT your Gmail password
+EMAIL_HOST_PASSWORD = 'your_app_password'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SESSION_COOKIE_SECURE = True
@@ -202,4 +202,3 @@ LOGGING = {
         },
     },
 }
-

@@ -1,12 +1,11 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Delete Exam Session</h1>
-    <p>Are you sure you want to delete the Exam Session: {{ exam_session.exam_session_name }}?</p>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Delete</button>
-    </form>
-    <a href="{% url 'list_exam_session' %}" class="btn btn-secondary">Cancel</a>
+<h1>Delete Exam Session</h1>
+<p>Are you sure you want to delete the Exam Session: {{ exam_session.exam_session_name }}?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+<a href="{% url 'list_exam_session' %}" class="btn btn-secondary">Cancel</a>
 {% endblock %}

@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Section</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Section{% endif %}</button>
-    </form>
+<h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Section</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Section{% endif
+        %}</button>
+</form>
 {% endblock %}

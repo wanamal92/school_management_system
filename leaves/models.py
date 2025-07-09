@@ -2,40 +2,46 @@ from django.db import models
 from teachers.models import Teacher
 from django.db.models import F
 
+
 class LeaveType(models.Model):
     name = models.CharField(max_length=100)
-    
+
     def __str__(self):
         return self.name
 
+
 class LeaveAllocation(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    casual_leave = models.IntegerField(default=14)  # 14 days casual leave annually
+    casual_leave = models.IntegerField(
+        default=14)  # 14 days casual leave annually
     sick_leave = models.IntegerField(default=7)  # 7 days sick leave annually
-    year=models.CharField(max_length=4)
+    year = models.CharField(max_length=4)
 
     class Meta:
         unique_together = ('teacher', 'year')
 
     def __str__(self):
         return f"Leave Allocation for {self.teacher.full_name}"
-    
+
 
 class LeaveRequest(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    leave_type = models.ForeignKey(LeaveType, on_delete=models.SET_NULL, null=True)
+    leave_type = models.ForeignKey(
+        LeaveType, on_delete=models.SET_NULL, null=True)
     from_date = models.DateField()
     to_date = models.DateField()
-    duration = models.IntegerField(blank=True, null=True)  # Duration will be calculated
+    # Duration will be calculated
+    duration = models.IntegerField(blank=True, null=True)
     description = models.TextField()
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), (
+        'Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
 
     def save(self, *args, **kwargs):
         # Automatically calculate duration based on from_date and to_date
         if self.from_date and self.to_date:
             self.duration = (self.to_date - self.from_date).days + 1
         super().save(*args, **kwargs)
-        
+
         # Update leave allocation balance
         if self.status == 'Approved':
             if self.leave_type.name == "Casual Leave":

@@ -1,37 +1,88 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Health Records</h1>
-    <a href="{% url 'create_health_record' %}" class="btn btn-primary mb-3">Create Health Record</a>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Record Type</th>
-                <th>Teacher / Student</th>
-                <th>Height (cm)</th>
-                <th>Weight (kg)</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in health_records %}
-                <tr>
-                    <td>{{ record.get_record_type_display }}</td>
-                    <td>
-                        {% if record.record_type == 'student' %}
-                            {{ record.student }}
-                        {% else %}
-                            {{ record.teacher }}
-                        {% endif %}
-                    </td>
-                    <td>{{ record.height_cm }}</td>
-                    <td>{{ record.weight_kg }}</td>
-                    <td>
-                        <a href="{% url 'update_health_record' record.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_health_record' record.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>Health Records</h1>
+<a href="{% url 'create_health_record' %}" class="btn btn-primary mb-3">Create Health Record</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Record Type</th>
+            <th>Teacher / Student</th>
+            <th>Height (cm)</th>
+            <th>Weight (kg)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in health_records %}
+        <tr>
+            <td>{{ record.get_record_type_display }}</td>
+            <td>
+                {% if record.record_type == 'student' %}
+                {{ record.student }}
+                {% else %}
+                {{ record.teacher }}
+                {% endif %}
+            </td>
+            <td>{{ record.height_cm }}</td>
+            <td>{{ record.weight_kg }}</td>
+            <td>
+                <a href="{% url 'update_health_record' record.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ record.id }}"
+                    data-item-name="{% if record.record_type == 'teacher' %}{{ record.teacher.full_name }}{% else %}{{ record.student.full_name }}{% endif %}"
+                    data-delete-url="{% url 'delete_health_record' record.id %}">
+                    <i class="fas fa-trash me-2"></i> Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if health_records.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ health_records.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ health_records.number }} of {{ health_records.paginator.num_pages }}.
+        </span>
+
+        {% if health_records.has_next %}
+        <a href="?page={{ health_records.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ health_records.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
+<!--  Modal Template (For Deletion) -->
+<div id="confirmModal" class="confirm-modal" style="display:none;">
+    <div class="confirm-modal-content">
+        <div class="confirm-modal-header">
+            <h4>Confirm Delete</h4>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="confirm-modal-body">
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <p style="color: #666; font-size: 0.9em;">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-modal-footer">
+            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger confirm-btn">Delete</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

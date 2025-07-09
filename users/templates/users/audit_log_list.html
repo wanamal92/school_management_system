@@ -39,16 +39,16 @@
                     <td class="by">{{ log.performed_by.username }}</td>
                     <td>
                         {% if log.action == 'create' %}
-                            <span class="text-success fw-bold">Created</span>
+                        <span class="text-success fw-bold">Created</span>
                         {% elif log.action == 'delete' %}
-                            <span class="text-danger fw-bold">Deleted</span>
+                        <span class="text-danger fw-bold">Deleted</span>
                         {% elif log.action == 'deactivate' %}
-                            <span class="text-warning fw-bold">Deactivated</span>
+                        <span class="text-warning fw-bold">Deactivated</span>
                         {% elif log.action == 'reactivate' %}
-                            <span class="text-primary fw-bold">Reactivated</span>
+                        <span class="text-primary fw-bold">Reactivated</span>
                         {% endif %}
                     </td>
-                    
+
                     <td class="target">{{ log.target_user.username }}</td>
                     <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
                 </tr>

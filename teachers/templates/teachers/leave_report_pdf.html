@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
-        h1, h2 {
+        h1,
+        h2 {
             text-align: center;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #444;
             padding: 6px;
             text-align: center;
             font-size: 12px;
         }
+
         th {
             background-color: #ddd;
         }
+
         img.chart {
             display: block;
             margin: 30px auto 0 auto;
@@ -26,6 +33,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>{{ pirivena_name }}</h1>
     <h2>Teachers' Leaves Records</h2>
@@ -53,4 +61,5 @@
 
     <img class="chart" src="{{ chart_path }}" alt="Chart">
 </body>
+
 </html>

@@ -1,4 +1,3 @@
-
 #listView .list-group-item {
     border: 1px solid #ddd;
     margin-bottom: 10px;
@@ -30,8 +29,10 @@
 }
 
 .guardian-row:hover {
-    transform: scale(1.02); /* Slightly scale the row */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    transform: scale(1.02);
+    /* Slightly scale the row */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    /* Add a subtle shadow */
 }
 
 /* Style the card with hover effect */
@@ -40,8 +41,10 @@
 }
 
 .guardian-card:hover {
-    transform: scale(1.05); /* Slightly scale the card */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    transform: scale(1.05);
+    /* Slightly scale the card */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    /* Add a subtle shadow */
 }
 
 /* Ensure the card images have consistent height */
@@ -49,4 +52,3 @@
     height: 200px;
     object-fit: cover;
 }
-

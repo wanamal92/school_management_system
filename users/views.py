@@ -9,6 +9,11 @@ from django.contrib.auth.forms import SetPasswordForm
 from .models import AuditLog
 from axes.handlers.proxy import AxesProxyHandler
 from axes.utils import reset
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -25,20 +30,22 @@ def user_login(request):
                     return redirect('force_password_change')
                 return redirect('dashboard')
             else:
-                messages.error(request, 'Your account has been deactivated. Please contact admin.')
+                messages.error(
+                    request, 'Your account has been deactivated. Please contact admin.')
         else:
             # ✅ Use proxy handler with request + credentials
-            is_locked = axes_handler.is_locked(request=request, credentials={'username': username})
+            is_locked = axes_handler.is_locked(
+                request=request, credentials={'username': username})
             if is_locked:
-                messages.error(request, 'Too many failed attempts. Account locked. Try again later.')
+                messages.error(
+                    request, 'Too many failed attempts. Account locked. Try again later.')
             else:
                 messages.error(request, 'Invalid username or password')
 
     return render(request, 'users/login.html')
 
 
-
-
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
@@ -48,32 +55,34 @@ def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
 
 
-
-
-
-
-
 @login_required
 @user_passes_test(is_admin)
-def user_list(request):
-    users = CustomUser.objects.all()
+def list_users(request):
+    users = CustomUser.objects.all().order_by('full_name')
     axes_handler = AxesProxyHandler()
 
     for user in users:
-        user.is_locked = axes_handler.is_locked(request=request, credentials={'username': user.username})
+        user.is_locked = axes_handler.is_locked(
+            request=request, credentials={'username': user.username})
 
-    return render(request, 'users/user_list.html', {'users': users})
+    # Pagination setup
+    paginator = Paginator(users, 10)  # Show 10 users per page
+    page_number = request.GET.get('page')
+    users_page = paginator.get_page(page_number)
+
+    return render(request, 'users/list_users.html', {'users': users_page})
+
 
 @login_required
 @user_passes_test(is_admin)
-def user_detail(request, user_id):
+def detail_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    return render(request, 'users/user_detail.html', {'user': user})
+    return render(request, 'users/detail_user.html', {'user': user})
 
 
 @login_required
 @user_passes_test(is_admin)
-def user_create(request):
+def create_user(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -89,67 +98,81 @@ def user_create(request):
                 action='create'
             )
 
-            return redirect('user_list')
+            return redirect('list_users')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/user_form.html', {'form': form, 'title': 'Add User'})
+    return render(request, 'users/create_user.html', {'form': form, 'title': 'Add User'})
 
 
 @login_required
 @user_passes_test(is_admin)
-def user_edit(request, user_id):
+def edit_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('user_list')
+            return redirect('list_users')
     else:
         form = CustomUserChangeForm(instance=user)
-    return render(request, 'users/user_form.html', {'form': form, 'title': 'Edit User'})
+    return render(request, 'users/edit_user.html', {'form': form, 'title': 'Update User'})
+
 
 @login_required
 @user_passes_test(is_admin)
-def user_delete(request, user_id):
+def delete_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
 
     if user == request.user:
         messages.error(request, "You cannot delete your own account.")
-        return redirect('user_list')
+        return redirect('list_users')
 
-    # 🔍 Log before deletion
-    AuditLog.objects.create(
-        performed_by=request.user,
-        target_user=user,
-        action='delete'
-    )
+    try:
+        AuditLog.objects.create(
+            performed_by=request.user,
+            target_user=user,
+            action='delete'
+        )
+        if request.method == 'POST':
+            # Try deleting the user
+            user.delete()
+            messages.success(
+                request, f"User {user.full_name} deleted successfully.")
+            return redirect('list_users')
 
-    user.delete()
-    messages.success(request, "User deleted.")
-    return redirect('user_list')
+    except IntegrityError as e:
+        # Handling IntegrityError (ForeignKey constraint violation)
+        if 'foreign key' in str(e).lower():
+            messages.error(
+                request, "Cannot delete this user because they are referenced in other records (e.g., as class in charge).")
+        else:
+            messages.error(request, f"A database error occurred: {str(e)}")
 
+        # Redirect back to the user list
+        return redirect('list_users')
 
+    return redirect('list_users')
 
 
 @login_required
-def profile_view(request):
+def view_profile(request):
     return render(request, 'users/profile_view.html')
 
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
 
 @login_required
-def profile_edit(request):
+def edit_profile(request):
     if request.method == 'POST':
         image = request.FILES.get('profile_image')
         if image:
             request.user.profile_image = image
             request.user.save()
 
-        password_form = PasswordChangeForm(user=request.user, data=request.POST)
+        password_form = PasswordChangeForm(
+            user=request.user, data=request.POST)
         if password_form.is_valid():
             password_form.save()
-            update_session_auth_hash(request, request.user)  # Keep user logged in
+            update_session_auth_hash(
+                request, request.user)  # Keep user logged in
             return redirect('profile_view')
     else:
         password_form = PasswordChangeForm(user=request.user)
@@ -169,26 +192,24 @@ def force_password_change(request):
         print(f"Form data: {request.POST}")
         print(f"Form is valid: {form.is_valid()}")
         print(f"Form Errors: {form.errors}")
-        
+
         if form.is_valid():
             print("Form is valid")
             form.save()
             request.user.must_change_password = False
             request.user.save()
             update_session_auth_hash(request, request.user)
-            messages.success(request, "Your password has been successfully updated.")
+            messages.success(
+                request, "Your password has been successfully updated.")
             return redirect('dashboard')
         else:
-            
-            messages.error(request, f"Error: {form.errors}")  # Display errors on the UI
+
+            # Display errors on the UI
+            messages.error(request, f"Error: {form.errors}")
     else:
         form = SetPasswordForm(request.user)
 
     return render(request, 'users/force_password_change.html', {'form': form})
-
-
-from django.contrib import messages
-
 
 
 @login_required
@@ -198,7 +219,7 @@ def toggle_user_status(request, user_id):
 
     if user == request.user:
         messages.error(request, "You cannot deactivate your own account.")
-        return redirect('user_list')
+        return redirect('list_users')
 
     user.is_active = not user.is_active
     user.save()
@@ -212,14 +233,15 @@ def toggle_user_status(request, user_id):
 
     status = "activated" if user.is_active else "deactivated"
     messages.success(request, f"{user.username} has been {status}.")
-    return redirect('user_list')
+    return redirect('list_users')
+
 
 @login_required
 @user_passes_test(is_admin)
 def audit_log_list(request):
-    logs = AuditLog.objects.select_related('performed_by', 'target_user').order_by('-timestamp')
+    logs = AuditLog.objects.select_related(
+        'performed_by', 'target_user').order_by('-timestamp')
     return render(request, 'users/audit_log_list.html', {'logs': logs})
-
 
 
 @login_required
@@ -230,9 +252,8 @@ def unlock_user(request, user_id):
 
     if not axes_handler.is_locked(request=request, credentials={'username': user.username}):
         messages.info(request, f"{user.username} is not currently locked.")
-        return redirect('user_list')
-
+        return redirect('list_users')
 
     reset(username=user.username)
     messages.success(request, f"{user.username} has been unlocked.")
-    return redirect('user_list')
+    return redirect('list_users')

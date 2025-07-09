@@ -1,10 +1,12 @@
 from django import forms
 from .models import FeePayment, FeeType, Student
 
+
 class FeeTypeForm(forms.ModelForm):
     class Meta:
         model = FeeType
         fields = ['name', 'amount']
+
 
 class FeePaymentForm(forms.ModelForm):
     class Meta:
@@ -17,6 +19,7 @@ class FeePaymentForm(forms.ModelForm):
 
         # Check if the paid amount is greater than the total fee amount
         if paid_amount > fee_type.amount:
-            raise forms.ValidationError("Paid amount cannot be greater than the total fee amount.")
+            raise forms.ValidationError(
+                "Paid amount cannot be greater than the total fee amount.")
 
         return paid_amount

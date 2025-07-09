@@ -5,26 +5,35 @@ from .models import TeacherQualification, Qualification, Teacher
 from .forms import TeacherQualificationForm, QualificationForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.paginator import Paginator
 
 # List View with filtering
+
+
 @login_required
 def list_teacher_qualifications(request):
-    qualifications = TeacherQualification.objects.all()
+    qualifications = TeacherQualification.objects.all().order_by('teacher')
 
     teacher_name = request.GET.get('teacher')
     qualification_name = request.GET.get('qualification')
 
     if teacher_name:
-        qualifications = qualifications.filter(teacher__full_name__icontains=teacher_name)
+        qualifications = qualifications.filter(
+            teacher__full_name__icontains=teacher_name)
     if qualification_name:
-        qualifications = qualifications.filter(qualification__name__icontains=qualification_name)
+        qualifications = qualifications.filter(
+            qualification__name__icontains=qualification_name)
+
+    # Pagination setup
+    paginator = Paginator(qualifications, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    qualifications_page = paginator.get_page(page_number)
 
     return render(request, 'qualifications/list_teacher_qualifications.html', {
-        'qualifications': qualifications,
+        'qualifications': qualifications_page,
         'teacher_name': teacher_name,
         'qualification_name': qualification_name
     })
-
 
 
 # Create View
@@ -34,7 +43,8 @@ def create_teacher_qualification(request):
         form = TeacherQualificationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Teacher qualification added successfully!')
+            messages.success(
+                request, 'Teacher qualification added successfully!')
             return redirect('list_teacher_qualifications')
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -44,14 +54,18 @@ def create_teacher_qualification(request):
     return render(request, 'qualifications/create_teacher_qualification.html', {'form': form})
 
 # Edit View
+
+
 @login_required
 def edit_teacher_qualification(request, pk):
     teacher_qualification = get_object_or_404(TeacherQualification, pk=pk)
     if request.method == 'POST':
-        form = TeacherQualificationForm(request.POST, instance=teacher_qualification)
+        form = TeacherQualificationForm(
+            request.POST, instance=teacher_qualification)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Teacher qualification updated successfully!')
+            messages.success(
+                request, 'Teacher qualification updated successfully!')
             return redirect('list_teacher_qualifications')
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -61,13 +75,16 @@ def edit_teacher_qualification(request, pk):
     return render(request, 'qualifications/edit_teacher_qualification.html', {'form': form})
 
 # Delete View
+
+
 @login_required
 def delete_teacher_qualification(request, pk):
     teacher_qualification = get_object_or_404(TeacherQualification, pk=pk)
     if request.method == 'POST':
         teacher_qualification.delete()
         return redirect('list_teacher_qualifications')
-    return render(request, 'qualifications/delete_teacher_qualification.html', {'teacher_qualification': teacher_qualification})
+    return redirect('list_teacher_qualifications')
+
 
 @login_required
 def list_qualifications(request):
@@ -78,15 +95,23 @@ def list_qualifications(request):
 
     # If the qualification name filter is provided, apply the filter
     if qualification_name:
-        qualifications = qualifications.filter(name__icontains=qualification_name)
+        qualifications = qualifications.filter(
+            name__icontains=qualification_name)
+
+    # Pagination setup
+    paginator = Paginator(qualifications, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    qualifications_page = paginator.get_page(page_number)
 
     # Render the qualifications list page with the filtered qualifications
     return render(request, 'qualifications/list_qualifications.html', {
-        'qualifications': qualifications,
+        'qualifications': qualifications_page,
         'qualification_name': qualification_name
     })
 
 # Create Qualification View
+
+
 @login_required
 def create_qualification(request):
     if request.method == 'POST':
@@ -100,13 +125,17 @@ def create_qualification(request):
     return render(request, 'qualifications/create_qualification.html', {'form': form})
 
 # List Qualifications (for selecting qualification when assigning to teacher)
+
+
 @login_required
 def list_qualifications(request):
-    qualifications = Qualification.objects.all()
+    qualifications = Qualification.objects.all().order_by('name')
     qualification_name = request.GET.get('qualification')
     return render(request, 'qualifications/list_qualifications.html', {'qualifications': qualifications})
 
 # Edit View
+
+
 @login_required
 def edit_qualification(request, pk):
     qualification = get_object_or_404(Qualification, pk=pk)
@@ -125,10 +154,11 @@ def edit_qualification(request, pk):
 
 # Delete View
 
+
 @login_required
 def delete_qualification(request, pk):
     qualification = get_object_or_404(Qualification, pk=pk)
     if request.method == 'POST':
         qualification.delete()
         return redirect('list_qualifications')
-    return render(request, 'qualifications/delete_qualification.html', {'qualification': qualification})
+    return redirect('list_qualifications')

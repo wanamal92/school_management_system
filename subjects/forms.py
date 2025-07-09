@@ -1,11 +1,11 @@
 from django import forms
 from .models import Subject
 from teachers.models import Teacher
-from .models import Subject,TeacherSubject
+from .models import Subject, TeacherSubject
 from django.forms import inlineformset_factory
 
-class SubjectForm(forms.ModelForm):
 
+class SubjectForm(forms.ModelForm):
 
     class Meta:
         model = Subject
@@ -16,6 +16,7 @@ class TeacherSubjectForm(forms.ModelForm):
     class Meta:
         model = TeacherSubject
         fields = ['teacher']  # subject is auto-set in the view
+
 
 # Inline formset
 TeacherSubjectFormSet = inlineformset_factory(

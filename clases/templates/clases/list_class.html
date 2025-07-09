@@ -1,32 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Classes</h1>
-    <a href="{% url 'create_class' %}" class="btn btn-primary mb-3">Add New Class</a>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Class Name</th>
-                <th>Class Code</th>
-                <th>Section</th>
-                <th>Class in Charge</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cls in classes %}
-                <tr>
-                    <td>{{ cls.class_name }}</td>
-                    <td>{{ cls.class_code }}</td>
-                    <td>{{ cls.section }}</td>
-                    <td>{{ cls.class_in_charge }}</td>
-                    <td>
-                        <a href="{% url 'detail_class' cls.pk %}" class="btn btn-info btn-sm">View</a>
-                        <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_class' cls.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>Classes</h1>
+<a href="{% url 'create_class' %}" class="btn btn-primary mb-3">Add New Class</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Class Name</th>
+            <th>Class Code</th>
+            <th>Section</th>
+            <th>Class in Charge</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cls in classes %}
+        <tr>
+            <td>{{ cls.class_name }}</td>
+            <td>{{ cls.class_code }}</td>
+            <td>{{ cls.section }}</td>
+            <td>{{ cls.class_in_charge }}</td>
+            <td>
+                <a href="{% url 'detail_class' cls.pk %}" class="btn btn-info btn-sm">View</a>
+                <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ cls.id }}"
+                    data-item-name="{{ cls.class_name }}" data-delete-url="{% url 'delete_class' cls.id %}">
+                    <i class="fas fa-trash me-2"></i> Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if classes.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ classes.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ classes.number }} of {{ classes.paginator.num_pages }}.
+        </span>
+
+        {% if classes.has_next %}
+        <a href="?page={{ classes.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ classes.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
+<!--  Modal Template (For Deletion) -->
+<div id="confirmModal" class="confirm-modal" style="display:none;">
+    <div class="confirm-modal-content">
+        <div class="confirm-modal-header">
+            <h4>Confirm Delete</h4>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="confirm-modal-body">
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <p style="color: #666; font-size: 0.9em;">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-modal-footer">
+            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger confirm-btn">Delete</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

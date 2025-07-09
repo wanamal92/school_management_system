@@ -1,43 +1,94 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Leave Requests and Leave Balance</h1>
+<h1>Leave Requests and Leave Balance</h1>
 
-    <!-- Display leave balance -->
-    <h3>Your Leave Balance</h3>
-    <p>Casual Leave: {{ leave_allocation.casual_leave }} days</p>
-    <p>Sick Leave: {{ leave_allocation.sick_leave }} days</p>
+<!-- Display leave balance -->
+<h3>Your Leave Balance</h3>
+<p>Casual Leave: {{ leave_allocation.casual_leave }} days</p>
+<p>Sick Leave: {{ leave_allocation.sick_leave }} days</p>
 
-    <h3>Your Leave Requests</h3>
-    <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
+<h3>Your Leave Requests</h3>
+<a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Leave Type</th>
-                <th>From Date</th>
-                <th>To Date</th>
-                <th>Duration</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in leave_requests %}
-                <tr>
-                    <td>{{ request.leave_type.name }}</td>
-                    <td>{{ request.from_date }}</td>
-                    <td>{{ request.to_date }}</td>
-                    <td>{{ request.duration }}</td>
-                    <td>{{ request.status }}</td>
-                    <td>
-                        {% if request.status == 'Pending' %}
-                            <a href="{% url 'create_leave_request' %}?edit={{ request.id }}" class="btn btn-warning btn-sm">Edit</a>
-                            
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Leave Type</th>
+            <th>From Date</th>
+            <th>To Date</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in leave_requests %}
+        <tr>
+            <td>{{ request.leave_type.name }}</td>
+            <td>{{ request.from_date }}</td>
+            <td>{{ request.to_date }}</td>
+            <td>{{ request.duration }}</td>
+            <td>{{ request.status }}</td>
+            <td>
+                {% if request.status == 'Pending' %}
+                <a href="{% url 'create_leave_request' %}?edit={{ request.id }}" class="btn btn-warning btn-sm">Edit</a>
+                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ request.id }}"
+                    data-item-name="{{ request.teacher.full_name }} - {{ request.leave_type.name }}"
+                    data-delete-url="{% url 'delete_request' request.id %}">
+                    <i class="fas fa-trash me-2"></i> Delete
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if leave_requests.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ leave_requests.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ leave_requests.number }} of {{ leave_requests.paginator.num_pages }}.
+        </span>
+
+        {% if leave_requests.has_next %}
+        <a href="?page={{ leave_requests.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ leave_requests.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
+<!--  Modal Template (For Deletion) -->
+<div id="confirmModal" class="confirm-modal" style="display:none;">
+    <div class="confirm-modal-content">
+        <div class="confirm-modal-header">
+            <h4>Confirm Delete</h4>
+            <span class="close-btn">&times;</span>
+        </div>
+        <div class="confirm-modal-body">
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <p style="color: #666; font-size: 0.9em;">This action cannot be undone.</p>
+        </div>
+        <div class="confirm-modal-footer">
+            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger confirm-btn">Delete</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

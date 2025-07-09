@@ -2,22 +2,34 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Class
 from .forms import ClassForm
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.paginator import Paginator
 
 # Check if the user is an admin
+
+
 def is_admin(user):
     return user.role == 'admin'
+
 
 @login_required
 @user_passes_test(is_admin)
 def list_class(request):
-    classes = Class.objects.all()
-    return render(request, 'clases/list_class.html', {'classes': classes})
+    classes = Class.objects.all().order_by('class_name')
+
+    # Pagination setup
+    paginator = Paginator(classes, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    classes_page = paginator.get_page(page_number)
+
+    return render(request, 'clases/list_class.html', {'classes': classes_page})
+
 
 @login_required
 @user_passes_test(is_admin)
 def detail_class(request, pk):
     cls = get_object_or_404(Class, pk=pk)
     return render(request, 'clases/detail_class.html', {'cls': cls})
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -30,6 +42,7 @@ def create_class(request):
     else:
         form = ClassForm()
     return render(request, 'clases/form_class.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -44,6 +57,7 @@ def edit_class(request, pk):
         form = ClassForm(instance=cls)
     return render(request, 'clases/form_class.html', {'form': form})
 
+
 @login_required
 @user_passes_test(is_admin)
 def delete_class(request, pk):
@@ -51,4 +65,4 @@ def delete_class(request, pk):
     if request.method == 'POST':
         cls.delete()
         return redirect('list_class')
-    return render(request, 'clases/confirm_delete_class.html', {'cls': cls})
+    return redirect('list_class')

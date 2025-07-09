@@ -1,62 +1,67 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <style>
-        .form-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .document-fields {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
+<style>
+    .form-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 
-        
-        .alert {
-            margin-bottom: 20px;
-        }
-        
-        /* Initially hide both student and teacher fields */
-        .student-field, .teacher-field {
-            display: none;
-        }
-        
-        /* Show fields when they have the 'show' class */
-        .student-field.show, .teacher-field.show {
-            display: block;
-        }
-        
-        /* Smooth transition for showing/hiding fields */
-        .student-field, .teacher-field {
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-            max-height: 0;
-            overflow: hidden;
-        }
-        
-        .student-field.show, .teacher-field.show {
-            opacity: 1;
-            max-height: 200px;
-        }
-        
-        /* Error styling */
-        .field-error {
-            border-color: #dc3545 !important;
-            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-        }
-        
-        .error-message {
-            color: #dc3545;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-    </style>
+    .document-fields {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+
+    .alert {
+        margin-bottom: 20px;
+    }
+
+    /* Initially hide both student and teacher fields */
+    .student-field,
+    .teacher-field {
+        display: none;
+    }
+
+    /* Show fields when they have the 'show' class */
+    .student-field.show,
+    .teacher-field.show {
+        display: block;
+    }
+
+    /* Smooth transition for showing/hiding fields */
+    .student-field,
+    .teacher-field {
+        transition: all 0.3s ease-in-out;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    .student-field.show,
+    .teacher-field.show {
+        opacity: 1;
+        max-height: 200px;
+    }
+
+    /* Error styling */
+    .field-error {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
 </head>
+
 <body>
     <div class="container mt-4">
         <div class="row justify-content-center">
@@ -68,21 +73,21 @@
                     <div class="card-body">
                         <!-- Display messages -->
                         {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
                         {% endif %}
 
                         <!-- Display form errors -->
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    <p class="mb-0">{{ error }}</p>
-                                {% endfor %}
-                            </div>
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                         {% endif %}
 
                         <!-- JavaScript validation error container -->
@@ -92,45 +97,48 @@
 
                         <form method="post" enctype="multipart/form-data" id="documentRecordForm">
                             {% csrf_token %}
-                            
+
                             <!-- User Type Selection -->
                             <div class="form-section">
                                 <h5>User</h5>
                                 <div class="mb-3">
-                                    <label for="{{ form.user_type.id_for_label }}" class="form-label">Select User Type *</label>
+                                    <label for="{{ form.user_type.id_for_label }}" class="form-label">Select User Type
+                                        *</label>
                                     {{ form.user_type }}
                                     {% if form.user_type.errors %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form.user_type.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.user_type.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
                                     {% endif %}
                                 </div>
 
                                 <!-- Student Field -->
                                 <div class="mb-3 student-field" id="studentField">
-                                    <label for="{{ form.student.id_for_label }}" class="form-label">Select Student *</label>
+                                    <label for="{{ form.student.id_for_label }}" class="form-label">Select Student
+                                        *</label>
                                     {{ form.student }}
                                     {% if form.student.errors %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form.student.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.student.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
                                     {% endif %}
                                 </div>
 
                                 <!-- Teacher Field -->
                                 <div class="mb-3 teacher-field" id="teacherField">
-                                    <label for="{{ form.teacher.id_for_label }}" class="form-label">Select Teacher *</label>
+                                    <label for="{{ form.teacher.id_for_label }}" class="form-label">Select Teacher
+                                        *</label>
                                     {{ form.teacher }}
                                     {% if form.teacher.errors %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form.teacher.errors %}
-                                                <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.teacher.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -138,52 +146,55 @@
                             <!-- Document Information -->
                             <div class="document-fields">
                                 <h5>Document Information</h5>
-                                
-                                
+
+
                                 <div class="row">
                                     <div class="col-md-6 ">
                                         <div class="mb-3">
-                                            <label for="{{ form.document_type.id_for_label }}" class="form-label">Document Type *</label>
+                                            <label for="{{ form.document_type.id_for_label }}"
+                                                class="form-label">Document Type *</label>
                                             {{ form.document_type }}
                                             {% if form.document_type.errors %}
-                                                <div class="text-danger mt-1">
-                                                    {% for error in form.document_type.errors %}
-                                                        <small>{{ error }}</small>
-                                                    {% endfor %}
-                                                </div>
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.document_type.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
                                             {% endif %}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="{{ form.expire_date.id_for_label }}" class="form-label">Expire Date</label>
+                                            <label for="{{ form.expire_date.id_for_label }}" class="form-label">Expire
+                                                Date</label>
                                             {{ form.expire_date }}
                                             {% if form.expire_date.errors %}
-                                                <div class="text-danger mt-1">
-                                                    {% for error in form.expire_date.errors %}
-                                                        <small>{{ error }}</small>
-                                                    {% endfor %}
-                                                </div>
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.expire_date.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
                                             {% endif %}
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <label for="{{ form.document_file.id_for_label }}" class="form-label">Document *</label>
+                                            <label for="{{ form.document_file.id_for_label }}"
+                                                class="form-label">Document *</label>
                                             {{ form.document_file }}
                                             {% if form.document_file.errors %}
-                                                <div class="text-danger mt-1">
-                                                    {% for error in form.document_file.errors %}
-                                                        <small>{{ error }}</small>
-                                                    {% endfor %}
-                                                </div>
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.document_file.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
 
-                              
-                                
+
+
                             </div>
 
                             <!-- Form Actions -->
@@ -199,9 +210,9 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const recordTypeSelect = document.getElementById('id_user_type');
             const studentField = document.getElementById('studentField');
             const teacherField = document.getElementById('teacherField');
@@ -239,14 +250,14 @@
             // Function to show/hide fields based on record type
             function toggleFields() {
                 const selectedType = recordTypeSelect.value;
-                
+
                 // Hide errors when changing record type
                 hideErrors();
-                
+
                 // Hide both fields first
                 studentField.classList.remove('show');
                 teacherField.classList.remove('show');
-                
+
                 // Clear the non-selected field
                 if (selectedType === 'student') {
                     setTimeout(() => {
@@ -273,7 +284,7 @@
             toggleFields();
 
             // Form validation before submit
-            document.getElementById('documentRecordForm').addEventListener('submit', function(e) {
+            document.getElementById('documentRecordForm').addEventListener('submit', function (e) {
                 const recordType = recordTypeSelect.value;
                 const studentValue = studentSelect.value;
                 const teacherValue = teacherSelect.value;
@@ -309,4 +320,4 @@
             });
         });
     </script>
-{% endblock %}
+    {% endblock %}

@@ -1,12 +1,11 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Delete Teacher Qualification</h1>
-    <p>Are you sure you want to delete the Teacher Qualification: {{ teacher_qualication }}?</p>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Delete</button>
-    </form>
-    <a href="{% url 'teacher_list' %}" class="btn btn-secondary">Cancel</a>
+<h1>Delete Teacher Qualification</h1>
+<p>Are you sure you want to delete the Teacher Qualification: {{ teacher_qualication }}?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+<a href="{% url 'teacher_list' %}" class="btn btn-secondary">Cancel</a>
 {% endblock %}

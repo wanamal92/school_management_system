@@ -21,9 +21,11 @@ class Document(models.Model):
 
     # Type of record (Student or Teacher)
     user_type = models.CharField(max_length=7, choices=USER_TYPES)
-    
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, blank=True, null=True)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, blank=True, null=True)
+
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, blank=True, null=True)
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, blank=True, null=True)
     document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPES)
     document_file = models.FileField(upload_to='documents/')  # Store the file
     expire_date = models.DateField(null=True, blank=True)

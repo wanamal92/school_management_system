@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Edit Teacher Qualification</h2>
-    
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Update Qualification</button>
-    </form>
-    
-    <a href="{% url 'list_teacher_qualifications' %}" class="btn btn-secondary mt-3">Cancel</a>
+<h2>Edit Teacher Qualification</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update Qualification</button>
+</form>
+
+<a href="{% url 'list_teacher_qualifications' %}" class="btn btn-secondary mt-3">Cancel</a>
 {% endblock %}
