@@ -13,11 +13,7 @@
         <div>
             <form class="d-flex" method="get">
                 <input name="q" class="form-control me-2" placeholder="Search by username" value="{{ request.GET.q }}">
-                <select name="group_by" class="form-select me-2">
-                    <option value="">Group by</option>
-                    <option value="class_level" {% if request.GET.group_by=="class_level" %}selected{% endif %}>Class
-                        Level</option>
-                </select>
+                
                 <button type="submit" class="btn btn-outline-secondary">Search</button>
                 <a href="?view=list" class="btn btn-outline-info ms-2">List</a>
                 <a href="?view=card" class="btn btn-outline-info">Card</a>

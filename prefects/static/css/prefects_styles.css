@@ -1,0 +1,17 @@
+/* Add styles to hide the class-level input by default */
+form .form-group {
+    margin-bottom: 15px;
+}
+
+form .form-group label {
+    font-weight: bold;
+}
+
+form .form-control {
+    width: 100%;
+    padding: 10px;
+}
+
+form .form-group.hidden {
+    display: none;
+}
