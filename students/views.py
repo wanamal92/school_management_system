@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
+from clases.models import Class
 
 
 def is_admin_or_staff(user):
@@ -16,16 +17,17 @@ def is_admin_or_staff(user):
 def list_students(request):
     # Fetch all students
     students = Student.objects.select_related('user').order_by('full_name')
+    classes = Class.objects.all()
 
     # Apply search filter if a query is present
-    query = request.GET.get('q')
-    if query:
-        students = students.filter(user__username__icontains=query)
+    # query = request.GET.get('q')
+    # if query:
+    #     students = students.filter(user__username__icontains=query)
 
-    # Apply group_by filter if specified (optional)
-    group_by = request.GET.get('group_by')
-    if group_by == "class_level":
-        students = students.order_by('class_level')
+    # # Apply group_by filter if specified (optional)
+    # group_by = request.GET.get('group_by')
+    # if group_by == "class_level":
+    #     students = students.order_by('class_level')
 
     # Pagination setup
     paginator = Paginator(students, 10)  # Show 10 students per page
@@ -35,11 +37,13 @@ def list_students(request):
     # View mode selection: either list or card view
     view_mode = request.GET.get('view', 'list')
 
+
     # Context data
     context = {
         'students': students_page,
         'view_mode': view_mode,
-        'group_by': group_by,
+        # 'group_by': group_by,
+        'classes': classes
     }
 
     # Render the list_students template with context data

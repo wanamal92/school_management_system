@@ -7,8 +7,22 @@
     <i class="fas fa-user-plus"></i> Add Exam Attendee
 </a>
 {% endif %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="exam-attendee-search" class="form-control" placeholder="Search by Student">
+    </div>
 
-<table class="table table-bordered">
+    <div class="col-md-4">
+        <select id="status-filter" class="form-select">
+            <option value="">Filter by Status</option>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+        </select>
+    </div>
+
+</div>
+
+<table class="table table-bordered" id="exam-attendee-table">
     <thead>
         <tr>
             <th>Student Name</th>
@@ -22,9 +36,9 @@
     <tbody>
         {% for exam_attendee in exam_attendees %}
         <tr>
-            <td>{{ exam_attendee.student }}</td>
+            <td class="student_name">{{ exam_attendee.student }}</td>
             <td>{{ exam_attendee.exam }}</td>
-            <td>{{ exam_attendee.status }}</td>
+            <td class="status">{{ exam_attendee.status }}</td>
             <td>{{ exam_attendee.exam_marks }}</td>
             <td>{{ exam_attendee.grade }}</td>
             <td>
@@ -88,5 +102,32 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("exam-attendee-search");
+        const statusFilter = document.getElementById("status-filter");
+        const rows = document.querySelectorAll("#exam-attendee-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const status = statusFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const student_name = row.querySelector(".student_name").textContent.toLowerCase();
+                const statusText = row.querySelector(".status").textContent.toLowerCase();
+
+                const matchesSearch = student_name.includes(search);
+                const matchesStatus = !status || statusText.toLowerCase() === status;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesStatus ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        statusFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 
 {% endblock %}

@@ -3,7 +3,23 @@
 {% block content %}
 <h2>Inventory Items</h2>
 <a href="{% url 'create_item' %}" class="btn btn-success mb-3">Add Item</a>
-<table class="table table-striped">
+<div class="row mb-3">
+
+    <div class="col-md-6">
+        <input type="text" id="item-search" class="form-control" placeholder="Search by Item Name">
+    </div>
+
+    <div class="col-md-4">
+        <select id="status-filter" class="form-select">
+            <option value="">Filter by Status</option>
+            <option value="available">Available</option>
+            <option value="in_use">In Use</option>
+            <option value="out_of_stock">Out of Stock</option>
+        </select>
+    </div>
+</div>
+
+<table class="table table-striped" id="item-table">
     <thead>
         <tr>
             <th>Item Name</th>
@@ -17,11 +33,11 @@
     <tbody>
         {% for item in items %}
         <tr>
-            <td>{{ item.name }}</td>
+            <td class="name">{{ item.name }}</td>
             <td>{{ item.category.name }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.added_date }}</td>
-            <td>{{ item.get_status_display }}</td>
+            <td class="status">{{ item.get_status_display }}</td>
             <td>
                 <a href="{% url 'edit_item' item.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ item.id }}"
@@ -80,5 +96,32 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("item-search");
+        const statusFilter = document.getElementById("status-filter");
+        const rows = document.querySelectorAll("#item-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const status = statusFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.querySelector(".name").textContent.toLowerCase();
+                const statusText = row.querySelector(".status").textContent.toLowerCase();
+
+                const matchesSearch = name.includes(search);
+                const matchesStatus = !status || statusText.toLowerCase() === status;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesStatus ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        statusFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 
 {% endblock %}

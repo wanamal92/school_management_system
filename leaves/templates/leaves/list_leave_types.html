@@ -5,17 +5,23 @@
 
 <a href="{% url 'create_leave_type' %}" class="btn btn-success mb-3">Add New Leave Type</a>
 
-<table class="table table-bordered">
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="leave-type-search" class="form-control" placeholder="Search by Name">
+    </div>
+</div>
+
+<table class="table table-bordered" id="leave-type-table">
     <thead>
         <tr>
-            <th>Leave Type Name</th>
+            <th class="name">Leave Type Name</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for leave_type in leave_types %}
         <tr>
-            <td>{{ leave_type.name }}</td>
+            <td class="name">{{ leave_type.name }}</td>
             <td>
                 <a href="{% url 'edit_leave_type' leave_type.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ leave_type.id }}"
@@ -77,4 +83,26 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("leave-type-search");
+        const rows = document.querySelectorAll("#leave-type-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.querySelector(".name").textContent.toLowerCase();
+
+                const matchesSearch = name.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

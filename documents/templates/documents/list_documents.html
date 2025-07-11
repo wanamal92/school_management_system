@@ -4,54 +4,39 @@
 {% block content %}
 <h2>Document List</h2>
 
-<!-- Filter Form -->
-<form method="GET" class="mb-3">
-    <div class="row">
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="teacher" placeholder="Teacher Name"
-                value="{{ request.GET.teacher }}">
-        </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="student" placeholder="Student Name"
-                value="{{ request.GET.student }}">
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" name="user_type">
-                <option value="">All Types</option>
-                <option value="teacher" {% if request.GET.user_type=='teacher' %}selected{% endif %}>Teacher</option>
-                <option value="student" {% if request.GET.user_type=='student' %}selected{% endif %}>Student</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <select class="form-select" name="document_type">
-                <option value="">All Types</option>
-                <option value="NIC" {% if request.GET.document_type=='NIC' %}selected{% endif %}>NIC</option>
-                <option value="Passport" {% if request.GET.document_type=='Passport' %}selected{% endif %}>Passport
-                </option>
-                <option value="Birth Certificate" {% if request.GET.document_type=='Birth Certificate' %}selected{%
-                    endif %}>Birth Certificate</option>
-                <option value="Samanera Certificate" {% if request.GET.document_type=='Samanera Certificate'
-                    %}selected{% endif %}>Samanera Certificate</option>
-                <option value="Upasampada Certificate" {% if request.GET.document_type=='Upasampada Certificate'
-                    %}selected{% endif %}>Upasampada Certificate</option>
-                <option value="School Leaving Certificate" {% if request.GET.document_type=='School Leaving Certificate'
-                    %}selected{% endif %}>School Leaving Certificate</option>
-                <option value="Competition Certificate" {% if request.GET.document_type=='Competition Certificate'
-                    %}selected{% endif %}>Competition Certificate</option>
 
-            </select>
-        </div>
-        <div class="col-md-12 mt-3">
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </div>
-    </div>
-</form>
 
 <!-- Add Document Button -->
 <a href="{% url 'create_document' %}" class="btn btn-success mb-3">Add Document</a>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="document-search" class="form-control" placeholder="Search by Teacher & Student">
+    </div>
+
+    <div class="col-md-4">
+        <select id="user-type-filter" class="form-select">
+            <option value="">Filter by User Type</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <select id="document-type-filter" class="form-select">
+            <option value="">Filter by Document Type</option>
+            <option value="NIC">NIC</option>
+            <option value="Passport">Passport</option>
+            <option value="Birth Certificate">Birth Certificate</option>
+            <option value="Samanera Certificate">Samanera Certificate</option>
+            <option value="Upasampada Certificate">Upasampada Certificate</option>
+            <option value="School Leaving Certificate">School Leaving Certificate</option>
+            <option value="Competition Certificate">Competition Certificate</option>
+        </select>
+    </div>
+</div>
 
 <!-- Documents Table -->
-<table class="table table-striped document-table">
+<table class="table table-striped document-table" id="document-table">
     <thead>
         <tr>
             <th>User Type</th>
@@ -64,13 +49,13 @@
     <tbody>
         {% for document in documents %}
         <tr>
-            <td>>{{ document.get_user_type_display }}</td>
-            <td>{% if document.user_type == 'student' %}
+            <td class="user_type">{{ document.get_user_type_display }}</td>
+            <td class="teacher_student_name">{% if document.user_type == 'student' %}
                 {{ document.student }}
                 {% else %}
                 {{ document.teacher }}
                 {% endif %}</td>
-            <td>{{ document.document_type }}</td>
+            <td class="document_type">{{ document.document_type }}</td>
             <td>{{ document.expire_date }}</td>
             <td>
                 <a href="{% url 'edit_document' document.pk %}" class="btn btn-warning btn-action">Edit</a>
@@ -133,5 +118,40 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("document-search");
+        const documentTypeFilter = document.getElementById("document-type-filter");
+        const userTypeFilter = document.getElementById("user-type-filter");
+        const rows = document.querySelectorAll("#document-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const documentType = documentTypeFilter.value.toLowerCase();
+            const userType = userTypeFilter.value.toLowerCase();
+            
+
+            rows.forEach(row => {
+                const teacher_student_name = row.querySelector(".teacher_student_name").textContent.toLowerCase();
+                const document_type = row.querySelector(".document_type").textContent.toLowerCase();
+                const user_type = row.querySelector(".user_type").textContent.toLowerCase();
+
+                const matchesSearch = teacher_student_name.includes(search);
+                const matchesDocumentType = !documentType || document_type.toLowerCase() === documentType;
+                const matchesUserType = !userType || user_type.toLowerCase() === userType;
+                
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesDocumentType && matchesUserType ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        documentTypeFilter.addEventListener("change", filterTable);
+        userTypeFilter.addEventListener("change", filterTable);
+        
+    });
+
+</script>
 
 {% endblock %}

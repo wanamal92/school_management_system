@@ -3,7 +3,12 @@
 {% block content %}
 <h2>Competition Results</h2>
 <a href="{% url 'create_competition_result' %}" class="btn btn-success mb-3">Add Result</a>
-<table class="table table-striped">
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="student-search" class="form-control" placeholder="Search by Student Name & Year">
+    </div>
+</div>
+<table class="table table-striped" id="competition-result-table">
     <thead>
         <tr>
             <th>Student</th>
@@ -16,9 +21,9 @@
     <tbody>
         {% for result in results %}
         <tr>
-            <td>{{ result.student.full_name }}</td>
+            <td class="student_name">{{ result.student.full_name }}</td>
             <td>{{ result.competition.name }}</td>
-            <td>{{ result.year }}</td>
+            <td class="year">{{ result.year }}</td>
             <td>{{ result.get_result_display }}</td>
             <td>
                 <a href="{% url 'edit_competition_result' result.pk %}" class="btn btn-warning btn-sm">Edit</a>
@@ -80,4 +85,28 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("student-search");
+        const rows = document.querySelectorAll("#competition-result-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const student_name = row.querySelector(".student_name").textContent.toLowerCase();
+                const year = row.querySelector(".year").textContent.toLowerCase();
+                
+
+                const matchesSearch = student_name.includes(search) || year.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

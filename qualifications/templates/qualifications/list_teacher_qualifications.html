@@ -3,21 +3,17 @@
 {% block content %}
 <h2>Teacher Qualifications</h2>
 
-<form method="GET" class="form-inline mb-3">
-    <div class="form-group">
-        <label for="teacher_name">Teacher Name</label>
-        <input type="text" name="teacher" id="teacher_name" class="form-control" value="{{ teacher_name }}">
-    </div>
-    <div class="form-group">
-        <label for="qualification_name">Qualification</label>
-        <input type="text" name="qualification" id="qualification_name" class="form-control"
-            value="{{ qualification_name }}">
-    </div>
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
+
 <a href="{% url 'create_teacher_qualification' %}" class="btn btn-success mb-3">Add Teacher Qualification</a>
 
-<table class="table table-striped">
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="teacher-qualification-search" class="form-control"
+            placeholder="Search by Teacher Name or Qualification">
+    </div>
+</div>
+
+<table class="table table-striped" id="teacher-qualification-table">
     <thead>
         <tr>
             <th>Teacher</th>
@@ -30,8 +26,8 @@
     <tbody>
         {% for qualification in qualifications %}
         <tr>
-            <td>{{ qualification.teacher.full_name }}</td>
-            <td>{{ qualification.qualification.name }}</td>
+            <td class="teacher_name">{{ qualification.teacher.full_name }}</td>
+            <td class="qualification">{{ qualification.qualification.name }}</td>
             <td>{{ qualification.institute }}</td>
             <td>{{ qualification.date_obtained }}</td>
             <td>
@@ -94,4 +90,27 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("teacher-qualification-search");
+        const rows = document.querySelectorAll("#teacher-qualification-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
+                const qualification = row.querySelector(".qualification").textContent.toLowerCase();
+
+                const matchesSearch = teacher_name.includes(search) || qualification.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

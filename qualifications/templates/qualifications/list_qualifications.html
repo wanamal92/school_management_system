@@ -3,18 +3,17 @@
 {% block content %}
 <h2>Qualifications</h2>
 
-<form method="GET" class="form-inline mb-3">
-    <div class="form-group">
-        <label for="qualification_name">Qualification</label>
-        <input type="text" name="qualification_name" id="qualification_name" class="form-control"
-            value="{{ qualification_name }}">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="qualification-search" class="form-control"
+            placeholder="Search by Qualification or ShortCode">
     </div>
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
+</div>
 
 <a href="{% url 'create_qualification' %}" class="btn btn-success mb-3">Add Qualification</a>
 
-<table class="table table-striped">
+<table class="table table-striped" id="qualification-table">
     <thead>
         <tr>
             <th>Qualification</th>
@@ -25,8 +24,8 @@
     <tbody>
         {% for qualification in qualifications %}
         <tr>
-            <td>{{ qualification.name }}</td>
-            <td>{{ qualification.short_code }}</td>
+            <td class="name">{{ qualification.name }}</td>
+            <td class="shortcode">{{ qualification.short_code }}</td>
             <td>
                 <a href="{% url 'edit_qualification' qualification.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ qualification.id }}"
@@ -86,4 +85,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("qualification-search");
+        const rows = document.querySelectorAll("#qualification-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.querySelector(".name").textContent.toLowerCase();
+                const shortcode = row.querySelector(".shortcode").textContent.toLowerCase();
+
+                const matchesSearch = name.includes(search) || shortcode.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

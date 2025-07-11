@@ -3,7 +3,14 @@
 {% block content %}
 <h2>Fee Types</h2>
 <a href="{% url 'create_fee_type' %}" class="btn btn-success mb-3">Add Fee Type</a>
-<table class="table table-striped">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="fee-type-search" class="form-control" placeholder="Search by Fee Name">
+    </div>
+
+</div>
+<table class="table table-striped" id="fee-type-table">
     <thead>
         <tr>
             <th>Fee Type Name</th>
@@ -14,7 +21,7 @@
     <tbody>
         {% for fee_type in fee_types %}
         <tr>
-            <td>{{ fee_type.name }}</td>
+            <td class="fee_name">{{ fee_type.name }}</td>
             <td>{{ fee_type.amount }}</td>
             <td>
                 <a href="{% url 'edit_fee_type' fee_type.pk %}" class="btn btn-warning btn-sm">Edit</a>
@@ -74,4 +81,26 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("fee-type-search");
+        const rows = document.querySelectorAll("#fee-type-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const fee_name = row.querySelector(".fee_name").textContent.toLowerCase();
+
+                const matchesSearch = fee_name.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

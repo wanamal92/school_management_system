@@ -3,8 +3,22 @@
 {% block content %}
 <h1>All Leave Requests</h1>
 <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="request-search" class="form-control" placeholder="Search by Teacher Name">
+    </div>
 
-<table class="table table-bordered">
+    <div class="col-md-4">
+        <select id="status-filter" class="form-select">
+            <option value="">Filter by Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+</div>
+
+<table class="table table-bordered" id="request-table">
     <thead>
         <tr>
             <th>Teacher</th>
@@ -19,12 +33,12 @@
     <tbody>
         {% for request in leave_requests %}
         <tr>
-            <td>{{ request.teacher.full_name }}</td>
+            <td class="teacher_name">{{ request.teacher.full_name }}</td>
             <td>{{ request.leave_type.name }}</td>
             <td>{{ request.from_date }}</td>
             <td>{{ request.to_date }}</td>
             <td>{{ request.duration }}</td>
-            <td>{{ request.status }}</td>
+            <td class="status">{{ request.status }}</td>
             <td>
                 {% if request.status == 'Pending' %}
                 <a href="{% url 'approve_reject_leave' request.id %}?status=Approved"
@@ -59,5 +73,33 @@
         {% endif %}
     </span>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("request-search");
+        const statusFilter = document.getElementById("status-filter");
+        const rows = document.querySelectorAll("#request-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const status = statusFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
+                const statusText = row.querySelector(".status").textContent.toLowerCase();
+
+                const matchesSearch = teacher_name.includes(search);
+                const matchesStatus = !status || statusText.toLowerCase() === status;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesStatus ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        statusFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 
 {% endblock %}

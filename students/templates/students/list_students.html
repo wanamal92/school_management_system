@@ -1,28 +1,50 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-3">
     <div class="d-flex justify-content-between align-items-center">
         <h3>Students</h3>
-        {% if request.user.role in 'admin staff' %}
+        {% if request.user.gender in 'admin staff' %}
         <a href="{% url 'create_student' %}" class="btn btn-success me-2">
             <i class="fas fa-user-plus"></i> Add Student
         </a>
         {% endif %}
 
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="student-search" class="form-control" placeholder="Search by Full Name">
+            </div>
+
+            <div class="col-md-4">
+                <select id="gender-filter" class="form-select">
+                    <option value="">Filter by Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select id="class-level-filter" class="form-select">
+                    <option value="">Filter by Class Level</option>
+                    {% for class in classes %}
+                    <option value="{{ class.class_name }}">{{ class.class_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
         <div>
             <form class="d-flex" method="get">
-                <input name="q" class="form-control me-2" placeholder="Search by username" value="{{ request.GET.q }}">
-                
-                <button type="submit" class="btn btn-outline-secondary">Search</button>
                 <a href="?view=list" class="btn btn-outline-info ms-2">List</a>
                 <a href="?view=card" class="btn btn-outline-info">Card</a>
             </form>
         </div>
     </div>
+
     <hr>
     {% if messages %}
-    <div class="alert alert-info" role="alert">
+    <div class="alert alert-info" gender="alert">
         {% for message in messages %}
         <p>{{ message }}</p>
         {% endfor %}
@@ -51,19 +73,21 @@
         {% endfor %}
     </div>
     {% else %}
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="student-table">
         <thead>
             <tr>
                 <th>Full Name</th>
                 <th>Class</th>
+                <th>Gender</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for student in students %}
             <tr>
-                <td>{{ student.full_name }}</td>
-                <td>{{ student.class_level }}</td>
+                <td class="full_name">{{ student.full_name }}</td>
+                <td class="class_level">{{ student.class_level.class_name }}</td> <!-- Display class name -->
+                <td class="gender">{{ student.gender }}</td>
                 <td>
                     <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-warning"><i
                             class="fas fa-edit me-2"></i>Edit</a>
@@ -80,6 +104,7 @@
         </tbody>
     </table>
     {% endif %}
+
     <!-- Hidden form for deletion -->
     <form method="POST" id="deleteForm" style="display: none;">
         {% csrf_token %}
@@ -109,8 +134,7 @@
     </div>
 </div>
 
-
-<!--  Modal Template (For Deletion) -->
+<!-- Modal Template (For Deletion) -->
 <div id="confirmModal" class="confirm-modal" style="display:none;">
     <div class="confirm-modal-content">
         <div class="confirm-modal-header">
@@ -129,5 +153,38 @@
 </div>
 
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("student-search");
+        const genderFilter = document.getElementById("gender-filter");
+        const classLevelFilter = document.getElementById("class-level-filter");
+        const rows = document.querySelectorAll("#student-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const gender = genderFilter.value.toLowerCase();
+            const classLevel = classLevelFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const full_name = row.querySelector(".full_name").textContent.toLowerCase();
+                const class_level = row.querySelector(".class_level").textContent.toLowerCase();
+                const genderText = row.querySelector(".gender").textContent.toLowerCase();
+
+                const matchesSearch = full_name.includes(search) || class_level.includes(search);
+                const matchesGender = !gender || genderText.toLowerCase() === gender;
+                const matchesClassLevel = !classLevel || class_level.toLowerCase() === classLevel;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesGender && matchesClassLevel ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        genderFilter.addEventListener("change", filterTable);
+        classLevelFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 
 {% endblock %}

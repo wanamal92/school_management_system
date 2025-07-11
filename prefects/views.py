@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def list_prefects(request):
-    prefects = Prefect.objects.all()
+    prefects = Prefect.objects.all().order_by('student__full_name')
     
     # Pagination setup
     paginator = Paginator(prefects, 10)  # Show 10 students per page

@@ -1,9 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Sectiones</h1>
+<h1>Sections</h1>
 <a href="{% url 'create_section' %}" section="btn btn-primary mb-3">Add New Section</a>
-<table section="table table-bordered">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="section-search" class="form-control"
+            placeholder="Search by Section Name or Section Code">
+    </div>
+</div>
+
+
+<table section="table table-bordered" id="section-table">
     <thead>
         <tr>
             <th>Section Name</th>
@@ -14,8 +23,8 @@
     <tbody>
         {% for cls in sections %}
         <tr>
-            <td>{{ cls.section_name }}</td>
-            <td>{{ cls.section_code }}</td>
+            <td class="name">{{ cls.section_name }}</td>
+            <td class="code">{{ cls.section_code }}</td>
             <td>
                 <a href="{% url 'detail_section' cls.pk %}" section="btn btn-info btn-sm">View</a>
                 <a href="{% url 'edit_section' cls.pk %}" section="btn btn-warning btn-sm">Edit</a>
@@ -75,4 +84,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("section-search");
+        const rows = document.querySelectorAll("#section-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.querySelector(".name").textContent.toLowerCase();
+                const code = row.querySelector(".code").textContent.toLowerCase();
+
+                const matchesSearch = name.includes(search) || code.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

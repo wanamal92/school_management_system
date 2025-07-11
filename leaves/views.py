@@ -4,6 +4,7 @@ from .forms import LeaveRequestForm, LeaveAllocationForm, LeaveTypeForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.contrib import messages
+from teachers.models import Teacher
 
 
 def is_admin(user):
@@ -155,19 +156,25 @@ def approve_reject_leave(request, pk):
 # Teacher Leave Request List (View and Apply Leave)
 @login_required
 def teacher_leave_requests(request):
+    # Fetch the teacher object linked to the logged-in user
     teacher = request.user.teacher  # Assuming user is related to teacher model
     leave_requests = LeaveRequest.objects.filter(
         teacher=teacher).order_by('teacher__full_name')
     leave_allocation = LeaveAllocation.objects.get(teacher=teacher)
 
     # Pagination setup
-    paginator = Paginator(leave_requests, 10)  # Show 10 students per page
+    paginator = Paginator(leave_requests, 10)  # Show 10 leave requests per page
     page_number = request.GET.get('page')
     leave_requests_page = paginator.get_page(page_number)
 
+    # Pass the teacher object to the form so it can pre-fill the teacher field
+    form = LeaveRequestForm(user=request.user)  # Pass the user to the form to set the teacher field
+
     return render(request, 'leaves/teacher_leave_requests.html', {
         'leave_requests': leave_requests_page,
-        'leave_allocation': leave_allocation
+        'leave_allocation': leave_allocation,
+        'teacher': teacher,
+        'form': form  # Pass the form to the template
     })
 
 

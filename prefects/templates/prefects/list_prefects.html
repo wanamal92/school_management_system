@@ -4,7 +4,14 @@
 <div class="container">
     <h3>Prefects</h3>
     <a href="{% url 'create_prefect' %}" class="btn btn-primary">Add Prefect</a>
-    <table class="table table-bordered mt-3">
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="prefect-search" class="form-control" placeholder="Search by Student Name">
+        </div>
+    </div>
+
+    <table class="table table-bordered mt-3" id="prefect-table">
         <thead>
             <tr>
                 <th>Student Name</th>
@@ -16,14 +23,13 @@
         <tbody>
             {% for prefect in prefects %}
             <tr>
-                <td>{{ prefect.student.full_name }}</td>
+                <td class="student_name">{{ prefect.student.full_name }}</td>
                 <td>{{ prefect.get_prefect_type_display }}</td>
                 <td>{{ prefect.class_level }}</td>
                 <td>
                     <a href="{% url 'edit_prefect' prefect.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                        data-item-id="{{ prefect.id }}" 
-                        data-item-name="{{ prefect.student.full_name }} - {{ prefect.prefect_type }}" 
+                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ prefect.id }}"
+                        data-item-name="{{ prefect.student.full_name }} - {{ prefect.prefect_type }}"
                         data-delete-url="{% url 'delete_prefect' prefect.id %}">
                         <i class="fas fa-trash me-2"></i> Delete
                     </button>
@@ -34,28 +40,32 @@
     </table>
 </div>
 <!-- Hidden form for deletion -->
-    <form method="POST" id="deleteForm" style="display: none;">
-        {% csrf_token %}
-    </form>
-    
-    <!-- Pagination Links -->
-    <div class="pagination justify-content-center mt-4">
-        <span class="step-links">
-            {% if prefects.has_previous %}
-                <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}" class="btn btn-outline-primary btn-sm">&laquo; First</a>
-                <a href="?page={{ prefects.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}" class="btn btn-outline-primary btn-sm">Previous</a>
-            {% endif %}
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
 
-            <span class="current">
-                Page {{ prefects.number }} of {{ prefects.paginator.num_pages }}.
-            </span>
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if prefects.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ prefects.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
 
-            {% if prefects.has_next %}
-                <a href="?page={{ prefects.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}" class="btn btn-outline-primary btn-sm">Next</a>
-                <a href="?page={{ prefects.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}" class="btn btn-outline-primary btn-sm">Last &raquo;</a>
-            {% endif %}
+        <span class="current">
+            Page {{ prefects.number }} of {{ prefects.paginator.num_pages }}.
         </span>
-    </div>
+
+        {% if prefects.has_next %}
+        <a href="?page={{ prefects.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ prefects.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 
 
@@ -76,4 +86,26 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("prefect-search");
+        const rows = document.querySelectorAll("#prefect-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const student_name = row.querySelector(".student_name").textContent.toLowerCase();
+
+                const matchesSearch = student_name.includes(search) ;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

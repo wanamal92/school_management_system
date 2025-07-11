@@ -3,7 +3,22 @@
 {% block content %}
 <h1>Health Records</h1>
 <a href="{% url 'create_health_record' %}" class="btn btn-primary mb-3">Create Health Record</a>
-<table class="table table-bordered">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="health-search" class="form-control" placeholder="Search by Teacher or Student Name">
+    </div>
+
+    <div class="col-md-4">
+        <select id="type-filter" class="form-select">
+            <option value="">Filter by Record Type</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+        </select>
+    </div>
+</div>
+
+<table class="table table-bordered" id="health-table">
     <thead>
         <tr>
             <th>Record Type</th>
@@ -16,8 +31,8 @@
     <tbody>
         {% for record in health_records %}
         <tr>
-            <td>{{ record.get_record_type_display }}</td>
-            <td>
+            <td class="type">{{ record.get_record_type_display }}</td>
+            <td class="teacher_student">
                 {% if record.record_type == 'student' %}
                 {{ record.student }}
                 {% else %}
@@ -85,4 +100,31 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("health-search");
+        const typeFilter = document.getElementById("type-filter");
+        const rows = document.querySelectorAll("#health-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const type = typeFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const teacher_student = row.querySelector(".teacher_student").textContent.toLowerCase();
+                const typeText = row.querySelector(".type").textContent.toLowerCase();
+
+                const matchesSearch = teacher_student.includes(search);
+                const matchesType = !type || typeText.toLowerCase() === type;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesType ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        typeFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 {% endblock %}

@@ -10,8 +10,25 @@
     <i class="fas fa-user-plus"></i> Upload Exam Session
 </a>
 {% endif %}
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="exam-session-search" class="form-control"
+            placeholder="Search by Exam Session Name & Academic Year">
+    </div>
 
-<table class="table table-bordered">
+    <div class="col-md-4">
+        <select id="exam-type-filter" class="form-select">
+            <option value="">Filter by Exam Type</option>
+            <option value="first_term">First Term</option>
+            <option value="mid_term">Mid Term</option>
+            <option value="final_term">Final Term</option>
+        </select>
+    </div>
+
+
+</div>
+
+<table class="table table-bordered" id="exam-session-table">
     <thead>
         <tr>
             <th>Session Name</th>
@@ -27,12 +44,12 @@
     <tbody>
         {% for session in exam_sessions %}
         <tr>
-            <td>{{ session.exam_session_name }}</td>
+            <td class="exam_session_name">{{ session.exam_session_name }}</td>
             <td>{{ session.exam_session_code }}</td>
             <td>{{ session.start_date }}</td>
             <td>{{ session.end_date }}</td>
-            <td>{{ session.exam_type }}</td>
-            <td>{{ session.academic_year }}</td>
+            <td class="exam_type">{{ session.get_exam_type_display }}</td>
+            <td class="academic_year">{{ session.academic_year }}</td>
             <td>{{ session.class_assigned }}</td>
             <td>
                 <a href="{% url 'edit_exam_session' session.pk %}" class="btn btn-warning btn-sm">Edit</a>
@@ -96,5 +113,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("exam-session-search");
+        const examTypeFilter = document.getElementById("exam-type-filter");
+        const rows = document.querySelectorAll("#exam-session-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const examType = examTypeFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const exam_session_name = row.querySelector(".exam_session_name").textContent.toLowerCase();
+                const academic_year = row.querySelector(".academic_year").textContent.toLowerCase();
+                const examTypeText = row.querySelector(".exam_type").textContent.toLowerCase();
+
+                const matchesSearch = exam_session_name.includes(search) || academic_year.includes(search);
+                const matchesExamType = !examType || examTypeText.toLowerCase() === examType;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesExamType ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        examTypeFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 
 {% endblock %}

@@ -3,7 +3,12 @@
 {% block content %}
 <h2>Teacher Duties</h2>
 <a href="{% url 'create_teacher_duty' %}" class="btn btn-success mb-3">Assign Duty</a>
-<table class="table table-striped">
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="teacher-duty-search" class="form-control" placeholder="Search by Teacher, Duty & Year">
+    </div>
+</div>
+<table class="table table-striped" id="teacher-duty-table">
     <thead>
         <tr>
             <th>Teacher</th>
@@ -15,9 +20,9 @@
     <tbody>
         {% for teacher_duty in teacher_duties %}
         <tr>
-            <td>{{ teacher_duty.teacher.full_name }}</td>
-            <td>{{ teacher_duty.duty.name }}</td>
-            <td>{{ teacher_duty.year }}</td>
+            <td class="full_name">{{ teacher_duty.teacher.full_name }}</td>
+            <td class="duty">{{ teacher_duty.duty.name }}</td>
+            <td class="year">{{ teacher_duty.year }}</td>
             <td>
                 <a href="{% url 'edit_teacher_duty' teacher_duty.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ teacher_duty.id }}"
@@ -77,4 +82,28 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("teacher-duty-search");
+        const rows = document.querySelectorAll("#teacher-duty-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const full_name = row.querySelector(".full_name").textContent.toLowerCase();
+                const duty = row.querySelector(".duty").textContent.toLowerCase();
+                const year = row.querySelector(".year").textContent.toLowerCase();
+
+                const matchesSearch = full_name.includes(search) || duty.includes(search) || year.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 {% endblock %}

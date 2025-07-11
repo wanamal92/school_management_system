@@ -4,21 +4,29 @@
 <h1>Leave Allocation Management</h1>
 <a href="{% url 'create_leave_allocation' %}" class="btn btn-success mb-3">Add New Leave Allocation</a>
 
-<table class="table table-bordered">
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="leave-allocation-search" class="form-control" placeholder="Search by Teacher Name or Year">
+    </div>
+</div>
+
+<table class="table table-bordered" id="leave-allocation-table">
     <thead>
         <tr>
             <th>Teacher</th>
             <th>Casual Leave</th>
             <th>Sick Leave</th>
+            <th>Year</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for allocation in leave_allocations %}
         <tr>
-            <td>{{ allocation.teacher.full_name }}</td>
+            <td class="teacher_name">{{ allocation.teacher.full_name }}</td>
             <td>{{ allocation.casual_leave }}</td>
             <td>{{ allocation.sick_leave }}</td>
+            <td class="year">{{ allocation.year }}</td>
             <td>
                 <a href="{% url 'edit_leave_allocation' allocation.id %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ allocation.id }}"
@@ -78,5 +86,29 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("leave-allocation-search");
+        const rows = document.querySelectorAll("#leave-allocation-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
+                const year = row.querySelector(".year").textContent.toLowerCase();
+
+                const matchesSearch = teacher_name.includes(search) || year.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 
 {% endblock %}

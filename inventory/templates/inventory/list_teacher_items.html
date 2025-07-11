@@ -3,7 +3,14 @@
 {% block content %}
 <h2>Assigned Items to Teachers</h2>
 <a href="{% url 'create_teacher_item' %}" class="btn btn-success mb-3">Assign Item</a>
-<table class="table table-striped">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="teacher-item-search" class="form-control" placeholder="Search by Teacher or Item">
+    </div>
+</div>
+
+<table class="table table-striped" id="teacher-item-table">
     <thead>
         <tr>
             <th>Teacher</th>
@@ -16,8 +23,8 @@
     <tbody>
         {% for teacher_item in teacher_items %}
         <tr>
-            <td>{{ teacher_item.teacher.full_name }}</td>
-            <td>{{ teacher_item.item.name }}</td>
+            <td class="teacher_name">{{ teacher_item.teacher.full_name }}</td>
+            <td class="item">{{ teacher_item.item.name }}</td>
             <td>{{ teacher_item.quantity }}</td>
             <td>{{ teacher_item.assigned_date }}</td>
             <td>
@@ -79,5 +86,28 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("teacher-item-search");
+        const rows = document.querySelectorAll("#teacher-item-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
+                const item = row.querySelector(".item").textContent.toLowerCase();
+
+                const matchesSearch = teacher_name.includes(search) || item.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 
 {% endblock %}

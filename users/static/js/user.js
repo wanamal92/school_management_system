@@ -9,15 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         rows.forEach(row => {
             const username = row.querySelector(".username").textContent.toLowerCase();
+            const fullname = row.querySelector(".full_name").textContent.toLowerCase();
             const email = row.querySelector(".email").textContent.toLowerCase();
             const userRole = row.querySelector(".role").textContent.toLowerCase();
 
-            const matchesSearch = username.includes(search) || email.includes(search);
+            const matchesSearch = username.includes(search) || email.includes(search) || fullname.includes(search);
             const matchesRole = !role || userRole === role;
 
             row.style.display = matchesSearch && matchesRole ? "" : "none";
         });
     }
+    
+    
 
     searchInput.addEventListener("input", filterTable);
     roleFilter.addEventListener("change", filterTable);

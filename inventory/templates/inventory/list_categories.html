@@ -3,7 +3,14 @@
 {% block content %}
 <h2>Inventory Categories</h2>
 <a href="{% url 'create_category' %}" class="btn btn-success mb-3">Add Category</a>
-<table class="table table-striped">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="category-search" class="form-control" placeholder="Search by Name">
+    </div>
+
+</div>
+<table class="table table-striped" id="category-table">
     <thead>
         <tr>
             <th>Category Name</th>
@@ -13,7 +20,7 @@
     <tbody>
         {% for category in categories %}
         <tr>
-            <td>{{ category.name }}</td>
+            <td class="name">{{ category.name }}</td>
             <td>
                 <a href="{% url 'edit_category' category.pk %}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ category.id }}"
@@ -72,5 +79,27 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("category-search");
+        const rows = document.querySelectorAll("#category-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.querySelector(".name").textContent.toLowerCase();
+
+                const matchesSearch = name.includes(search);
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+    });
+
+</script>
 
 {% endblock %}

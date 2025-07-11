@@ -99,7 +99,7 @@ def list_qualifications(request):
             name__icontains=qualification_name)
 
     # Pagination setup
-    paginator = Paginator(qualifications, 10)  # Show 10 students per page
+    paginator = Paginator(qualifications, 10) 
     page_number = request.GET.get('page')
     qualifications_page = paginator.get_page(page_number)
 
@@ -127,11 +127,11 @@ def create_qualification(request):
 # List Qualifications (for selecting qualification when assigning to teacher)
 
 
-@login_required
-def list_qualifications(request):
-    qualifications = Qualification.objects.all().order_by('name')
-    qualification_name = request.GET.get('qualification')
-    return render(request, 'qualifications/list_qualifications.html', {'qualifications': qualifications})
+# @login_required
+# def list_qualifications(request):
+#     qualifications = Qualification.objects.all().order_by('name')
+#     qualification_name = request.GET.get('qualification')
+#     return render(request, 'qualifications/list_qualifications.html', {'qualifications': qualifications})
 
 # Edit View
 

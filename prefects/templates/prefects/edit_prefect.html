@@ -1,12 +1,57 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container">
-    <h3>Edit Prefect</h3>
-    <form method="POST">
+    <h3>Add Prefect</h3>
+    <form method="POST" id="prefect-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Save Changes</button>
+
+        <!-- Student field -->
+        <div class="form-group">
+            <label for="{{ form.student.id_for_label }}">{{ form.student.label }}</label>
+            {{ form.student }}
+            {% if form.student.errors %}
+            <div class="text-danger">
+                {{ form.student.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Prefect Type field -->
+        <div class="form-group">
+            <label for="{{ form.prefect_type.id_for_label }}">{{ form.prefect_type.label }}</label>
+            {{ form.prefect_type }}
+            {% if form.prefect_type.errors %}
+            <div class="text-danger">
+                {{ form.prefect_type.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Class Level field with container -->
+        <div class="form-group" id="class-level-container" style="display:none;">
+            <label for="{{ form.class_level.id_for_label }}">{{ form.class_level.label }}</label>
+            {{ form.class_level }}
+            {% if form.class_level.errors %}
+            <div class="text-danger">
+                {{ form.class_level.errors }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.year.id_for_label }}">{{ form.year.label }}</label>
+            {{ form.year }}
+            {% if form.year.errors %}
+            <div class="text-danger">
+                {{ form.year.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Prefect</button>
     </form>
 </div>
+<script src="{% static 'js/prefects_js.js' %}"></script>
+
 {% endblock %}

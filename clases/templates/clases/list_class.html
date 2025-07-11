@@ -1,9 +1,19 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
+<script src="{% static 'js/class_js.js' %}"></script>
 <h1>Classes</h1>
+
 <a href="{% url 'create_class' %}" class="btn btn-primary mb-3">Add New Class</a>
-<table class="table table-bordered">
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="class-search" class="form-control" placeholder="Search by Class Name, Code, or Section">
+    </div>
+
+</div>
+
+<table class="table table-bordered" id="class-table">
     <thead>
         <tr>
             <th>Class Name</th>
@@ -16,10 +26,10 @@
     <tbody>
         {% for cls in classes %}
         <tr>
-            <td>{{ cls.class_name }}</td>
-            <td>{{ cls.class_code }}</td>
-            <td>{{ cls.section }}</td>
-            <td>{{ cls.class_in_charge }}</td>
+            <td class="class_name">{{ cls.class_name }}</td>
+            <td class="class_code">{{ cls.class_code }}</td> 
+            <td class="section">{{ cls.section }}</td> 
+            <td class="class_in_charge">{{ cls.class_in_charge }}</td> 
             <td>
                 <a href="{% url 'detail_class' cls.pk %}" class="btn btn-info btn-sm">View</a>
                 <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning btn-sm">Edit</a>
@@ -32,6 +42,7 @@
         {% endfor %}
     </tbody>
 </table>
+
 <!-- Hidden form for deletion -->
 <form method="POST" id="deleteForm" style="display: none;">
     {% csrf_token %}
@@ -61,7 +72,6 @@
 </div>
 </div>
 
-
 <!--  Modal Template (For Deletion) -->
 <div id="confirmModal" class="confirm-modal" style="display:none;">
     <div class="confirm-modal-content">
@@ -79,5 +89,34 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("class-search");
+        const rows = document.querySelectorAll("#class-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const class_name = row.querySelector(".class_name").textContent.toLowerCase();
+                const class_code = row.querySelector(".class_code").textContent.toLowerCase();
+                const section = row.querySelector(".section").textContent.toLowerCase();
+                const class_in_charge = row.querySelector(".class_in_charge").textContent.toLowerCase();
+
+                // Check if the search term matches class name, class code, or section
+                const matchesSearch = class_name.includes(search) || class_code.includes(search) || section.includes(search);
+
+
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch ? "" : "none";
+            });
+        }
+
+        // Trigger filter on search or role change
+        searchInput.addEventListener("input", filterTable);
+    });
+</script>
+
 
 {% endblock %}

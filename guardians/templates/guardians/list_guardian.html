@@ -11,14 +11,22 @@
             <i class="fas fa-user-plus"></i> Add Guardian
         </a>
         {% endif %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="guardian-search" class="form-control" placeholder="Search by Full Name">
+            </div>
+
+            <div class="col-md-4">
+                <select id="gender-filter" class="form-select">
+                    <option value="">Filter by Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+        </div>
         <div>
             <form class="d-flex" method="get">
-                <input name="q" class="form-control me-2" placeholder="Search by username">
-                <select name="group_by" class="form-select me-2">
-                    <option value="">Group by</option>
-                    <option value="section">Section</option>
-                </select>
-                <button type="submit" class="btn btn-outline-secondary">Search</button>
                 <a href="?view=list"
                     class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
                 <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card
@@ -30,11 +38,11 @@
 
     <!-- List View -->
     {% if view_mode == "list" %}
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="guardian-table">
         <thead>
             <tr>
-                <th>Username</th>
-                <th>Section</th>
+                <th>Full Name</th>
+                <th>Gender</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -42,8 +50,8 @@
             {% for guardian in guardians %}
             <tr class="guardian-row" style="cursor: pointer;"
                 onclick="window.location.href='{% url 'detail_guardian' guardian.pk %}'">
-                <td>{{ guardian.full_name }}</td>
-                <td>{{ guardian.section }}</td>
+                <td class="full_name">{{ guardian.full_name }}</td>
+                <td class="gender">{{ guardian.gender }}</td>
                 <td>
                     <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning btn-sm">Edit</a>
                     <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ guardian.id }}"
@@ -135,4 +143,31 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("guardian-search");
+        const genderFilter = document.getElementById("gender-filter");
+        const rows = document.querySelectorAll("#guardian-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const gender = genderFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const full_name = row.querySelector(".full_name").textContent.toLowerCase();
+                const genderText = row.querySelector(".gender").textContent.toLowerCase();
+
+                const matchesSearch = full_name.includes(search);
+                const matchesGender = !gender || genderText.toLowerCase() === gender;
+
+                // Toggle row visibility based on filter conditions
+                row.style.display = matchesSearch && matchesGender ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        genderFilter.addEventListener("change", filterTable);
+    });
+
+</script>
 {% endblock %}

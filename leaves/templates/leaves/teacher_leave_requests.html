@@ -11,7 +11,19 @@
 <h3>Your Leave Requests</h3>
 <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
 
-<table class="table table-bordered">
+<div class="row mb-3">
+    <div class="col-md-4">
+        <select id="status-filter" class="form-select">
+            <option value="">Filter by Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+
+</div>
+
+<table class="table table-bordered" id="request-table">
     <thead>
         <tr>
             <th>Leave Type</th>
@@ -29,13 +41,13 @@
             <td>{{ request.from_date }}</td>
             <td>{{ request.to_date }}</td>
             <td>{{ request.duration }}</td>
-            <td>{{ request.status }}</td>
+            <td class="status">{{ request.status }}</td> 
             <td>
                 {% if request.status == 'Pending' %}
                 <a href="{% url 'create_leave_request' %}?edit={{ request.id }}" class="btn btn-warning btn-sm">Edit</a>
                 <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ request.id }}"
-                    data-item-name="{{ request.teacher.full_name }} - {{ request.leave_type.name }}"
-                    data-delete-url="{% url 'delete_request' request.id %}">
+                        data-item-name="{{ request.teacher.full_name }} - {{ request.leave_type.name }}"
+                        data-delete-url="{% url 'delete_leave_request' request.id %}">
                     <i class="fas fa-trash me-2"></i> Delete
                 </button>
                 {% endif %}
@@ -44,6 +56,7 @@
         {% endfor %}
     </tbody>
 </table>
+
 <!-- Hidden form for deletion -->
 <form method="POST" id="deleteForm" style="display: none;">
     {% csrf_token %}
@@ -91,4 +104,30 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const statusFilter = document.getElementById("status-filter");
+    const rows = document.querySelectorAll("#request-table tbody tr");  
+
+    
+    function filterTable() {
+        const status = statusFilter.value.toLowerCase();  
+
+        rows.forEach(row => {
+            const statusText = row.querySelector(".status").textContent.toLowerCase(); 
+
+            
+            const matchesStatus = !status || statusText === status;  
+
+            
+            row.style.display = matchesStatus ? "" : "none";
+        });
+    }
+
+    
+    statusFilter.addEventListener("change", filterTable);
+});
+
+
+</script>
 {% endblock %}
