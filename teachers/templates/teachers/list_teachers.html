@@ -2,34 +2,47 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/teacher_styles.css' %}">
-<div class="container mt-3">
-    <div class="d-flex justify-content-between align-items-center">
-        <h3>Teachers</h3>
-        {% if request.user.role in 'admin staff' %}
-        <a href="{% url 'add_teacher' %}" class="btn btn-success me-2">
-            <i class="fas fa-user-plus"></i> Add Teacher
-        </a>
-        <a href="{% url 'export_leave_excel' %}" class="btn btn-success">Download Leave Excel</a>
-        <a href="{% url 'export_teacher_leave_pdf' %}" class="btn btn-danger">Download PDF Report</a>
-        {% endif %}
+<div class="container mt-4">
+    <h3 class="mb-4">Teachers</h3>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" id="teacher-search" class="form-control" placeholder="Search by Full Name">
-            </div>
-
-            <div class="col-md-4">
-                <select id="gender-filter" class="form-select">
-                    <option value="">Filter by Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-            </div>
-
+    <!-- Button Row -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Add Teacher Button on Left -->
+        <div class="d-flex">
+            {% if request.user.role in 'admin staff' %}
+            <a href="{% url 'add_teacher' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus-circle"></i> Add Teacher
+            </a>
+            {% endif %}
         </div>
-        <div>
-            <form class="d-flex" method="get">
+
+        <!-- Other Buttons (Download Excel, PDF, Filter, View) on Right -->
+        <div class="d-flex">
+            <a href="{% url 'export_leave_excel' %}" class="btn btn-outline-success me-2">
+                <i class="fas fa-download"></i> Download Leave Excel
+            </a>
+            <a href="{% url 'export_teacher_leave_pdf' %}" class="btn btn-outline-danger me-2">
+                <i class="fas fa-download"></i> Download PDF Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section with Filter and View Mode in Same Row -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" id="teacher-search" class="form-control" placeholder="Search by Full Name">
+        </div>
+
+        <div class="col-md-4">
+            <select id="gender-filter" class="form-select">
+                <option value="">Filter by Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <form class="d-flex justify-content-end" method="get">
                 <a href="?view=list"
                     class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
                 <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card
@@ -37,7 +50,7 @@
             </form>
         </div>
     </div>
-    <hr>
+
     {% if messages %}
     <div class="alert alert-info" role="alert">
         {% for message in messages %}
@@ -45,6 +58,10 @@
         {% endfor %}
     </div>
     {% endif %}
+
+    <hr>
+
+
 
     <!-- List View -->
     {% if view_mode == "list" %}
@@ -59,19 +76,21 @@
         </thead>
         <tbody>
             {% for teacher in teachers %}
-            <tr class="teacher-row" style="cursor: pointer;"
-                onclick="window.location.href='{% url 'detail_teacher' teacher.pk %}'">
+            <tr>
                 <td class="full_name">{{ teacher.full_name }}</td>
                 <td class="section">{{ teacher.section }}</td>
                 <td class="gender">{{ teacher.gender }}</td>
                 <td>
-                    <a href="{% url 'edit_teacher' teacher.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'edit_teacher' teacher.pk %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-2"></i> Edit
+                    </a>
                     <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ teacher.id }}"
-                        data-item-name="{{ teacher.full_name }}"
-                        data-delete-url="{% url 'delete_teacher' teacher.id %}">
+                        data-item-name="{{ teacher.full_name }}">
                         <i class="fas fa-trash me-2"></i> Delete
                     </button>
-                    <a href="{% url 'detail_teacher' teacher.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'detail_teacher' teacher.pk %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-eye me-2"></i> View
+                    </a>
                 </td>
             </tr>
             {% endfor %}
@@ -85,7 +104,7 @@
         {% for teacher in teachers %}
         <div class="col-md-4 mb-3">
             <a href="{% url 'detail_teacher' teacher.pk %}" class="text-decoration-none">
-                <div class="card teacher-card">
+                <div class="card teacher-card" style="min-height: 400px;">
                     {% if teacher.profile_photo %}
                     <img src="{{ teacher.profile_photo.url }}" class="card-img-top" alt="Profile Photo"
                         style="height: 200px; object-fit: cover;">
@@ -108,6 +127,7 @@
     </div>
     {% endif %}
 </div>
+
 <!-- Hidden form for deletion -->
 <form method="POST" id="deleteForm" style="display: none;">
     {% csrf_token %}

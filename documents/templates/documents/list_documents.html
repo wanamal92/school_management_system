@@ -2,102 +2,124 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Document List</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Document List</h2>
+
+    <!-- Add Document Button -->
+    <a href="{% url 'create_document' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus-circle"></i> Add Document
+    </a>
 
 
 
-<!-- Add Document Button -->
-<a href="{% url 'create_document' %}" class="btn btn-success mb-3">Add Document</a>
-<div class="row mb-3">
-    <div class="col-md-6">
-        <input type="text" id="document-search" class="form-control" placeholder="Search by Teacher & Student">
+    <!-- Search and Filter Section -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" id="document-search" class="form-control" placeholder="Search by Teacher & Student">
+        </div>
+
+        <div class="col-md-4">
+            <select id="user-type-filter" class="form-select">
+                <option value="">Filter by User Type</option>
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <select id="document-type-filter" class="form-select">
+                <option value="">Filter by Document Type</option>
+                <option value="NIC">NIC</option>
+                <option value="Passport">Passport</option>
+                <option value="Birth Certificate">Birth Certificate</option>
+                <option value="Samanera Certificate">Samanera Certificate</option>
+                <option value="Upasampada Certificate">Upasampada Certificate</option>
+                <option value="School Leaving Certificate">School Leaving Certificate</option>
+                <option value="Competition Certificate">Competition Certificate</option>
+            </select>
+        </div>
     </div>
 
-    <div class="col-md-4">
-        <select id="user-type-filter" class="form-select">
-            <option value="">Filter by User Type</option>
-            <option value="teacher">Teacher</option>
-            <option value="student">Student</option>
-        </select>
-    </div>
-
-    <div class="col-md-4">
-        <select id="document-type-filter" class="form-select">
-            <option value="">Filter by Document Type</option>
-            <option value="NIC">NIC</option>
-            <option value="Passport">Passport</option>
-            <option value="Birth Certificate">Birth Certificate</option>
-            <option value="Samanera Certificate">Samanera Certificate</option>
-            <option value="Upasampada Certificate">Upasampada Certificate</option>
-            <option value="School Leaving Certificate">School Leaving Certificate</option>
-            <option value="Competition Certificate">Competition Certificate</option>
-        </select>
-    </div>
-</div>
-
-<!-- Documents Table -->
-<table class="table table-striped document-table" id="document-table">
-    <thead>
-        <tr>
-            <th>User Type</th>
-            <th>User Name</th>
-            <th>Document Type</th>
-            <th>Expire Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for document in documents %}
-        <tr>
-            <td class="user_type">{{ document.get_user_type_display }}</td>
-            <td class="teacher_student_name">{% if document.user_type == 'student' %}
-                {{ document.student }}
-                {% else %}
-                {{ document.teacher }}
-                {% endif %}</td>
-            <td class="document_type">{{ document.document_type }}</td>
-            <td>{{ document.expire_date }}</td>
-            <td>
-                <a href="{% url 'edit_document' document.pk %}" class="btn btn-warning btn-action">Edit</a>
-                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ document.id }}"
-                    data-item-name="{% if document.user_type == 'teacher' %}{{ document.teacher.full_name }}{% else %}{{ document.student.full_name }}{% endif %}"
-                    data-delete-url="{% url 'delete_document' document.id %}">
-                    <i class="fas fa-trash me-2"></i> Delete
-                </button>
-                <a href="{% url 'download_document' document.pk %}" class="btn btn-success btn-sm">Download</a>
-            </td>
-        </tr>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
         {% endfor %}
-    </tbody>
-</table>
+    </div>
+    {% endif %}
+    <hr>
 
-<!-- Hidden form for deletion -->
-<form method="POST" id="deleteForm" style="display: none;">
-    {% csrf_token %}
-</form>
+    <!-- Documents Table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered" id="document-table">
+            <thead>
+                <tr>
+                    <th>User Type</th>
+                    <th>User Name</th>
+                    <th>Document Type</th>
+                    <th>Expire Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for document in documents %}
+                <tr>
+                    <td class="user_type">{{ document.get_user_type_display }}</td>
+                    <td class="teacher_student_name">
+                        {% if document.user_type == 'student' %}
+                        {{ document.student }}
+                        {% else %}
+                        {{ document.teacher }}
+                        {% endif %}
+                    </td>
+                    <td class="document_type">{{ document.document_type }}</td>
+                    <td>{{ document.expire_date }}</td>
+                    <td>
+                        <a href="{% url 'edit_document' document.pk %}" class="btn btn-warning btn-sm btn-action">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ document.id }}"
+                            data-item-name="{% if document.user_type == 'teacher' %}{{ document.teacher.full_name }}{% else %}{{ document.student.full_name }}{% endif %}"
+                            data-delete-url="{% url 'delete_document' document.id %}">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                        <a href="{% url 'download_document' document.pk %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<!-- Pagination Links -->
-<div class="pagination justify-content-center mt-4">
-    <span class="step-links">
-        {% if documents.has_previous %}
-        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">&laquo; First</a>
-        <a href="?page={{ documents.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Previous</a>
-        {% endif %}
+    <!-- Hidden form for deletion -->
+    <form method="POST" id="deleteForm" style="display: none;">
+        {% csrf_token %}
+    </form>
 
-        <span class="current">
-            Page {{ documents.number }} of {{ documents.paginator.num_pages }}.
+    <!-- Pagination Links -->
+    <div class="pagination justify-content-center mt-4">
+        <span class="step-links">
+            {% if documents.has_previous %}
+            <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">&laquo; First</a>
+            <a href="?page={{ documents.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ documents.number }} of {{ documents.paginator.num_pages }}.
+            </span>
+
+            {% if documents.has_next %}
+            <a href="?page={{ documents.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Next</a>
+            <a href="?page={{ documents.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+            {% endif %}
         </span>
-
-        {% if documents.has_next %}
-        <a href="?page={{ documents.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Next</a>
-        <a href="?page={{ documents.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
+    </div>
 </div>
 
 
@@ -129,7 +151,7 @@
             const search = searchInput.value.toLowerCase();
             const documentType = documentTypeFilter.value.toLowerCase();
             const userType = userTypeFilter.value.toLowerCase();
-            
+
 
             rows.forEach(row => {
                 const teacher_student_name = row.querySelector(".teacher_student_name").textContent.toLowerCase();
@@ -139,7 +161,7 @@
                 const matchesSearch = teacher_student_name.includes(search);
                 const matchesDocumentType = !documentType || document_type.toLowerCase() === documentType;
                 const matchesUserType = !userType || user_type.toLowerCase() === userType;
-                
+
 
                 // Toggle row visibility based on filter conditions
                 row.style.display = matchesSearch && matchesDocumentType && matchesUserType ? "" : "none";
@@ -149,7 +171,7 @@
         searchInput.addEventListener("input", filterTable);
         documentTypeFilter.addEventListener("change", filterTable);
         userTypeFilter.addEventListener("change", filterTable);
-        
+
     });
 
 </script>

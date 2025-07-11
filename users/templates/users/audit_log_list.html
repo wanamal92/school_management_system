@@ -22,6 +22,14 @@
             </select>
         </div>
     </div>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <hr>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped" id="audit-table">
@@ -39,13 +47,13 @@
                     <td class="by">{{ log.performed_by.username }}</td>
                     <td>
                         {% if log.action == 'create' %}
-                        <span class="text-success fw-bold">Created</span>
+                        <span class="text-success fw-bold action">Created</span>
                         {% elif log.action == 'delete' %}
-                        <span class="text-danger fw-bold">Deleted</span>
+                        <span class="text-danger fw-bold action">Deleted</span>
                         {% elif log.action == 'deactivate' %}
-                        <span class="text-warning fw-bold">Deactivated</span>
+                        <span class="text-warning fw-bold action">Deactivated</span>
                         {% elif log.action == 'reactivate' %}
-                        <span class="text-primary fw-bold">Reactivated</span>
+                        <span class="text-primary fw-bold action">Reactivated</span>
                         {% endif %}
                     </td>
 
@@ -57,4 +65,33 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("audit-search");
+        const actionFilter = document.getElementById("action-filter");
+        const rows = document.querySelectorAll("#audit-table tbody tr");
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const action = actionFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const by = row.querySelector(".by").textContent.toLowerCase();
+                const target = row.querySelector(".target").textContent.toLowerCase();
+                const rowAction = row.querySelector(".action").textContent.toLowerCase();
+
+                // Check if search term matches performed by or target username
+                const matchesSearch = by.includes(search) || target.includes(search);
+                // Check if action filter matches the action text in the row
+                const matchesAction = !action || rowAction.includes(action);
+
+                row.style.display = matchesSearch && matchesAction ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterTable);
+        actionFilter.addEventListener("change", filterTable);
+    });
+</script>
 {% endblock %}

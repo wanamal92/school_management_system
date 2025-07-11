@@ -5,7 +5,6 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Section{% endif
-        %}</button>
+    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Section{% endif %}</button>
 </form>
 {% endblock %}

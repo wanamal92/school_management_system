@@ -2,136 +2,149 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-3">
-    <div class="d-flex justify-content-between align-items-center">
-        <h3>Students</h3>
-        {% if request.user.gender in 'admin staff' %}
-        <a href="{% url 'create_student' %}" class="btn btn-success me-2">
-            <i class="fas fa-user-plus"></i> Add Student
-        </a>
-        {% endif %}
+<div class="container mt-4">
+    <h3 class="mb-4">Students</h3>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" id="student-search" class="form-control" placeholder="Search by Full Name">
-            </div>
+    <!-- Add Student Button -->
+    {% if request.user.role in 'admin staff' %}
+    <a href="{% url 'create_student' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus-circle"></i> Add Student
+    </a>
+    {% endif %}
 
-            <div class="col-md-4">
-                <select id="gender-filter" class="form-select">
-                    <option value="">Filter by Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <select id="class-level-filter" class="form-select">
-                    <option value="">Filter by Class Level</option>
-                    {% for class in classes %}
-                    <option value="{{ class.class_name }}">{{ class.class_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <!-- Search and Filter Section -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input type="text" id="student-search" class="form-control" placeholder="Search by Full Name">
         </div>
 
-        <div>
-            <form class="d-flex" method="get">
-                <a href="?view=list" class="btn btn-outline-info ms-2">List</a>
-                <a href="?view=card" class="btn btn-outline-info">Card</a>
+        <div class="col-md-3">
+            <select id="gender-filter" class="form-select">
+                <option value="">Filter by Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select id="class-level-filter" class="form-select">
+                <option value="">Filter by Class Level</option>
+                {% for class in classes %}
+                <option value="{{ class.class_name }}">{{ class.class_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <form class="d-flex justify-content-end" method="get">
+                <a href="?view=list"
+                    class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
+                <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card
+                    View</a>
             </form>
         </div>
     </div>
 
-    <hr>
     {% if messages %}
-    <div class="alert alert-info" gender="alert">
+    <div class="alert alert-info" role="alert">
         {% for message in messages %}
         <p>{{ message }}</p>
         {% endfor %}
     </div>
     {% endif %}
 
+    <hr>
+
+
+    <!-- Card View -->
     {% if view_mode == "card" %}
     <div class="row">
         {% for student in students %}
-        <div class="col-md-4">
-            <div class="card mb-3">
+        <div class="col-md-4 mb-3">
+            <div class="card">
                 <div class="card-body">
-                    <h5>{{ student.full_name }}</h5>
-                    <p>Class: {{ student.class_level }}</p>
-                    <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-warning"><i
+                    <h5 class="card-title">{{ student.full_name }}</h5>
+                    <p class="card-text">Class: {{ student.class_level.class_name }}</p>
+                    <p class="card-text">Gender: {{ student.gender }}</p>
+                    <a href="{% url 'edit_student' student.id %}" class="btn btn-warning btn-sm"><i
                             class="fas fa-edit me-2"></i>Edit</a>
-                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-student-id="{{ student.id }}"
-                        data-student-name="{{ student.full_name }}">
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ student.id }}"
+                        data-item-name="{{ student.full_name }}"
+                        data-delete-url="{% url 'delete_student' student.id %}">
                         <i class="fas fa-trash me-2"></i> Delete
                     </button>
-                    <a href="{% url 'detail_student' student.id %}" class="btn btn-sm btn-info"><i
+                    <a href="{% url 'detail_student' student.id %}" class="btn btn-info btn-sm"><i
                             class="fas fa-eye me-2"></i>View</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- List View -->
     {% else %}
-    <table class="table table-bordered" id="student-table">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Class</th>
-                <th>Gender</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            <tr>
-                <td class="full_name">{{ student.full_name }}</td>
-                <td class="class_level">{{ student.class_level.class_name }}</td> <!-- Display class name -->
-                <td class="gender">{{ student.gender }}</td>
-                <td>
-                    <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-warning"><i
-                            class="fas fa-edit me-2"></i>Edit</a>
-                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ student.id }}"
-                        data-item-name="{{ student.full_name }}"
-                        data-delete-url="{% url 'delete_student' student.id %}">
-                        <i class="fas fa-trash me-2"></i> Delete
-                    </button>
-                    <a href="{% url 'detail_student' student.id %}" class="btn btn-sm btn-info"><i
-                            class="fas fa-eye me-2"></i>View</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-
-    <!-- Hidden form for deletion -->
-    <form method="POST" id="deleteForm" style="display: none;">
-        {% csrf_token %}
-    </form>
-
-    <!-- Pagination Links -->
-    <div class="pagination justify-content-center mt-4">
-        <span class="step-links">
-            {% if students.has_previous %}
-            <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-                class="btn btn-outline-primary btn-sm">&laquo; First</a>
-            <a href="?page={{ students.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-                class="btn btn-outline-primary btn-sm">Previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ students.number }} of {{ students.paginator.num_pages }}.
-            </span>
-
-            {% if students.has_next %}
-            <a href="?page={{ students.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-                class="btn btn-outline-primary btn-sm">Next</a>
-            <a href="?page={{ students.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-                class="btn btn-outline-primary btn-sm">Last &raquo;</a>
-            {% endif %}
-        </span>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="student-table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Class</th>
+                    <th>Gender</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td class="full_name">{{ student.full_name }}</td>
+                    <td class="class_level">{{ student.class_level.class_name }}</td>
+                    <td class="gender">{{ student.gender }}</td>
+                    <td>
+                        <a href="{% url 'edit_student' student.id %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit me-2"></i>Edit</a>
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ student.id }}"
+                            data-item-name="{{ student.full_name }}"
+                            data-delete-url="{% url 'delete_student' student.id %}">
+                            <i class="fas fa-trash me-2"></i> Delete
+                        </button>
+                        <a href="{% url 'detail_student' student.id %}" class="btn btn-info btn-sm"><i
+                                class="fas fa-eye me-2"></i>View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% endif %}
+</div>
+
+<!-- Hidden form for deletion -->
+<form method="POST" id="deleteForm" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Pagination Links -->
+<div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+        {% if students.has_previous %}
+        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">&laquo; First</a>
+        <a href="?page={{ students.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ students.number }} of {{ students.paginator.num_pages }}.
+        </span>
+
+        {% if students.has_next %}
+        <a href="?page={{ students.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Next</a>
+        <a href="?page={{ students.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 
 <!-- Modal Template (For Deletion) -->

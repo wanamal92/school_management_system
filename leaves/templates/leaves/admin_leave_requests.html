@@ -1,105 +1,128 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>All Leave Requests</h1>
-<a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">Apply for Leave</a>
-<div class="row mb-3">
-    <div class="col-md-6">
-        <input type="text" id="request-search" class="form-control" placeholder="Search by Teacher Name">
+<div class="container mt-4">
+    <h1 class="mb-4">All Leave Requests</h1>
+
+    <!-- Apply for Leave Button -->
+    <a href="{% url 'create_leave_request' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus-circle"></i> Apply for Leave
+    </a>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="request-search" class="form-control" placeholder="Search by Teacher Name">
+        </div>
+        <div class="col-md-4">
+            <select id="status-filter" class="form-select">
+                <option value="">Filter by Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+        </div>
     </div>
 
-    <div class="col-md-4">
-        <select id="status-filter" class="form-select">
-            <option value="">Filter by Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-        </select>
-    </div>
-</div>
-
-<table class="table table-bordered" id="request-table">
-    <thead>
-        <tr>
-            <th>Teacher</th>
-            <th>Leave Type</th>
-            <th>From Date</th>
-            <th>To Date</th>
-            <th>Duration</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for request in leave_requests %}
-        <tr>
-            <td class="teacher_name">{{ request.teacher.full_name }}</td>
-            <td>{{ request.leave_type.name }}</td>
-            <td>{{ request.from_date }}</td>
-            <td>{{ request.to_date }}</td>
-            <td>{{ request.duration }}</td>
-            <td class="status">{{ request.status }}</td>
-            <td>
-                {% if request.status == 'Pending' %}
-                <a href="{% url 'approve_reject_leave' request.id %}?status=Approved"
-                    class="btn btn-success btn-sm">Approve</a>
-                <a href="{% url 'approve_reject_leave' request.id %}?status=Rejected"
-                    class="btn btn-danger btn-sm">Reject</a>
-                {% endif %}
-            </td>
-        </tr>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
         {% endfor %}
-    </tbody>
-</table>
-<!-- Pagination Links -->
-<div class="pagination justify-content-center mt-4">
-    <span class="step-links">
-        {% if leave_requests.has_previous %}
-        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">&laquo; First</a>
-        <a href="?page={{ leave_requests.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Previous</a>
-        {% endif %}
+    </div>
+    {% endif %}
+    <hr>
 
-        <span class="current">
-            Page {{ leave_requests.number }} of {{ leave_requests.paginator.num_pages }}.
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-bordered" id="request-table">
+            <thead>
+                <tr>
+                    <th>Teacher</th>
+                    <th>Leave Type</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in leave_requests %}
+                <tr>
+                    <td class="teacher_name">{{ request.teacher.full_name }}</td>
+                    <td>{{ request.leave_type.name }}</td>
+                    <td>{{ request.from_date }}</td>
+                    <td>{{ request.to_date }}</td>
+                    <td>{{ request.duration }}</td>
+                    <td class="status">{{ request.status }}</td>
+                    <td>
+                        {% if request.status == 'Pending' %}
+                        <a href="{% url 'approve_reject_leave' request.id %}?status=Approved"
+                            class="btn btn-success btn-sm">
+                            <i class="fas fa-check-circle me-1"></i>Approve
+                        </a>
+                        <a href="{% url 'approve_reject_leave' request.id %}?status=Rejected"
+                            class="btn btn-danger btn-sm">
+                            <i class="fas fa-times-circle me-1"></i>Reject
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Links -->
+    <div class="pagination justify-content-center mt-4">
+        <span class="step-links">
+            {% if leave_requests.has_previous %}
+            <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">&laquo; First</a>
+            <a href="?page={{ leave_requests.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ leave_requests.number }} of {{ leave_requests.paginator.num_pages }}.
+            </span>
+
+            {% if leave_requests.has_next %}
+            <a href="?page={{ leave_requests.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Next</a>
+            <a href="?page={{ leave_requests.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+            {% endif %}
         </span>
+    </div>
 
-        {% if leave_requests.has_next %}
-        <a href="?page={{ leave_requests.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Next</a>
-        <a href="?page={{ leave_requests.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchInput = document.getElementById("request-search");
+            const statusFilter = document.getElementById("status-filter");
+            const rows = document.querySelectorAll("#request-table tbody tr");
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const searchInput = document.getElementById("request-search");
-        const statusFilter = document.getElementById("status-filter");
-        const rows = document.querySelectorAll("#request-table tbody tr");
+            function filterTable() {
+                const search = searchInput.value.toLowerCase();
+                const status = statusFilter.value.toLowerCase();
 
-        function filterTable() {
-            const search = searchInput.value.toLowerCase();
-            const status = statusFilter.value.toLowerCase();
+                rows.forEach(row => {
+                    const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
+                    const statusText = row.querySelector(".status").textContent.toLowerCase();
 
-            rows.forEach(row => {
-                const teacher_name = row.querySelector(".teacher_name").textContent.toLowerCase();
-                const statusText = row.querySelector(".status").textContent.toLowerCase();
+                    const matchesSearch = teacher_name.includes(search);
+                    const matchesStatus = !status || statusText.toLowerCase() === status;
 
-                const matchesSearch = teacher_name.includes(search);
-                const matchesStatus = !status || statusText.toLowerCase() === status;
+                    // Toggle row visibility based on filter conditions
+                    row.style.display = matchesSearch && matchesStatus ? "" : "none";
+                });
+            }
 
-                // Toggle row visibility based on filter conditions
-                row.style.display = matchesSearch && matchesStatus ? "" : "none";
-            });
-        }
+            searchInput.addEventListener("input", filterTable);
+            statusFilter.addEventListener("change", filterTable);
+        });
 
-        searchInput.addEventListener("input", filterTable);
-        statusFilter.addEventListener("change", filterTable);
-    });
+    </script>
 
-</script>
-
-{% endblock %}
+    {% endblock %}

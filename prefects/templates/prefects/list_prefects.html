@@ -1,44 +1,67 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h3>Prefects</h3>
-    <a href="{% url 'create_prefect' %}" class="btn btn-primary">Add Prefect</a>
+<div class="container mt-4">
+    <h3 class="mb-4">Prefects</h3>
 
+    <!-- Add Prefect Button -->
+    <a href="{% url 'create_prefect' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus-circle me-2"></i> Add Prefect
+    </a>
+
+
+
+    <!-- Search Section -->
     <div class="row mb-3">
         <div class="col-md-6">
             <input type="text" id="prefect-search" class="form-control" placeholder="Search by Student Name">
         </div>
     </div>
 
-    <table class="table table-bordered mt-3" id="prefect-table">
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Prefect Type</th>
-                <th>Class Level</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for prefect in prefects %}
-            <tr>
-                <td class="student_name">{{ prefect.student.full_name }}</td>
-                <td>{{ prefect.get_prefect_type_display }}</td>
-                <td>{{ prefect.class_level }}</td>
-                <td>
-                    <a href="{% url 'edit_prefect' prefect.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ prefect.id }}"
-                        data-item-name="{{ prefect.student.full_name }} - {{ prefect.prefect_type }}"
-                        data-delete-url="{% url 'delete_prefect' prefect.id %}">
-                        <i class="fas fa-trash me-2"></i> Delete
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <hr>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-bordered mt-3" id="prefect-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Prefect Type</th>
+                    <th>Class Level</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prefect in prefects %}
+                <tr>
+                    <td class="student_name">{{ prefect.student.full_name }}</td>
+                    <td>{{ prefect.get_prefect_type_display }}</td>
+                    <td>{{ prefect.class_level }}</td>
+                    <td>
+                        <a href="{% url 'edit_prefect' prefect.pk %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ prefect.id }}"
+                            data-item-name="{{ prefect.student.full_name }} - {{ prefect.prefect_type }}"
+                            data-delete-url="{% url 'delete_prefect' prefect.id %}">
+                            <i class="fas fa-trash me-2"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+
 <!-- Hidden form for deletion -->
 <form method="POST" id="deleteForm" style="display: none;">
     {% csrf_token %}
@@ -97,7 +120,7 @@
             rows.forEach(row => {
                 const student_name = row.querySelector(".student_name").textContent.toLowerCase();
 
-                const matchesSearch = student_name.includes(search) ;
+                const matchesSearch = student_name.includes(search);
 
                 // Toggle row visibility based on filter conditions
                 row.style.display = matchesSearch ? "" : "none";

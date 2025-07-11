@@ -52,7 +52,7 @@ def edit_leave_type(request, pk):
             return redirect('list_leave_types')
     else:
         form = LeaveTypeForm(instance=leave_type)
-    return render(request, 'inventory/edit_list_leave_type.html', {'form': form})
+    return render(request, 'leaves/edit_leave_type.html', {'form': form})
 
 # Delete Leave Type
 
@@ -95,7 +95,7 @@ def create_leave_allocation(request):
             return redirect('leave_allocation')
     else:
         form = LeaveAllocationForm()
-    return render(request, 'leaves/list_leave_allocations.html', {'form': form})
+    return render(request, 'leaves/create_leave_allocation.html', {'form': form})
 
 # Update Leave Allocation
 

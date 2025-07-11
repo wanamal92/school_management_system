@@ -1,91 +1,122 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Fee Payments</h2>
-<a href="{% url 'create_fee_payment' %}" class="btn btn-success mb-3">Add Fee Payment</a>
+<div class="container mt-4">
+    <h2 class="mb-4">Fee Payments</h2>
 
-<div class="row mb-3">
 
-    <div class="col-md-6">
-        <input type="text" id="payment-search" class="form-control" placeholder="Search by Student Name">
-    </div>
 
-    <div class="col-md-4">
-        <select id="status-filter" class="form-select">
-            <option value="">Filter by Status</option>
-            <option value="Paid">Paid</option>
-            <option value="Pending">Pending</option>
-            <option value="Partially">Partially</option>
-        </select>
-    </div>
-</div>
+    <!-- Conditional Button for Admin/Staff -->
+    {% if request.user.role in 'admin staff' %}
+    <a href="{% url 'create_fee_payment' %}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus-circle"></i> Add Fee Payment
+    </a>
+    {% endif %}
 
-<table class="table table-striped" id="payment-table">
-    <thead>
-        <tr>
-            <th>Student</th>
-            <th>Fee Type</th>
-            <th>Paid Amount</th>
-            <th>Balance</th>
-            <th>Status</th>
-            <th>Year</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for payment in payments %}
-        <tr>
-            <td class="student_name">{{ payment.student.full_name }}</td>
-            <td>{{ payment.fee_type.name }}</td>
-            <td>{{ payment.paid_amount }}</td>
-            <td>{{ payment.balance }}</td>
-            <td class="status">{{ payment.status }}</td>
-            <td>{{ payment.year }}</td>
-            <td>
-                <a href="{% url 'edit_fee_payment' payment.pk %}" class="btn btn-warning btn-sm">
-                    <i class="fas fa-edit me-2"></i>Edit
-                </a>
-                <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ payment.id }}"
-                    data-item-name="{{ payment.student.full_name }} - {{ payment.fee_type }}"
-                    data-delete-url="{% url 'delete_fee_payment' payment.id %}">
-                    <i class="fas fa-trash me-2"></i> Delete
-                </button>
-                <!-- Download PDF Button -->
-                <a href="{% url 'generate_invoice_pdf' payment.pk %}" class="btn btn-info btn-sm">
-                    <i class="fas fa-download me-2"></i>Download Invoice
-                </a>
-            </td>
-        </tr>
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
         {% endfor %}
-    </tbody>
-</table>
-<!-- Hidden form for deletion -->
-<form method="POST" id="deleteForm" style="display: none;">
-    {% csrf_token %}
-</form>
+    </div>
+    {% endif %}
 
-<!-- Pagination Links -->
-<div class="pagination justify-content-center mt-4">
-    <span class="step-links">
-        {% if payments.has_previous %}
-        <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">&laquo; First</a>
-        <a href="?page={{ payments.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Previous</a>
-        {% endif %}
+    <!-- Search Section -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="payment-search" class="form-control" placeholder="Search by Student Name">
+        </div>
 
-        <span class="current">
-            Page {{ payments.number }} of {{ payments.paginator.num_pages }}.
+        <div class="col-md-4">
+            <select id="status-filter" class="form-select">
+                <option value="">Filter by Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Partially">Partially</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Display error messages -->
+    {% if messages %}
+    <div class="alert alert-danger" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <hr>
+
+    <!-- Fee Payments Table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered" id="payment-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Fee Type</th>
+                    <th>Paid Amount</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Year</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td class="student_name">{{ payment.student.full_name }}</td>
+                    <td>{{ payment.fee_type.name }}</td>
+                    <td>{{ payment.paid_amount }}</td>
+                    <td>{{ payment.balance }}</td>
+                    <td class="status">{{ payment.status }}</td>
+                    <td>{{ payment.year }}</td>
+                    <td>
+                        <a href="{% url 'edit_fee_payment' payment.pk %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-2"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ payment.id }}"
+                            data-item-name="{{ payment.student.full_name }} - {{ payment.fee_type }}"
+                            data-delete-url="{% url 'delete_fee_payment' payment.id %}">
+                            <i class="fas fa-trash me-2"></i> Delete
+                        </button>
+                        <!-- Download PDF Button -->
+                        <a href="{% url 'generate_invoice_pdf' payment.pk %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-download me-2"></i> Download Invoice
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Hidden form for deletion -->
+    <form method="POST" id="deleteForm" style="display: none;">
+        {% csrf_token %}
+    </form>
+
+    <!-- Pagination Links -->
+    <div class="pagination justify-content-center mt-4">
+        <span class="step-links">
+            {% if payments.has_previous %}
+            <a href="?page=1&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">&laquo; First</a>
+            <a href="?page={{ payments.previous_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ payments.number }} of {{ payments.paginator.num_pages }}.
+            </span>
+
+            {% if payments.has_next %}
+            <a href="?page={{ payments.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Next</a>
+            <a href="?page={{ payments.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
+                class="btn btn-outline-primary btn-sm">Last &raquo;</a>
+            {% endif %}
         </span>
-
-        {% if payments.has_next %}
-        <a href="?page={{ payments.next_page_number }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Next</a>
-        <a href="?page={{ payments.paginator.num_pages }}&view={{ view_mode }}&q={{ request.GET.q }}&group_by={{ request.GET.group_by }}"
-            class="btn btn-outline-primary btn-sm">Last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
+    </div>
 </div>
 
 

@@ -2,31 +2,38 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/guardian_styles.css' %}">
-<div class="container mt-3">
-    <div class="d-flex justify-content-between align-items-center">
-        <h3>Guardians</h3>
-        {% if request.user.role in 'admin staff' %}
-        <a href="{% url 'add_guardian' %}" class="btn btn-success me-2">
-            <i class="fas fa-user-plus"></i> Add Guardian
-        </a>
-        {% endif %}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input type="text" id="guardian-search" class="form-control" placeholder="Search by Full Name">
-            </div>
 
-            <div class="col-md-4">
-                <select id="gender-filter" class="form-select">
-                    <option value="">Filter by Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-            </div>
+<div class="container mt-4">
+    <h3 class="mb-4">Guardians</h3>
 
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            {% if request.user.role in 'admin staff' %}
+            <a href="{% url 'add_guardian' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus-circle"></i> Add Guardian
+            </a>
+            {% endif %}
         </div>
-        <div>
-            <form class="d-flex" method="get">
+    </div>
+
+
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-3 d-flex align-items-center">
+        <div class="col-md-3">
+            <input type="text" id="guardian-search" class="form-control" placeholder="Search by Full Name">
+        </div>
+
+        <div class="col-md-3">
+            <select id="gender-filter" class="form-select">
+                <option value="">Filter by Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <form class="d-flex justify-content-end" method="get">
                 <a href="?view=list"
                     class="btn btn-outline-info ms-2 {% if view_mode == 'list' %}active{% endif %}">List View</a>
                 <a href="?view=card" class="btn btn-outline-info {% if view_mode == 'card' %}active{% endif %}">Card
@@ -34,6 +41,15 @@
             </form>
         </div>
     </div>
+
+    {% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <hr>
 
     <!-- List View -->
@@ -48,18 +64,21 @@
         </thead>
         <tbody>
             {% for guardian in guardians %}
-            <tr class="guardian-row" style="cursor: pointer;"
-                onclick="window.location.href='{% url 'detail_guardian' guardian.pk %}'">
+            <tr>
                 <td class="full_name">{{ guardian.full_name }}</td>
                 <td class="gender">{{ guardian.gender }}</td>
                 <td>
-                    <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-2"></i> Edit
+                    </a>
                     <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ guardian.id }}"
                         data-item-name="{{ guardian.full_name }}"
                         data-delete-url="{% url 'delete_guardian' guardian.id %}">
                         <i class="fas fa-trash me-2"></i> Delete
                     </button>
-                    <a href="{% url 'detail_guardian' guardian.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'detail_guardian' guardian.pk %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-eye me-2"></i> View
+                    </a>
                 </td>
             </tr>
             {% endfor %}
@@ -88,6 +107,19 @@
                             <strong>Gender:</strong> {{ guardian.gender }} <br>
                             <strong>Section:</strong> {{ guardian.section }}
                         </p>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit me-2"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                data-item-id="{{ guardian.id }}" data-item-name="{{ guardian.full_name }}"
+                                data-delete-url="{% url 'delete_guardian' guardian.id %}">
+                                <i class="fas fa-trash me-2"></i> Delete
+                            </button>
+                            <a href="{% url 'detail_guardian' guardian.pk %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye me-2"></i> View
+                            </a>
+                        </div>
                     </div>
                 </div>
             </a>
@@ -96,6 +128,8 @@
     </div>
     {% endif %}
 </div>
+
+
 <!-- Hidden form for deletion -->
 <form method="POST" id="deleteForm" style="display: none;">
     {% csrf_token %}
