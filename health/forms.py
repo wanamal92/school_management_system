@@ -3,6 +3,7 @@ from django import forms
 from .models import HealthRecord
 from students.models import Student
 from teachers.models import Teacher
+from django.core.exceptions import ValidationError
 
 
 class HealthRecordForm(forms.ModelForm):
@@ -67,6 +68,15 @@ class HealthRecordForm(forms.ModelForm):
             cleaned_data['student'] = None
         else:
             raise forms.ValidationError("Please select a record type.")
+
+        # Validate height and weight
+        height = cleaned_data.get('height_cm')
+        weight = cleaned_data.get('weight_kg')
+
+        if height <= 0:
+            raise ValidationError("Height must be a positive number.")
+        if weight <= 0:
+            raise ValidationError("Weight must be a positive number.")
 
         return cleaned_data
 

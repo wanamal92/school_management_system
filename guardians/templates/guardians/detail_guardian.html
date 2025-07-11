@@ -1,27 +1,64 @@
-<!-- guardians/templates/guardians/guardian_detail.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ guardian.full_name }}'s Profile</h1>
 
-<a href="{% url 'list_guardian' %}" class="btn btn-secondary mb-3">Back</a>
-<a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning mb-3">Edit</a>
+{% if messages %}
+<div class="alert alert-info" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
 
-<div class="card mb-3">
-    {% if guardian.profile_photo %}
-    <img src="{{ guardian.profile_photo.url }}" class="card-img-top" alt="Profile Photo"
-        style="height: 300px; object-fit: cover;">
-    {% else %}
-    <img src="/media/default.png" class="card-img-top" alt="Default Profile Photo"
-        style="height: 300px; object-fit: cover;">
-    {% endif %}
-    <div class="card-body">
-        <h5 class="card-title">{{ guardian.full_name }}</h5>
-        <strong>Gender:</strong> {{ guardian.gender }} <br>
-        <strong>Phone:</strong> {{ guardian.phone }} <br>
-        <strong>Mobile:</strong> {{ guardian.mobile }} <br>
-        <strong>Address:</strong> {{ guardian.address }}
-        </p>
+<div class="container mt-5">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user me-2"></i>{{ guardian.full_name }}'s Profile</h5>
+        </div>
+        <div class="card-body">
+            <!-- Guardian Profile Photo -->
+            <div class="d-flex justify-content-center mb-4">
+                {% if guardian.profile_photo %}
+                <img src="{{ guardian.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo"
+                    style="max-height: 300px; object-fit: cover;">
+                {% else %}
+                <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo"
+                    style="max-height: 300px; object-fit: cover;">
+                {% endif %}
+            </div>
+
+            <!-- Guardian Details -->
+            <dl class="row">
+                <dt class="col-md-3"><strong>Full Name:</strong></dt>
+                <dd class="col-md-9">{{ guardian.full_name }}</dd>
+
+                <dt class="col-md-3"><strong>Gender:</strong></dt>
+                <dd class="col-md-9">{{ guardian.gender }}</dd>
+
+                <dt class="col-md-3"><strong>Phone:</strong></dt>
+                <dd class="col-md-9">{{ guardian.phone }}</dd>
+
+                <dt class="col-md-3"><strong>Mobile:</strong></dt>
+                <dd class="col-md-9">{{ guardian.mobile }}</dd>
+
+                <dt class="col-md-3"><strong>Email:</strong></dt>
+                <dd class="col-md-9">{{ guardian.email }}</dd>
+
+                <dt class="col-md-3"><strong>Address:</strong></dt>
+                <dd class="col-md-9">{{ guardian.address }}</dd>
+            </dl>
+
+            <!-- Action Buttons (Back and Edit) -->
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'edit_guardian' guardian.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'list_guardian' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

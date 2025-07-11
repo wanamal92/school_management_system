@@ -3,26 +3,57 @@
 {% block content %}
 <div class="container mt-5">
     {% if teacher_profile %}
-    <div class="row">
-        <div class="col-md-4">
-            {% if teacher_profile.profile_photo %}
-            <img src="{{ teacher_profile.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo">
-            {% else %}
-            <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo">
-            {% endif %}
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user me-2"></i>My Profile</h5>
         </div>
-        <div class="col-md-8">
-            <h1>{{ teacher_profile.title }} {{ teacher_profile.full_name }}</h1>
-            <p><strong>Full Name:</strong> {{ teacher_profile.full_name }}</p>
-            <p><strong>Short Code:</strong> {{ teacher_profile.shortcode }}</p>
-            <p><strong>Section:</strong> {{ teacher_profile.section }}</p>
-            <p><strong>Birthdate:</strong> {{ teacher_profile.birthdate }}</p>
-            <p><strong>Email:</strong> {{ teacher_profile.email }}</p>
-            <p><strong>Telephone:</strong> {{ teacher_profile.telephone }}</p>
-            <p><strong>Mobile:</strong> {{ teacher_profile.mobile }}</p>
-            <p><strong>Address:</strong> {{ teacher_profile.address }}</p>
-            <p><strong>Nationality:</strong> {{ teacher_profile.nationality }}</p>
-            <p><strong>Emergency Contact:</strong> {{ teacher_profile.emergency_contact }}</p>
+        <div class="card-body">
+            <!-- Teacher Profile Photo -->
+            <div class="d-flex justify-content-center mb-4">
+                {% if teacher_profile.profile_photo %}
+                <img src="{{ teacher_profile.profile_photo.url }}" class="img-fluid rounded-circle" alt="Profile Photo"
+                    style="max-height: 300px; object-fit: cover;">
+                {% else %}
+                <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo"
+                    style="max-height: 300px; object-fit: cover;">
+                {% endif %}
+            </div>
+
+            <!-- Teacher Details -->
+            <dl class="row">
+                <dt class="col-md-3"><strong>Full Name:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.full_name }}</dd>
+
+                <dt class="col-md-3"><strong>Short Code:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.shortcode }}</dd>
+
+                <dt class="col-md-3"><strong>Section:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.section }}</dd>
+
+                <dt class="col-md-3"><strong>Birthdate:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.birthdate }}</dd>
+
+                <dt class="col-md-3"><strong>Email:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.email }}</dd>
+
+                <dt class="col-md-3"><strong>Telephone:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.telephone }}</dd>
+
+                <dt class="col-md-3"><strong>Mobile:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.mobile }}</dd>
+
+                <dt class="col-md-3"><strong>Address:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.address }}</dd>
+
+                <dt class="col-md-3"><strong>Nationality:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.nationality }}</dd>
+
+                <dt class="col-md-3"><strong>Emergency Contact:</strong></dt>
+                <dd class="col-md-9">{{ teacher_profile.emergency_contact }}</dd>
+            </dl>
+
+
+
         </div>
     </div>
     {% else %}
@@ -30,9 +61,3 @@
     {% endif %}
 </div>
 {% endblock %}
-birthdate = models.DateField()
-nationality = models.CharField(max_length=100)
-emergency_contact = models.CharField(max_length=15)
-section = models.CharField(max_length=50, choices=[('Primary Section', 'Primary Section'), ('Oriental Section',
-'Oriental Section'), ('Primary and Oriental Section', 'Primary and Oriental Section')])
-address = models.TextField()

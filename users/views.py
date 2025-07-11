@@ -156,7 +156,7 @@ def delete_user(request, user_id):
 
 @login_required
 def view_profile(request):
-    return render(request, 'users/profile_view.html')
+    return render(request, 'users/view_profile.html')
 
 
 @login_required
@@ -173,10 +173,10 @@ def edit_profile(request):
             password_form.save()
             update_session_auth_hash(
                 request, request.user)  # Keep user logged in
-            return redirect('profile_view')
+            return redirect('view_profile')
     else:
         password_form = PasswordChangeForm(user=request.user)
-    return render(request, 'users/profile_edit.html', {
+    return render(request, 'users/edit_profile.html', {
         'password_form': password_form,
         'user_profile_image': request.user.profile_image
     })

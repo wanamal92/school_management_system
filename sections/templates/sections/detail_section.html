@@ -1,11 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ cls.section_name }} Details</h1>
-<ul>
-    <li><strong>Section Code:</strong> {{ cls.section_code }}</li>
-    <li><strong>Section:</strong> {{ cls.section }}</li>
-</ul>
-<a href="{% url 'edit_section' cls.pk %}" class="btn btn-warning">Edit</a>
-<a href="{% url 'list_section' %}" class="btn btn-secondary">Back to List</a>
+<div class="container mt-5">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-chalkboard me-2"></i>{{ cls.section_name }} Details</h5>
+        </div>
+        <div class="card-body">
+            <!-- Section Details -->
+            <dl class="row">
+                <dt class="col-md-3"><strong>Section Code:</strong></dt>
+                <dd class="col-md-9">{{ cls.section_code }}</dd>
+
+                <dt class="col-md-3"><strong>Section:</strong></dt>
+                <dd class="col-md-9">{{ cls.section_name }}</dd>
+            </dl>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'edit_section' cls.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'list_section' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

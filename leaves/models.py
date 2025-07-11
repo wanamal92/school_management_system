@@ -15,7 +15,7 @@ class LeaveAllocation(models.Model):
     casual_leave = models.IntegerField(
         default=14)  # 14 days casual leave annually
     sick_leave = models.IntegerField(default=7)  # 7 days sick leave annually
-    year = models.CharField(max_length=4)
+    year = models.PositiveIntegerField()
 
     class Meta:
         unique_together = ('teacher', 'year')

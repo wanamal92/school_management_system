@@ -112,8 +112,9 @@ def create_fee_type(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = FeePaymentForm()
-    return render(request, 'fees/create_fee_type.html')
+        form = FeeTypeForm()
+    return render(request, 'fees/create_fee_type.html', {'form': form})
+
 
 # Edit fee type
 
@@ -122,20 +123,19 @@ def create_fee_type(request):
 @user_passes_test(is_admin)
 def edit_fee_type(request, pk):
     fee_type = get_object_or_404(FeeType, pk=pk)
+
     if request.method == 'POST':
-
-        if request.method == 'POST':
-            form = FeeTypeForm(request.POST, instance=fee_type)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Fee Type updated successfully!')
-                return redirect('list_fee_types')
-            else:
-                messages.error(request, 'Please correct the errors below.')
+        form = FeeTypeForm(request.POST, instance=fee_type)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fee Type updated successfully!')
+            return redirect('list_fee_types')
         else:
-            form = FeeTypeForm(instance=fee_type)
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = FeeTypeForm(instance=fee_type)
 
-    return render(request, 'fees/edit_fee_type.html', {'fee_type': fee_type})
+    return render(request, 'fees/edit_fee_type.html', {'form': form})
 
 # Delete fee type
 

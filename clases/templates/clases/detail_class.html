@@ -1,11 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ cls.class_name }} Details</h1>
-<ul>
-    <li><strong>Class Code:</strong> {{ cls.class_code }}</li>
-    <li><strong>class in Charge:</strong> {{ cls.class_in_charge }}</li>
-</ul>
-<a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning">Edit</a>
-<a href="{% url 'list_class' %}" class="btn btn-secondary">Back to List</a>
+{% if messages %}
+<div class="alert alert-info" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="container mt-5">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-school me-2"></i>{{ cls.class_name }} Details</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li><strong>Class Code:</strong> <span class="text-muted">{{ cls.class_code }}</span></li>
+                <li><strong>Class In Charge:</strong> <span class="text-muted">{{ cls.class_in_charge }}</span></li>
+            </ul>
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'list_class' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

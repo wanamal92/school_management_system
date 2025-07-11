@@ -1,14 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ subject.subject_name }} - {{ subject.subject_code }}</h1>
-<p><strong>Class:</strong> {{ subject.class_assigned }}</p>
-<p><strong>Teachers:</strong>
-    {% for ts in subject.teachersubject_set.all %}
-    {{ ts.teacher }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-    <em>No teachers assigned.</em>
-    {% endfor %}
-</p>
-<a href="{% url 'list_subject' %}" class="btn btn-secondary">Back</a>
+<div class="container mt-5">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-book me-2"></i>{{ subject.subject_name }} - {{ subject.subject_code }}</h5>
+        </div>
+        <div class="card-body">
+            <!-- Subject Details -->
+            <dl class="row">
+                <dt class="col-md-3"><strong>Code:</strong></dt>
+                <dd class="col-md-9">{{ subject.subject_code }}</dd>
+                <dt class="col-md-3"><strong>Class:</strong></dt>
+                <dd class="col-md-9">{{ subject.class_assigned }}</dd>
+
+                <dt class="col-md-3"><strong>Teachers:</strong></dt>
+                <dd class="col-md-9">
+                    {% for ts in subject.teachersubject_set.all %}
+                        {{ ts.teacher }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        <em>No teachers assigned.</em>
+                    {% endfor %}
+                </dd>
+            </dl>
+
+            <!-- Action Buttons (Edit on Left, Back on Right) -->
+            <div class="d-flex justify-content-between mt-4">
+                <!-- Edit Button on Left -->
+                <a href="{% url 'edit_subject' subject.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                
+                <!-- Back Button on Right -->
+                <a href="{% url 'list_subject' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -3,11 +3,11 @@
 {% block content %}
 <h1>Upload Exam Sessions Excel</h1>
 
-<!-- Show error if there is any -->
-{% if error %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ error }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+{% if messages %}
+<div class="alert alert-info" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
 </div>
 {% endif %}
 

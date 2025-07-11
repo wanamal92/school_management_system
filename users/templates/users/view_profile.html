@@ -1,11 +1,33 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="container mt-4">
-    <h3>My Profile</h3>
-    <p><strong>Username:</strong> {{ request.user.username }}</p>
-    <p><strong>Email:</strong> {{ request.user.email }}</p>
-    <p><strong>Role:</strong> {{ request.user.get_role_display }}</p>
-    <p><img src="{{ request.user.profile_image.url }}" width="100"></p>
-    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Change Password</a>
+<div class="container mt-5">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user me-2"></i>My User Profile</h5>
+        </div>
+        <div class="card-body">
+            <!-- Profile Image -->
+            <div class="d-flex justify-content-center mb-4">
+                {% if request.user.profile_image %}
+                    <img src="{{ request.user.profile_image.url }}" class="img-fluid rounded-circle" alt="Profile Photo" style="max-height: 300px; object-fit: cover;">
+                {% else %}
+                    <img src="/media/default.png" class="img-fluid rounded-circle" alt="Default Profile Photo" style="max-height: 300px; object-fit: cover;">
+                {% endif %}
+            </div>
+
+            <!-- User Details -->
+            <p><strong>Username:</strong> {{ request.user.username }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+            <p><strong>Role:</strong> {{ request.user.get_role_display }}</p>
+
+            <!-- Change Password Button -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'edit_profile' %}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Change Password
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

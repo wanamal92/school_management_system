@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
+
+{% if messages %}
+<div class="alert alert-info" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
 <div class="container mt-4">
     <h2>Welcome, Staff {{ request.user.username }}</h2>
     <p>Use the sidebar to manage the system.</p>

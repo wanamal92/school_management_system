@@ -1,10 +1,47 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Section</h1>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Section{% endif %}</button>
-</form>
+
+{% if messages %}
+<div class="alert alert-info" role="alert">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container mt-4">
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Section
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="row g-3">
+                {% csrf_token %}
+
+                {% for field in form.visible_fields %}
+                <div class="col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                    <a href="{% url 'list_section' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -1,6 +1,7 @@
 # teachers/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Teacher
+from leaves.models import LeaveRequest
 from .forms import TeacherForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from io import BytesIO
