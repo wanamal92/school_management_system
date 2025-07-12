@@ -2,12 +2,28 @@
 {% load static %}
 {% block content %}
 {% if messages %}
-<div class="alert alert-info" role="alert">
     {% for message in messages %}
-    <p>{{ message }}</p>
+        <div class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% else %}
+                alert-info
+            {% endif %} alert-dismissible fade show" role="alert">
+            
+            <!-- Message content -->
+            <p>{{ message }}</p>
+            
+            <!-- Close button (X) -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     {% endfor %}
-</div>
 {% endif %}
+
+
+
+
 
 <div class="container mt-4">
     <div class="card shadow rounded-3">
@@ -32,8 +48,8 @@
 
                 <div class="col-12 mt-3">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-1"></i> {% if form.instance.pk %}Save Changes{% else %}Create Class{%
-                        endif%}
+                        <i class="fas fa-save me-1"></i> {% if form.instance.pk %}Save Changes{% else %}Create
+                        Class{%endif%}
                     </button>
                     <a href="{% url 'list_class' %}" class="btn btn-secondary">
                         <i class="fas fa-times me-1"></i> Cancel

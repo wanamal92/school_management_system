@@ -6,8 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_admin_or_staff)
 def list_prefects(request):
     prefects = Prefect.objects.all().order_by('student__full_name')
     
@@ -19,7 +25,7 @@ def list_prefects(request):
     return render(request, 'prefects/list_prefects.html', {'prefects': prefects_page})
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_admin_or_staff)
 def create_prefect(request):
     if request.method == 'POST':
         form = PrefectForm(request.POST)
@@ -35,7 +41,7 @@ def create_prefect(request):
     return render(request, 'prefects/create_prefect.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_admin_or_staff)
 def edit_prefect(request, pk):
     prefect = get_object_or_404(Prefect, pk=pk)
     if request.method == 'POST':
@@ -52,7 +58,7 @@ def edit_prefect(request, pk):
     return render(request, 'prefects/edit_prefect.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(is_admin)
 def delete_prefect(request, pk):
     prefect = get_object_or_404(Prefect, pk=pk)
     if request.method == 'POST':

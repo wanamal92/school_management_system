@@ -28,7 +28,7 @@ class CategoryForm(forms.ModelForm):
             raise ValidationError("Category name cannot be longer than 255 characters.")
 
         # Ensure the name is unique
-        if Category.objects.filter(name=name).exists():
+        if Category.objects.exclude(id=self.instance.id).filter(name=name).exists():
             raise ValidationError(f"The category '{name}' already exists. Please choose a different name.")
         
         return name
@@ -149,17 +149,17 @@ class TeacherItemForm(forms.ModelForm):
         return assigned_date
 
     # Additional save logic can be applied here for custom actions before saving
-    def save(self, *args, **kwargs):
-        instance = super().save(commit=False)
+    # def save(self, *args, **kwargs):
+    #     instance = super().save(commit=False)
         
-        # Deduct the stock when the item is assigned to the teacher
-        item = instance.item
-        if item.quantity >= instance.quantity:
-            item.decrease_stock(instance.quantity)  # Deduct stock from the item
-            instance.save()
-        else:
-            raise ValueError(
-                f"Not enough stock of {item.name} to assign {instance.quantity} to {instance.teacher}"
-            )
+    #     # Deduct the stock when the item is assigned to the teacher
+    #     item = instance.item
+    #     if item.quantity >= instance.quantity:
+    #         item.decrease_stock(instance.quantity)  # Deduct stock from the item
+    #         instance.save()
+    #     else:
+    #         raise ValueError(
+    #             f"Not enough stock of {item.name} to assign {instance.quantity} to {instance.teacher}"
+    #         )
 
-        return instance
+    #     return instance

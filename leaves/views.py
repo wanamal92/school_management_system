@@ -8,7 +8,10 @@ from teachers.models import Teacher
 
 
 def is_admin(user):
-    return user.is_superuser  # Admin check
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
 
 @user_passes_test(is_admin)
@@ -33,14 +36,17 @@ def create_leave_type(request):
         form = LeaveTypeForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Leave Type created successfully!")
             return redirect('list_leave_types')
+        else:
+            messages.error(request, "There was an error in creating the leave type.")
     else:
         form = LeaveTypeForm()
     return render(request, 'leaves/create_leave_type.html', {'form': form})
 
 # Edit Leave Type
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_leave_type(request, pk):
     leave_type = get_object_or_404(LeaveType, pk=pk)
@@ -50,6 +56,8 @@ def edit_leave_type(request, pk):
             form.save()
             messages.success(request, "Leave Type updated successfully.")
             return redirect('list_leave_types')
+        else:
+            messages.error(request, "There was an error updating the leave type.")
     else:
         form = LeaveTypeForm(instance=leave_type)
     return render(request, 'leaves/edit_leave_type.html', {'form': form})
@@ -57,12 +65,13 @@ def edit_leave_type(request, pk):
 # Delete Leave Type
 
 
-@login_required
+@user_passes_test(is_admin)
 @login_required
 def delete_leave_type(request, pk):
     leave_type = get_object_or_404(LeaveType, pk=pk)
     if request.method == 'POST':
         leave_type.delete()  #
+        messages.success(request, "Leave Type deleted successfully!")
         return redirect('list_leave_types')
     return redirect('list_leave_types')
 
@@ -91,10 +100,15 @@ def create_leave_allocation(request):
         form = LeaveAllocationForm(request.POST)
         if form.is_valid():
             form.save()
-            # Redirect after creating leave allocation
-            return redirect('leave_allocation')
+            messages.success(request, "Leave Allocation created successfully!")
+            return redirect('list_leave_allocations')  # Redirect after saving the form
+        else:
+            messages.error(request, "There was an error in creating the leave allocation.")
+            # Pass form with errors back to template
+            return render(request, 'leaves/create_leave_allocation.html', {'form': form})
     else:
         form = LeaveAllocationForm()
+    
     return render(request, 'leaves/create_leave_allocation.html', {'form': form})
 
 # Update Leave Allocation
@@ -108,19 +122,23 @@ def edit_leave_allocation(request, pk):
         form = LeaveAllocationForm(request.POST, instance=leave_allocation)
         if form.is_valid():
             form.save()
+            messages.success(request, "Leave Allocation updated successfully!")
             return redirect('list_leave_allocations')
+        else:
+            messages.error(request, "There was an error updating the leave allocation.")
     else:
         form = LeaveAllocationForm(instance=leave_allocation)
     return render(request, 'leaves/edit_leave_allocation.html', {'form': form})
 
 # Delete Leave Allocation
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_leave_allocation(request, pk):
     leave_allocation = get_object_or_404(LeaveAllocation, pk=pk)
     if request.method == 'POST':
         leave_allocation.delete()  #
+        messages.success(request, "Leave Allocation deleted successfully!")
         return redirect('list_leave_allocations')
     return redirect('list_leave_allocations')
 
@@ -149,15 +167,21 @@ def approve_reject_leave(request, pk):
     if request.method == 'POST':
         leave_request.status = request.POST.get('status')
         leave_request.save()
+        messages.success(request, "Leave Request updated successfully!")
         return redirect('admin_leave_requests')
+    else:
+            messages.error(request, "There was an error updating the leave request.")
     return render(request, 'leaves/approve_reject_leave.html', {'leave_request': leave_request})
 
 
 # Teacher Leave Request List (View and Apply Leave)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def teacher_leave_requests(request):
     # Fetch the teacher object linked to the logged-in user
-    teacher = request.user.teacher  # Assuming user is related to teacher model
+     # Assuming user is related to teacher model
+    teacher = Teacher.objects.get(user=request.user)
+
     leave_requests = LeaveRequest.objects.filter(
         teacher=teacher).order_by('teacher__full_name')
     leave_allocation = LeaveAllocation.objects.get(teacher=teacher)
@@ -179,23 +203,26 @@ def teacher_leave_requests(request):
 
 
 # Create Leave Request (Teacher applies for leave)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_leave_request(request):
     if request.method == 'POST':
         form = LeaveRequestForm(request.POST)
         if form.is_valid():
             leave_request = form.save(commit=False)
-            leave_request.teacher = request.user.teacher  # Assign teacher automatically
             leave_request.save()
+            messages.success(request, "Leave Request created successfully!")
             # Redirect to leave requests list
             return redirect('teacher_leave_requests')
+        else:
+            messages.error(request, "There was an error in creating the leave request.")
     else:
         form = LeaveRequestForm()
     return render(request, 'leaves/create_leave_request.html', {'form': form})
 
 # Update Leave Request
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 @user_passes_test(is_admin)
 def edit_leave_request(request, pk):
@@ -204,13 +231,17 @@ def edit_leave_request(request, pk):
         form = LeaveRequestForm(request.POST, instance=leave_request)
         if form.is_valid():
             form.save()
+            messages.success(request, "Leave Request updated successfully!")
             return redirect('list_leave_allocations')
+        else:
+            messages.error(request, "There was an error updating the leave request.")
     else:
         form = LeaveRequestForm(instance=leave_request)
     return render(request, 'leaves/edit_leave_request.html', {'form': form})
 
 
 # Delete Leave Request
+@user_passes_test(is_admin_or_staff)
 @login_required
 def delete_leave_request(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
@@ -224,6 +255,7 @@ def delete_leave_request(request, pk):
             leave_request.teacher.leaveallocation.save()
 
         leave_request.delete()  # Delete the leave request
+        messages.success(request, "Leave Request deleted successfully!")
         return redirect('teacher_leave_requests')
     # Redirect back to leave requests list
     return redirect('teacher_leave_requests')

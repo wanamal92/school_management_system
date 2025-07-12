@@ -5,9 +5,17 @@ from .forms import CategoryForm, ItemForm, TeacherItemForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
+
 # Category Views
 
-
+@user_passes_test(is_admin)
 @login_required
 def list_categories(request):
     categories = Category.objects.all().order_by('name')
@@ -19,7 +27,7 @@ def list_categories(request):
 
     return render(request, 'inventory/list_categories.html', {'categories': categories_page})
 
-
+@user_passes_test(is_admin)
 @login_required
 def create_category(request):
     if request.method == 'POST':
@@ -28,11 +36,13 @@ def create_category(request):
             form.save()
             messages.success(request, "Category created successfully.")
             return redirect('list_categories')
+        else:
+            messages.error(request, "There was an error in creating the catagory.")
     else:
         form = CategoryForm()
     return render(request, 'inventory/create_category.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
@@ -42,11 +52,13 @@ def edit_category(request, pk):
             form.save()
             messages.success(request, "Category updated successfully.")
             return redirect('list_categories')
+        else:
+            messages.error(request, "There was an error updating the catagory.")
     else:
         form = CategoryForm(instance=category)
     return render(request, 'inventory/edit_category.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_category(request, pk):
     category = get_object_or_404(Category, pk=pk)
@@ -58,7 +70,7 @@ def delete_category(request, pk):
 
 # Item Views
 
-
+@user_passes_test(is_admin)
 @login_required
 def list_items(request):
     items = Item.objects.all().order_by('name')
@@ -70,7 +82,7 @@ def list_items(request):
 
     return render(request, 'inventory/list_items.html', {'items': items_page})
 
-
+@user_passes_test(is_admin)
 @login_required
 def create_item(request):
     if request.method == 'POST':
@@ -79,11 +91,13 @@ def create_item(request):
             form.save()
             messages.success(request, "Item created successfully.")
             return redirect('list_items')
+        else:
+            messages.error(request, "There was an error in creating the item.")
     else:
         form = ItemForm()
     return render(request, 'inventory/create_item.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -93,11 +107,13 @@ def edit_item(request, pk):
             form.save()
             messages.success(request, "Item updated successfully.")
             return redirect('list_items')
+        else:
+            messages.error(request, "There was an error updating the item.")
     else:
         form = ItemForm(instance=item)
     return render(request, 'inventory/edit_item.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -109,7 +125,7 @@ def delete_item(request, pk):
 
 # Teacher Item Views (assign items to teachers)
 
-
+@user_passes_test(is_admin)
 @login_required
 def list_teacher_items(request):
     teacher_items = TeacherItem.objects.all().order_by('teacher__full_name')
@@ -121,7 +137,7 @@ def list_teacher_items(request):
 
     return render(request, 'inventory/list_teacher_items.html', {'teacher_items': teacher_items_page})
 
-
+@user_passes_test(is_admin)
 @login_required
 def create_teacher_item(request):
     if request.method == 'POST':
@@ -131,11 +147,13 @@ def create_teacher_item(request):
 
             messages.success(request, "Item assigned to teacher successfully.")
             return redirect('list_teacher_items')
+        else:
+            messages.error(request, "There was an error in creating the teacher item.")
     else:
         form = TeacherItemForm()
     return render(request, 'inventory/create_teacher_item.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_teacher_item(request, pk):
     teacher_item = get_object_or_404(TeacherItem, pk=pk)
@@ -145,11 +163,13 @@ def edit_teacher_item(request, pk):
             form.save()
             messages.success(request, "Teacher item updated successfully.")
             return redirect('list_teacher_items')
+        else:
+            messages.error(request, "There was an error in updating the teacher item.")
     else:
         form = TeacherItemForm(instance=teacher_item)
     return render(request, 'inventory/edit_teacher_item.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_teacher_item(request, pk):
     teacher_item = get_object_or_404(TeacherItem, pk=pk)

@@ -30,7 +30,7 @@ class DutyForm(forms.ModelForm):
             raise ValidationError("Duty name must only contain letters, numbers, and spaces.")
 
         # Ensure the name is unique (if it already exists, raise an error)
-        if Duty.objects.filter(name=name).exists():
+        if Duty.objects.exclude(id=self.instance.id).filter(name=name).exists():
             raise ValidationError(f"The duty '{name}' already exists. Please choose a different name.")
         
         return name
@@ -44,7 +44,7 @@ class TeacherDutyForm(forms.ModelForm):
         fields = ['teacher', 'duty', 'year']
 
     year = forms.ChoiceField(
-        choices=[(str(year), str(year)) for year in range(1980, 2050)])
+        choices=[(str(year), str(year)) for year in range(2025, 2050)])
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,7 +78,7 @@ class TeacherDutyForm(forms.ModelForm):
         teacher = self.cleaned_data.get('teacher')
         duty = self.cleaned_data.get('duty')
 
-        if TeacherDuty.objects.filter(teacher=teacher, duty=duty, year=year).exists():
+        if TeacherDuty.objects.exclude(id=self.instance.id).filter(teacher=teacher, duty=duty, year=year).exists():
             raise ValidationError(f"This teacher already has this duty assigned in the year {year}.")
         
         return year

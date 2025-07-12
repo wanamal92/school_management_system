@@ -3,15 +3,20 @@ from .models import Guardian
 from .forms import GuardianForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
-
+from django.contrib import messages
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
 
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
+
 # List all guardians
 
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_guardian(request):
     # Get the view mode from the URL parameter (default is 'list')
@@ -34,14 +39,18 @@ def list_guardian(request):
 # Add a new guardian
 
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def add_guardian(request):
     if request.method == 'POST':
         form = GuardianForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(request, "Guardian created successfully!")
             return redirect('list_guardian')
+        else:
+            messages.error(request, "There was an error in creating the guardian.")
+        
     else:
         form = GuardianForm()
     return render(request, 'guardians/add_guardian.html', {'form': form})
@@ -57,7 +66,10 @@ def edit_guardian(request, pk):
         form = GuardianForm(request.POST, instance=guardian)
         if form.is_valid():
             form.save()
+            messages.success(request, "Guardian updated successfully!")
             return redirect('list_guardian')
+        else:
+            messages.error(request, "There was an error updating the guardian.")
     else:
         form = GuardianForm(instance=guardian)
     return render(request, 'guardians/edit_guardian.html', {'form': form})
@@ -71,11 +83,12 @@ def delete_guardian(request, pk):
     guardian = get_object_or_404(Guardian, pk=pk)
     if request.method == 'POST':
         guardian.delete()
+        messages.success(request, "Guardian deleted successfully!")
         return redirect('list_guardian')
     return redirect('list_guardian')
 
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def detail_guardian(request, pk):
     guardian = get_object_or_404(Guardian, pk=pk)

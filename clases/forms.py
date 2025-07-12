@@ -10,7 +10,7 @@ class ClassForm(forms.ModelForm):
         fields = ['class_name', 'class_code', 'section', 'class_in_charge']
 
     class_in_charge = forms.ModelChoiceField(
-        queryset=Teacher.objects.all(), empty_label="Select Teacher", required=False)
+        queryset=Teacher.objects.all().order_by('full_name'), empty_label="Select Teacher", required=False)
     section = forms.ModelChoiceField(
         queryset=Section.objects.all(), empty_label="Select Section", required=False)
 
@@ -34,11 +34,11 @@ class ClassForm(forms.ModelForm):
         if not class_code:
             raise forms.ValidationError("Class code is required.")
         # Ensure class code is unique
-        if Class.objects.filter(class_code=class_code).exists():
+        if Class.objects.exclude(id=self.instance.id).filter(class_code=class_code).exists():
             raise forms.ValidationError("This class code is already in use.")
         # Ensure the class code follows a specific format (e.g., alphanumeric and 5-10 characters)
-        if not class_code.isalnum() or len(class_code) < 5 or len(class_code) > 10:
-            raise forms.ValidationError("Class code must be alphanumeric and between 5 and 10 characters.")
+        if not class_code.isalnum() or len(class_code) < 2 or len(class_code) > 10:
+            raise forms.ValidationError("Class code must be alphanumeric and between 2 and 10 characters.")
         return class_code
 
     def clean_section(self):
@@ -54,7 +54,7 @@ class ClassForm(forms.ModelForm):
         if not class_in_charge:
             raise forms.ValidationError("Class in charge is required.")
         # You can also add a check to ensure that the teacher is not already assigned to another class
-        if Class.objects.filter(class_in_charge=class_in_charge).exists():
+        if Class.objects.exclude(id=self.instance.id).filter(class_in_charge=class_in_charge).exists():
             raise forms.ValidationError("This teacher is already assigned to another class.")
         return class_in_charge
 

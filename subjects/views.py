@@ -3,18 +3,22 @@ from .models import Subject, TeacherSubject
 from .forms import SubjectForm, TeacherSubjectFormSet
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 # Check if the user is an admin
 
 
 def is_admin(user):
-    return user.role == 'admin'
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
 # List all subjects
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 def list_subject(request):
     subjects = Subject.objects.all().order_by('subject_name')
 
@@ -38,7 +42,10 @@ def create_subject(request):
             subject = form.save()
             formset.instance = subject
             formset.save()
+            messages.success(request, "Subject created successfully!")
             return redirect('list_subject')
+        else:
+            messages.error(request, "There was an error in creating the subject.")
     else:
         form = SubjectForm()
         formset = TeacherSubjectFormSet()
@@ -58,7 +65,10 @@ def edit_subject(request, pk):
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
+            messages.success(request, "Subject updated successfully!")
             return redirect('list_subject')
+        else:
+            messages.error(request, "There was an error updating the subject.")
     else:
         form = SubjectForm(instance=subject)
         formset = TeacherSubjectFormSet(instance=subject)
@@ -74,6 +84,7 @@ def delete_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == 'POST':
         subject.delete()
+        messages.success(request, "Subject deleted successfully!")
         return redirect('list_subject')
     return redirect('list_subject')
 
@@ -81,7 +92,7 @@ def delete_subject(request, pk):
 
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 def detail_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     return render(request, 'subjects/detail_subject.html', {'subject': subject})
@@ -110,12 +121,12 @@ def detail_subject(request, pk):
 #         'form': form,
 #     })
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 def list_subject_teacher(request):
     subjects = TeacherSubject.objects.all()
     return render(request, 'subjects/list_subject_teacher.html', {'subjects': subjects})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_teacher_subject(request, pk):
     teacher_subject = get_object_or_404(TeacherSubject, pk=pk)

@@ -3,12 +3,16 @@ from .models import Section
 from .forms import SectionForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 # Check if the user is an admin
 
 
 def is_admin(user):
-    return user.role == 'admin'
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
 
 @login_required
@@ -38,7 +42,10 @@ def create_section(request):
         form = SectionForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Section created successfully!")
             return redirect('list_section')
+        else:
+            messages.error(request, "There was an error in creating the section.")
     else:
         form = SectionForm()
     return render(request, 'sections/form_section.html', {'form': form})
@@ -52,7 +59,10 @@ def edit_section(request, pk):
         form = SectionForm(request.POST, instance=cls)
         if form.is_valid():
             form.save()
+            messages.success(request, "Section updated successfully!")
             return redirect('list_section')
+        else:
+            messages.error(request, "There was an error updating the section.")
     else:
         form = SectionForm(instance=cls)
     return render(request, 'sections/form_section.html', {'form': form})
@@ -64,5 +74,6 @@ def delete_section(request, pk):
     cls = get_object_or_404(Section, pk=pk)
     if request.method == 'POST':
         cls.delete()
+        messages.success(request, "Section deleted successfully!")
         return redirect('list_section')
     return redirect('list_section')

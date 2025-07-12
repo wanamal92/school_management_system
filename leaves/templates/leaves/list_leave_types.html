@@ -18,13 +18,25 @@
     </div>
 
 
-    {% if messages %}
-    <div class="alert alert-info" role="alert">
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% else %}
+                alert-info
+            {% endif %} alert-dismissible fade show" role="alert">
+            
+            <!-- Message content -->
+            <p>{{ message }}</p>
+            
+            <!-- Close button (X) -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
     <hr>
 
     <!-- Table Section -->

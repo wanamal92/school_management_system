@@ -5,9 +5,16 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.core.paginator import Paginator
 
+
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
 # List all Health Records
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_health_records(request):
     health_records = HealthRecord.objects.all().order_by('record_type')
@@ -21,7 +28,7 @@ def list_health_records(request):
 
 # Create a new Health Record
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_health_record(request):
     if request.method == 'POST':
@@ -39,7 +46,7 @@ def create_health_record(request):
 
 # Update an existing Health Record
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def update_health_record(request, pk):
     health_record = get_object_or_404(HealthRecord, pk=pk)
@@ -47,18 +54,22 @@ def update_health_record(request, pk):
         form = HealthRecordForm(request.POST, instance=health_record)
         if form.is_valid():
             form.save()
+            messages.success(request, "Health Record updated successfully!")
             return redirect('list_health_records')
+        else:
+            messages.error(request, "There was an error updating the health record.")
     else:
         form = HealthRecordForm(instance=health_record)
     return render(request, 'health/update_health_record.html', {'form': form})
 
 # Delete a Health Record
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_health_record(request, pk):
     health_record = get_object_or_404(HealthRecord, pk=pk)
     if request.method == 'POST':
         health_record.delete()
+        messages.success(request, "Health Record deleted successfully!")
         return redirect('list_health_records')
     return redirect('list_health_records')

@@ -2,7 +2,7 @@
 from django import forms
 from .models import Qualification, TeacherQualification
 from django.core.exceptions import ValidationError
-
+from datetime import date
 
 class QualificationForm(forms.ModelForm):
     class Meta:
@@ -22,7 +22,7 @@ class QualificationForm(forms.ModelForm):
             raise ValidationError("Qualification name cannot be empty.")
         
         # Ensure the name is unique
-        if Qualification.objects.filter(name=name).exists():
+        if Qualification.objects.exclude(id=self.instance.id).filter(name=name).exists():
             raise ValidationError(f"The qualification name '{name}' already exists. Please choose a different name.")
         
         return name
@@ -36,7 +36,7 @@ class QualificationForm(forms.ModelForm):
             raise ValidationError("Short code cannot be empty.")
         
         # Ensure the short code is unique
-        if Qualification.objects.filter(short_code=short_code).exists():
+        if Qualification.objects.exclude(id=self.instance.id).filter(short_code=short_code).exists():
             raise ValidationError(f"The short code '{short_code}' already exists. Please choose a different short code.")
         
         return short_code
@@ -77,13 +77,13 @@ class TeacherQualificationForm(forms.ModelForm):
 
         # Validate that a teacher cannot have the same qualification twice
         if teacher and qualification:
-            if TeacherQualification.objects.filter(teacher=teacher, qualification=qualification).exists():
+            if TeacherQualification.objects.exclude(id=self.instance.id).filter(teacher=teacher, qualification=qualification).exists():
                 raise ValidationError(
                     "This teacher already has this qualification.")
 
         # Validate that the date_obtained is not in the future
         date_obtained = cleaned_data.get('date_obtained')
-        if date_obtained and date_obtained > forms.fields.DateField().to_python(str(forms.fields.DateField().now())):
-            raise ValidationError("The date obtained cannot be in the future.")
+        if date_obtained and date_obtained > date.today():
+            raise forms.ValidationError("The date obtained cannot be in the future.")
 
         return cleaned_data

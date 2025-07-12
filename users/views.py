@@ -90,6 +90,7 @@ def create_user(request):
             user.set_password('TempPass123')  # or generate random password
             user.must_change_password = True
             user.save()
+            messages.success(request, "User created successfully!")
 
             # 🔍 Create audit log
             AuditLog.objects.create(
@@ -99,6 +100,8 @@ def create_user(request):
             )
 
             return redirect('list_users')
+        else:
+            messages.error(request, "There was an error in creating the user.")
     else:
         form = CustomUserCreationForm()
     return render(request, 'users/create_user.html', {'form': form, 'title': 'Add User'})
@@ -112,7 +115,10 @@ def edit_user(request, user_id):
         form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, "User updated successfully!")
             return redirect('list_users')
+        else:
+            messages.error(request, "There was an error updating the user.")
     else:
         form = CustomUserChangeForm(instance=user)
     return render(request, 'users/edit_user.html', {'form': form, 'title': 'Update User'})
@@ -171,9 +177,12 @@ def edit_profile(request):
             user=request.user, data=request.POST)
         if password_form.is_valid():
             password_form.save()
+            messages.success(request, "Password updated successfully!")
             update_session_auth_hash(
                 request, request.user)  # Keep user logged in
             return redirect('view_profile')
+        else:
+            messages.error(request, "There was an error updating the password.")
     else:
         password_form = PasswordChangeForm(user=request.user)
     return render(request, 'users/edit_profile.html', {

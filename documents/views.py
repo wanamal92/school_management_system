@@ -9,8 +9,13 @@ import os
 from django.core.paginator import Paginator
 
 # Create Document
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
 
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
+@user_passes_test(is_admin)
 @login_required
 def create_document(request):
     if request.method == 'POST':
@@ -28,7 +33,7 @@ def create_document(request):
 
 # List Documents (with filtering and searching)
 
-
+@user_passes_test(is_admin)
 @login_required
 def list_documents(request):
     documents = Document.objects.all().order_by('document_type')
@@ -58,7 +63,7 @@ def list_documents(request):
 
 # Edit Document
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_document(request, pk):
     document = get_object_or_404(Document, pk=pk)
@@ -66,23 +71,27 @@ def edit_document(request, pk):
         form = DocumentForm(request.POST, request.FILES, instance=document)
         if form.is_valid():
             form.save()
+            messages.success(request, "Document updated successfully!")
             return redirect('list_documents')
+        else:
+            messages.error(request, "There was an error updating the document.")
     else:
         form = DocumentForm(instance=document)
     return render(request, 'documents/edit_document.html', {'form': form, 'document': document})
 
 # Delete Document
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_document(request, pk):
     document = get_object_or_404(Document, pk=pk)
     if request.method == 'POST':
         document.delete()
+        messages.success(request, "Document deleted successfully!")
         return redirect('list_documents')
     return redirect('list_documents')
 
-
+@user_passes_test(is_admin)
 @login_required
 def download_document(request, pk):
     # Get the document object using the primary key (pk)

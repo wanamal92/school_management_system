@@ -32,7 +32,7 @@ class SectionForm(forms.ModelForm):
         section_code = self.cleaned_data.get('section_code')
 
         # Ensure the section_code is unique
-        if Section.objects.filter(section_code=section_code).exists():
+        if Section.objects.exclude(id=self.instance.id).filter(section_code=section_code).exists():
             raise ValidationError(f"The section code '{section_code}' is already taken. Please choose a different code.")
         
         # Ensure the section_code does not exceed 100 characters

@@ -70,13 +70,13 @@ class CompetitionResultForm(forms.ModelForm):
             raise ValidationError("Competition must be selected.")
         return competition
 
-    # Custom validation for 'year'
-    def clean_year(self):
-        year = self.cleaned_data.get('year')
-        # Ensure the year is within the valid range (1980-2050)
-        if not 1980 <= year <= 2050:
-            raise ValidationError("Year must be between 1980 and 2050.")
-        return year
+    # # Custom validation for 'year'
+    # def clean_year(self):
+    #     year = self.cleaned_data.get('year')
+    #     # Ensure the year is within the valid range (1980-2050)
+    #     if not 1980 <= year <= 2050:
+    #         raise ValidationError("Year must be between 1980 and 2050.")
+    #     return year
 
     # Custom validation for 'result'
     def clean_result(self):

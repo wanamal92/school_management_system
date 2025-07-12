@@ -3,12 +3,25 @@
 {% block content %}
 
 {% if messages %}
-<div class="alert alert-info" role="alert">
     {% for message in messages %}
-    <p>{{ message }}</p>
+        <div class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% else %}
+                alert-info
+            {% endif %} alert-dismissible fade show" role="alert">
+            
+            <!-- message content -->
+            <p>{{ message }}</p>
+            
+            <!-- close button (x) -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+        </div>
     {% endfor %}
-</div>
 {% endif %}
+
 
 
 <div class="container mt-4">

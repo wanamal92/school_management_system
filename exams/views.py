@@ -26,6 +26,7 @@ from openpyxl.drawing.image import Image as XLImage
 from openpyxl.formatting import Rule
 from openpyxl.styles.differential import DifferentialStyle
 import os
+from django.contrib import messages
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -36,32 +37,42 @@ from reportlab.lib.utils import ImageReader
 import matplotlib
 matplotlib.use('Agg')
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
 
 # Exam sessions
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_exam_session(request):
     exam_sessions = ExamSession.objects.all().order_by('exam_session_name')
 
     # Pagination setup
-    paginator = Paginator(exam_sessions, 10)  # Show 10 students per page
+    paginator = Paginator(exam_sessions, 100)  # Show 10 students per page
     page_number = request.GET.get('page')
     exam_sessions_page = paginator.get_page(page_number)
 
     return render(request, 'exams/list_exam_session.html', {'exam_sessions': exam_sessions_page})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_exam_session(request):
     if request.method == 'POST':
         form = ExamSessionForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam Session created successfully!")
             return redirect('list_exam_session')
+        else:
+            messages.error(request, "There was an error in creating the exam session.")        
     else:
         form = ExamSessionForm()
     return render(request, 'exams/create_exam_session.html', {'form': form})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def edit_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
@@ -69,21 +80,25 @@ def edit_exam_session(request, pk):
         form = ExamSessionForm(request.POST, instance=exam_session)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam Session updated successfully!")            
             return redirect('list_exam_session')
+        else:
+            messages.error(request, "There was an error updating the exam session.")        
     else:
         form = ExamSessionForm(instance=exam_session)
     return render(request, 'exams/create_exam_session.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
     if request.method == 'POST':
         exam_session.delete()
+        messages.success(request, "Exam Session deleted successfully!")
         return redirect('list_exam_session')
     return redirect('list_exam_session')
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def detail_exam_session(request, pk):
     exam_session = get_object_or_404(ExamSession, pk=pk)
@@ -91,30 +106,35 @@ def detail_exam_session(request, pk):
 
 
 # Exams
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_exam(request):
     exams = Exam.objects.all().order_by('exam_name')
 
     # Pagination setup
-    paginator = Paginator(exams, 10)  # Show 10 students per page
+    paginator = Paginator(exams, 100)  # Show 10 students per page
     page_number = request.GET.get('page')
     exams_page = paginator.get_page(page_number)
 
     return render(request, 'exams/list_exam.html', {'exams': exams_page})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_exam(request):
     if request.method == 'POST':
         form = ExamForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam created successfully!")
             return redirect('list_exam')
+        else:
+            messages.error(request, "There was an error in creating the exam.")
+        
     else:
         form = ExamForm()
     return render(request, 'exams/create_exam.html', {'form': form})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def edit_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
@@ -122,21 +142,25 @@ def edit_exam(request, pk):
         form = ExamForm(request.POST, instance=exam)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam updated successfully!")
             return redirect('list_exam')
+        else:
+            messages.error(request, "There was an error updating the exam.")
     else:
         form = ExamForm(instance=exam)
     return render(request, 'exams/create_exam.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
     if request.method == 'POST':
         exam.delete()
+        messages.success(request, "Exam deleted successfully!")
         return redirect('list_exam')
     return redirect('list_exam')
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def detail_exam(request, pk):
     exam = get_object_or_404(Exam, pk=pk)
@@ -144,30 +168,34 @@ def detail_exam(request, pk):
 
 
 # Exam Attendees
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_exam_attendee(request):
     exam_attendees = ExamAttendee.objects.all().order_by('student__full_name')
 
     # Pagination setup
-    paginator = Paginator(exam_attendees, 10)  # Show 10 students per page
+    paginator = Paginator(exam_attendees, 200)  # Show 10 students per page
     page_number = request.GET.get('page')
     exam_attendees_page = paginator.get_page(page_number)
 
     return render(request, 'exams/list_exam_attendee.html', {'exam_attendees': exam_attendees_page})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_exam_attendee(request):
     if request.method == 'POST':
         form = ExamAttendeeForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam Attendee created successfully!")
             return redirect('list_exam_attendee')
+        else:
+            messages.error(request, "There was an error in creating the exam attendee.")
     else:
         form = ExamAttendeeForm()
     return render(request, 'exams/create_exam_attendee.html', {'form': form})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def edit_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
@@ -175,28 +203,32 @@ def edit_exam_attendee(request, pk):
         form = ExamAttendeeForm(request.POST, instance=exam_attendee)
         if form.is_valid():
             form.save()
+            messages.success(request, "Exam Attendee updated successfully!")
             return redirect('list_exam_attendee')
+        else:
+            messages.error(request, "There was an error updating the exam attendee.")
     else:
         form = ExamAttendeeForm(instance=exam_attendee)
     return render(request, 'exams/create_exam_attendee.html', {'form': form})
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
     if request.method == 'POST':
         exam_attendee.delete()
+        messages.success(request, "Exam Attendee deleted successfully!")
         return redirect('list_exam_attendee')
     return redirect('list_exam_attendee')
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def detail_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
 
     return render(request, 'exams/detail_exam_attendee.html', {'exam_attendee': exam_attendee})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def upload_exam_session_excel(request):
     if request.method == 'POST' and request.FILES['excel_file']:
@@ -279,7 +311,7 @@ def get_grade(marks):
     else:
         return 'W'
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def export_exam_session_excel(request, session_id):
     session = ExamSession.objects.get(id=session_id)
@@ -431,7 +463,7 @@ def export_exam_session_excel(request, session_id):
     response['Content-Disposition'] = f'attachment; filename="{session.exam_session_name}_report.xlsx"'
     return response
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def export_exam_session_pdf(request, session_id):
     session = ExamSession.objects.get(id=session_id)

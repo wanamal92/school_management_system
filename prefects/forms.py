@@ -3,57 +3,49 @@ from .models import Prefect
 from students.models import Student
 from clases.models import Class
 from django.core.exceptions import ValidationError
+from datetime import date
 
 
 class PrefectForm(forms.ModelForm):
     class Meta:
         model = Prefect
         fields = ['student', 'prefect_type', 'class_level', 'year']
-
-    
         widgets = {
             'student': forms.Select(attrs={'class': 'form-control'}),
             'prefect_type': forms.Select(attrs={'class': 'form-control'}),
             'class_level': forms.Select(attrs={'class': 'form-control'}),
-            'year': forms.Select(attrs={'class': 'form-control'}),
+            'year': forms.Select(attrs={'class': 'form-control'})  # Ensure 'year' field is a dropdown
         }
-
-    year = forms.ChoiceField(
-        choices=[(str(year), str(year)) for year in range(1980, 2050)])
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
-
-    year = forms.ChoiceField(
-        choices=[(str(year), str(year)) for year in range(1980, 2050)])
 
     def __init__(self, *args, **kwargs):
         super(PrefectForm, self).__init__(*args, **kwargs)
+        
+        # Add a dynamic range of years for selection
+        current_year = date.today().year
+        year_choices = [(str(year), str(year)) for year in range(current_year, current_year + 20)]  # Current year to next 20 years
+        self.fields['year'] = forms.ChoiceField(choices=year_choices, widget=forms.Select(attrs={'class': 'form-control'}))
 
-        # Don't hide the field here - let the JavaScript handle it
-        # Just set the required attribute based on form data
         if self.data:
             prefect_type = self.data.get('prefect_type')
-            if prefect_type == 'Class Monitor':  # Match the exact choice value
+            if prefect_type == 'Class Monitor':
                 self.fields['class_level'].required = True
             else:
                 self.fields['class_level'].required = False
         else:
             self.fields['class_level'].required = False
-    # Custom validation for 'year' to ensure it is within the range
+
+    # Clean the 'year' field to validate
     def clean_year(self):
         year = self.cleaned_data.get('year')
-        year = int(year)
+        if not year:
+            raise ValidationError("Year is required.")
 
-        # Ensure year is within the valid range
+        # Ensure the year is within a valid range
+        year = int(year)
         if year < 1980 or year > 2050:
             raise ValidationError("Year must be between 1980 and 2050.")
         
-        # Check for uniqueness
-        teacher = self.cleaned_data.get('teacher')
-        duty = self.cleaned_data.get('duty')
+        return year
 
     def clean(self):
         cleaned_data = super().clean()
@@ -62,17 +54,16 @@ class PrefectForm(forms.ModelForm):
         student = cleaned_data.get('student')
         year = cleaned_data.get('year')
 
-        # Validate that class_level is provided when prefect_type is 'Class Monitor'
         if prefect_type == 'Class Monitor' and not class_level:
-            self.add_error(
-                'class_level', 'Class level is required for Class Monitor.')
+            self.add_error('class_level', 'Class level is required for Class Monitor.')
 
-        # Clear class_level if prefect_type is not 'Class Monitor'
         if prefect_type != 'Class Monitor':
             cleaned_data['class_level'] = None
 
         # Check if a Prefect with the same student and year already exists
-        if Prefect.objects.filter(student=student, year=year).exists():
-            raise ValidationError("This student already has a prefect role assigned for the year {}.".format(year))
+        if Prefect.objects.exclude(id=self.instance.id).filter(student=student, year=year).exists():
+            raise ValidationError(f"This student already has a prefect role assigned for the year {year}.")
 
         return cleaned_data
+
+

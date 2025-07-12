@@ -60,9 +60,11 @@ def create_user_for_teacher(sender, instance, created, **kwargs):
             user.profile_image = instance.profile_photo
         user.save()  # Save the user with must_change_password = True
 
+
         # Link the user to the teacher
         instance.user = user
         instance.save()  # Save the teacher with the new user
+        
 
         # Create an audit log entry for user creation
         AuditLog.objects.create(

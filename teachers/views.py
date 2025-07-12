@@ -35,10 +35,13 @@ rcParams.update({'figure.autolayout': True})
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
 
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
 # List all teachers
 
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_teachers(request):
     # Get the view mode from the URL parameter (default is 'list')
@@ -68,7 +71,10 @@ def add_teacher(request):
         form = TeacherForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(request, "Teacher created successfully!")
             return redirect('list_teachers')
+        else:
+            messages.error(request, "There was an error in creating the teacher.")
     else:
         form = TeacherForm()
     return render(request, 'teachers/add_teacher.html', {'form': form})
@@ -81,12 +87,16 @@ def add_teacher(request):
 def edit_teacher(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
-        form = TeacherForm(request.POST, instance=teacher)
+        form = TeacherForm(request.POST, request.FILES, instance=teacher)
         if form.is_valid():
             form.save()
-            return redirect('list_teachers')
+            messages.success(request, "Teacher updated successfully!")
+            return redirect('list_teachers')  # Redirect after saving the teacher's information
+        else:
+            messages.error(request, "There was an error updating the teacher.")
     else:
         form = TeacherForm(instance=teacher)
+
     return render(request, 'teachers/edit_teacher.html', {'form': form})
 
 # Delete a teacher
@@ -99,6 +109,7 @@ def delete_teacher(request, pk):
     try:
         if request.method == 'POST':
             teacher.delete()
+            messages.success(request, "Teacher deleted successfully!")
             return redirect('list_teachers')
     except IntegrityError as e:
         # Handling IntegrityError (ForeignKey constraint violation)
@@ -112,13 +123,13 @@ def delete_teacher(request, pk):
     return redirect('list_teachers')
 
 
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_staff)
 @login_required
 def detail_teacher(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     return render(request, 'teachers/detail_teacher.html', {'teacher': teacher})
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def profile_teacher(request):
     # Fetch the teacher's profile related to the logged-in user
@@ -129,7 +140,7 @@ def profile_teacher(request):
 
     return render(request, 'teachers/profile_teacher.html', {'teacher_profile': teacher_profile})
 
-
+@user_passes_test(is_admin)
 @login_required
 def export_teacher_leave_excel(request):
     wb = openpyxl.Workbook()
@@ -248,7 +259,7 @@ def export_teacher_leave_excel(request):
             'Content-Disposition': 'attachment; filename="teachers_leave_records.xlsx"'}
     )
 
-
+@user_passes_test(is_admin)
 @login_required
 def export_teacher_leave_pdf(request):
     # Gather teacher leave data

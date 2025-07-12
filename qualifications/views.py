@@ -8,8 +8,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 
 # List View with filtering
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
 
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_teacher_qualifications(request):
     qualifications = TeacherQualification.objects.all().order_by('teacher')
@@ -37,6 +42,7 @@ def list_teacher_qualifications(request):
 
 
 # Create View
+@user_passes_test(is_admin)
 @login_required
 def create_teacher_qualification(request):
     if request.method == 'POST':
@@ -55,7 +61,7 @@ def create_teacher_qualification(request):
 
 # Edit View
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_teacher_qualification(request, pk):
     teacher_qualification = get_object_or_404(TeacherQualification, pk=pk)
@@ -76,16 +82,17 @@ def edit_teacher_qualification(request, pk):
 
 # Delete View
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_teacher_qualification(request, pk):
     teacher_qualification = get_object_or_404(TeacherQualification, pk=pk)
     if request.method == 'POST':
         teacher_qualification.delete()
+        messages.success(request, "Teacher Qualification deleted successfully!")
         return redirect('list_teacher_qualifications')
     return redirect('list_teacher_qualifications')
 
-
+@user_passes_test(is_admin)
 @login_required
 def list_qualifications(request):
     qualifications = Qualification.objects.all()  # Get all qualifications initially
@@ -111,7 +118,7 @@ def list_qualifications(request):
 
 # Create Qualification View
 
-
+@user_passes_test(is_admin)
 @login_required
 def create_qualification(request):
     if request.method == 'POST':
@@ -120,6 +127,8 @@ def create_qualification(request):
             form.save()
             messages.success(request, 'Qualification added successfully!')
             return redirect('list_qualifications')
+        else:
+            messages.error(request, "There was an error in creating the qualification.")
     else:
         form = QualificationForm()
     return render(request, 'qualifications/create_qualification.html', {'form': form})
@@ -135,7 +144,7 @@ def create_qualification(request):
 
 # Edit View
 
-
+@user_passes_test(is_admin)
 @login_required
 def edit_qualification(request, pk):
     qualification = get_object_or_404(Qualification, pk=pk)
@@ -154,11 +163,12 @@ def edit_qualification(request, pk):
 
 # Delete View
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_qualification(request, pk):
     qualification = get_object_or_404(Qualification, pk=pk)
     if request.method == 'POST':
         qualification.delete()
+        messages.success(request, "Qualification deleted successfully!")
         return redirect('list_qualifications')
     return redirect('list_qualifications')

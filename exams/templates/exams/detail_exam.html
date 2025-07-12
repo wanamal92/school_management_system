@@ -1,12 +1,27 @@
 {% extends 'base.html' %}
 
+
+
+
 {% block content %}
 {% if messages %}
-<div class="alert alert-info" role="alert">
     {% for message in messages %}
-    <p>{{ message }}</p>
+        <div class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% else %}
+                alert-info
+            {% endif %} alert-dismissible fade show" role="alert">
+            
+            <!-- Message content -->
+            <p>{{ message }}</p>
+            
+            <!-- Close button (X) -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     {% endfor %}
-</div>
 {% endif %}
 
 <div class="container mt-5">
@@ -15,6 +30,16 @@
             <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i> Exam Details</h5>
         </div>
         <div class="card-body">
+            <!-- Action Buttons (Schedule, Edit, Download) -->
+            <div class="d-flex justify-content-between mb-4">
+                <!-- Schedule Exam Button -->
+                <a href="{% url 'schedule_exam_attendees' exam.id %}" class="btn btn-success me-2">
+                    <i class="fas fa-user-plus me-1"></i> Schedule Exam
+                </a>
+
+    
+            </div>
+
             <!-- Exam Details -->
             <dl class="row">
                 <dt class="col-md-3"><strong>Exam Session:</strong></dt>
@@ -49,3 +74,4 @@
     </div>
 </div>
 {% endblock %}
+

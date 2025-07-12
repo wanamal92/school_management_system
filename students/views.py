@@ -8,6 +8,9 @@ from django.core.paginator import Paginator
 from clases.models import Class
 
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
 
@@ -30,7 +33,7 @@ def list_students(request):
     #     students = students.order_by('class_level')
 
     # Pagination setup
-    paginator = Paginator(students, 10)  # Show 10 students per page
+    paginator = Paginator(students, 100)  # Show 10 students per page
     page_number = request.GET.get('page')
     students_page = paginator.get_page(page_number)
 
@@ -54,49 +57,48 @@ def list_students(request):
 @user_passes_test(is_admin_or_staff)
 def create_student(request):
     if request.method == 'POST':
-        form = StudentForm(request.POST)
+        form = StudentForm(request.POST, request.FILES)  # Pass request.FILES to the form
 
         if form.is_valid():
             try:
-                # Save but don't commit to the database
-                student = form.save(commit=False)
-
-                student.save()  # This will trigger the signal that creates the user
-
+                student = form.save(commit=False)  # Save but don't commit to the database
+                student.save()  # This will trigger any post-save signals (like user creation)
+                messages.success(request, "Student created successfully!")
                 return redirect('list_students')
             except IntegrityError as e:
-                # Catch any IntegrityError (e.g., username already taken)
-                form.add_error(
-                    None, "There was an error with the database. Please try again.")
-
+                form.add_error(None, "There was an error with the database. Please try again.")
             except Exception as e:
-                # Catch other errors and show a generic error message
                 form.add_error(None, f"An unexpected error occurred: {e}")
-
         else:
+            # Handle form invalid case (you can also log form.errors for debugging)
+            messages.error(request, "There was an error in creating the student.")
             pass
     else:
         form = StudentForm()
 
     return render(request, 'students/create_student.html', {'form': form})
 
-
 @login_required
 @user_passes_test(is_admin_or_staff)
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
+
     if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
+        form = StudentForm(request.POST, request.FILES, instance=student)  # Pass request.FILES to the form
         if form.is_valid():
-            form.save()
+            form.save()  # Save the student profile along with the profile photo
+            messages.success(request, "Student Updated successfully!")
             return redirect('list_students')
+        else:
+            messages.error(request, "There was an error updating the student.")
     else:
         form = StudentForm(instance=student)
+
     return render(request, 'students/edit_student.html', {'form': form})
 
 
 @login_required
-@user_passes_test(is_admin_or_staff)
+@user_passes_test(is_admin)
 def delete_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
 

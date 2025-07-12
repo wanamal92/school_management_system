@@ -25,7 +25,7 @@ class SubjectForm(forms.ModelForm):
         subject_code = self.cleaned_data.get('subject_code')
         
         # Ensure the subject_code is unique
-        if Subject.objects.filter(subject_code=subject_code).exists():
+        if Subject.objects.exclude(id=self.instance.id).filter(subject_code=subject_code).exists():
             raise ValidationError(f"The subject code '{subject_code}' is already taken. Please choose a different one.")
         
         return subject_code

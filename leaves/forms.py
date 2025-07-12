@@ -29,7 +29,7 @@ class LeaveTypeForm(forms.ModelForm):
             raise ValidationError("Leave type name cannot be longer than 100 characters.")
 
         # Ensure the name is unique (no other LeaveType exists with this name)
-        if LeaveType.objects.filter(name=name).exists():
+        if LeaveType.objects.exclude(id=self.instance.id).filter(name=name).exists():
             raise ValidationError(f"The leave type '{name}' already exists. Please choose a different name.")
 
         return name
@@ -44,10 +44,8 @@ class LeaveRequestForm(forms.ModelForm):
             'from_date': forms.DateInput(attrs={'type': 'date'}),
             'to_date': forms.DateInput(attrs={'type': 'date'}),
         }
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+
+
 
 
     # Custom validation for 'from_date' and 'to_date' to ensure correct range
@@ -102,6 +100,11 @@ class LeaveRequestForm(forms.ModelForm):
             teacher_leave_allocation.save()
 
         return leave_request
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 
 
@@ -124,33 +127,19 @@ class LeaveAllocationForm(forms.ModelForm):
         model = LeaveAllocation
         fields = ['teacher', 'casual_leave', 'sick_leave', 'year']
 
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
-
-    year = forms.ChoiceField(
-            choices=[(str(year), str(year)) for year in range(1980, 2050)])
-
     # Custom validation for 'teacher'
     def clean_teacher(self):
         teacher = self.cleaned_data.get('teacher')
-
-        # Ensure that the teacher exists
         if not Teacher.objects.filter(id=teacher.id).exists():
             raise ValidationError("The selected teacher does not exist.")
-        
         return teacher
 
-    # Custom validation for 'year' to ensure it is within the range
+    # Custom validation for 'year' to ensure it is within the valid range
     def clean_year(self):
         year = self.cleaned_data.get('year')
-        year = int(year)
-
-        # Ensure year is within the valid range
-        if year < 1980 or year > 2050:
-            raise ValidationError("Year must be between 1980 and 2050.")
+        if year < 2025 or year > 2050:
+            raise ValidationError("Year must be between 2025 and 2050.")
+        return year
 
     # Custom validation for 'casual_leave' and 'sick_leave'
     def clean(self):
@@ -158,10 +147,15 @@ class LeaveAllocationForm(forms.ModelForm):
         casual_leave = cleaned_data.get('casual_leave')
         sick_leave = cleaned_data.get('sick_leave')
 
-        # Ensure the casual leave and sick leave are positive integers
+        # Ensure casual_leave and sick_leave are positive numbers
         if casual_leave < 0:
             raise ValidationError("Casual leave must be a positive number.")
         if sick_leave < 0:
             raise ValidationError("Sick leave must be a positive number.")
 
         return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'

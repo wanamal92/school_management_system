@@ -8,7 +8,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 # View to list all competitions
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
 
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
+
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_competitions(request):
     competitions = Competition.objects.all().order_by('name')
@@ -20,7 +26,7 @@ def list_competitions(request):
 
 # View to create a new competition
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_competition(request):
     if request.method == 'POST':
@@ -29,13 +35,15 @@ def create_competition(request):
             form.save()
             messages.success(request, "Competition created successfully.")
             return redirect('list_competitions')
+        else:
+            messages.error(request, "There was an error in creating the competition.")
     else:
         form = CompetitionForm()
     return render(request, 'competitions/create_competition.html', {'form': form})
 
 # View to update an existing competition
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def edit_competition(request, pk):
     competition = get_object_or_404(Competition, pk=pk)
@@ -45,13 +53,15 @@ def edit_competition(request, pk):
             form.save()
             messages.success(request, "Competition updated successfully.")
             return redirect('list_competitions')
+        else:
+            messages.error(request, "There was an error updating the competition.")
     else:
         form = CompetitionForm(instance=competition)
     return render(request, 'competitions/edit_competition.html', {'form': form})
 
 # View to delete a competition
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_competition(request, pk):
     competition = get_object_or_404(Competition, pk=pk)
@@ -63,6 +73,7 @@ def delete_competition(request, pk):
 
 
 # View to list all competition results
+@user_passes_test(is_admin_or_staff)
 @login_required
 def list_competition_results(request):
     results = CompetitionResult.objects.all().order_by('student__full_name')
@@ -74,7 +85,7 @@ def list_competition_results(request):
 
 # View to create a new competition result
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def create_competition_result(request):
     if request.method == 'POST':
@@ -83,13 +94,15 @@ def create_competition_result(request):
             form.save()
             messages.success(request, "Competition result added successfully.")
             return redirect('list_competition_results')
+        else:
+            messages.error(request, "There was an error in creating the competition result.")
     else:
         form = CompetitionResultForm()
     return render(request, 'competitions/create_competition_result.html', {'form': form})
 
 # View to edit an existing competition result
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def edit_competition_result(request, pk):
     result = get_object_or_404(CompetitionResult, pk=pk)
@@ -100,13 +113,15 @@ def edit_competition_result(request, pk):
             messages.success(
                 request, "Competition result updated successfully.")
             return redirect('list_competition_results')
+        else:
+            messages.error(request, "There was an error updating the competition result.")
     else:
         form = CompetitionResultForm(instance=result)
     return render(request, 'competitions/edit_competition_result.html', {'form': form})
 
 # View to delete a competition result
 
-
+@user_passes_test(is_admin)
 @login_required
 def delete_competition_result(request, pk):
     result = get_object_or_404(CompetitionResult, pk=pk)

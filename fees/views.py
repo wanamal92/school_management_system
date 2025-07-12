@@ -15,7 +15,10 @@ from django.core.paginator import Paginator
 
 
 def is_admin(user):
-    return user.is_authenticated and user.role in ['admin']
+    return user.is_authenticated and user.role == 'admin'
+
+def is_admin_or_staff(user):
+    return user.is_authenticated and user.role in ['admin', 'staff']
 
 # List all fee payments
 
@@ -150,7 +153,7 @@ def delete_fee_type(request, pk):
         return redirect('list_fee_types')
     return redirect('list_fee_types')
 
-
+@user_passes_test(is_admin)
 @login_required
 def generate_invoice_pdf(request, pk):
     # Get the FeePayment object

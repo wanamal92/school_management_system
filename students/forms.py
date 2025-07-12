@@ -21,13 +21,13 @@ class StudentForm(forms.ModelForm):
         queryset=Class.objects.all(), empty_label="Select Class")
     
     guardian = forms.ModelChoiceField(
-        queryset=Guardian.objects.all(), empty_label="Select Guardian")
+        queryset=Guardian.objects.all().order_by("full_name"), empty_label="Select Guardian")
 
     # Custom validation for 'student_number' to ensure it's unique
     def clean_student_number(self):
         student_number = self.cleaned_data.get('student_number')
         
-        if Student.objects.filter(student_number=student_number).exists():
+        if Student.objects.exclude(id=self.instance.id).filter(student_number=student_number).exists():
             raise ValidationError(f"Student number '{student_number}' is already taken. Please choose a different one.")
         
         return student_number

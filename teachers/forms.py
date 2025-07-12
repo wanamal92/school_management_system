@@ -7,6 +7,7 @@ from .models import Teacher
 from sections.models import Section
 from django.core.exceptions import ValidationError
 import re
+from datetime import date
 
 class TeacherForm(forms.ModelForm):
 
@@ -28,15 +29,14 @@ class TeacherForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-    # Custom validation for 'shortcode' to ensure it's unique
-    def clean_shortcode(self):
-        shortcode = self.cleaned_data.get('shortcode')
+def clean_shortcode(self):
+    shortcode = self.cleaned_data.get('shortcode')
 
-        # Ensure the shortcode is unique
-        if Teacher.objects.filter(shortcode=shortcode).exists():
-            raise ValidationError(f"The shortcode '{shortcode}' is already taken. Please choose a different one.")
+    # Ensure the shortcode is unique, but exclude the current instance (the one being edited)
+    if Teacher.objects.exclude(id=self.instance.id).filter(shortcode=shortcode).exists():
+        raise ValidationError(f"The shortcode '{shortcode}' is already taken. Please choose a different one.")
 
-        return shortcode
+    return shortcode
 
     # Custom validation for 'birthdate' to ensure the date is not in the future
     def clean_birthdate(self):

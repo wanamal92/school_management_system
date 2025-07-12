@@ -25,8 +25,7 @@ class ExamSessionForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-    academic_yearyear = forms.ChoiceField(
-        choices=[(str(year), str(year)) for year in range(1980, 2050)])
+
 
     # Custom validation for 'exam_session_name'
     def clean_exam_session_name(self):
@@ -38,7 +37,7 @@ class ExamSessionForm(forms.ModelForm):
     # Custom validation for 'exam_session_code' to ensure it's unique
     def clean_exam_session_code(self):
         exam_session_code = self.cleaned_data.get('exam_session_code')
-        if ExamSession.objects.filter(exam_session_code=exam_session_code).exists():
+        if ExamSession.objects.exclude(id=self.instance.id).filter(exam_session_code=exam_session_code).exists():
             raise ValidationError(
                 f"Exam session code '{exam_session_code}' already exists.")
         return exam_session_code
