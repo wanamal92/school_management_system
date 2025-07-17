@@ -35,10 +35,17 @@ from django.http import HttpResponse
 from .models import ExamSession, Exam, ExamAttendee, Student
 from reportlab.lib.utils import ImageReader
 import matplotlib
+from guardians.models import Guardian
 matplotlib.use('Agg')
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
+
+def is_guardian(user):
+    return user.is_authenticated and user.role == 'guardian'
+
+def is_student(user):
+    return user.is_authenticated and user.role == 'student'
 
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
@@ -221,7 +228,7 @@ def delete_exam_attendee(request, pk):
         return redirect('list_exam_attendee')
     return redirect('list_exam_attendee')
 
-@user_passes_test(is_admin_or_staff)
+
 @login_required
 def detail_exam_attendee(request, pk):
     exam_attendee = get_object_or_404(ExamAttendee, pk=pk)
@@ -285,6 +292,7 @@ def upload_exam_session_excel(request):
                         academic_year=row['academic_year'],
                         class_assigned=class_assigned,
                     )
+                    messages.success(request, 'The Excel File Uploaded successfully!')
                 except IntegrityError:
                     return render(request, 'exams/upload_exam_session_excel.html', {
                         'form': form,
@@ -461,6 +469,7 @@ def export_exam_session_excel(request, session_id):
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = f'attachment; filename="{session.exam_session_name}_report.xlsx"'
+    
     return response
 
 @user_passes_test(is_admin_or_staff)
@@ -567,9 +576,10 @@ def export_exam_session_pdf(request, session_id):
     # Finalize PDF
     c.showPage()
     c.save()
+    
     return response
 
-
+@user_passes_test(is_admin_or_staff)
 @login_required
 def schedule_exam_attendees(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
@@ -605,3 +615,30 @@ def schedule_exam_attendees(request, exam_id):
             request, "All students were already scheduled for this exam.")
 
     return redirect('detail_exam', pk=exam.id)
+
+
+@user_passes_test(is_guardian)
+def my_children_exams(request):
+   
+    try:
+        guardian = Guardian.objects.get(user=request.user)  
+        students = Student.objects.filter(guardian=guardian)  
+        exam_attendees = ExamAttendee.objects.filter(student__in=students)  
+
+    except Student.DoesNotExist:
+        exam_attendees = None  # or handle if the profile does not exist
+
+    return render(request, 'exams/list_exam_attendee.html', {'exam_attendees':exam_attendees})
+
+@user_passes_test(is_student)
+def my_exams(request):
+   
+    try:
+         
+        student = Student.objects.get(user=request.user)   
+        exam_attendees = ExamAttendee.objects.filter(student=student)  
+
+    except Student.DoesNotExist:
+        exam_attendees = None  # or handle if the profile does not exist
+
+    return render(request, 'exams/list_exam_attendee.html', {'exam_attendees':exam_attendees})

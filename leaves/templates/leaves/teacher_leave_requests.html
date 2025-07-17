@@ -97,7 +97,7 @@
                     <td class="status">{{ request.status }}</td>
                     <td>
                         {% if request.status == 'Pending' %}
-                        <a href="{% url 'create_leave_request' %}?edit={{ request.id }}" class="btn btn-warning btn-sm">
+                        <a href="{% url 'edit_leave_request' request.id %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ request.id }}"

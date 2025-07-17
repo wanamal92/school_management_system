@@ -83,11 +83,13 @@
                         <a href="{% url 'edit_exam_session' session.pk %}" class="btn btn-warning btn-sm btn-action">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        {% if request.user.role == 'admin' %}
                         <button type="button" class="btn btn-sm btn-danger delete-btn" data-item-id="{{ session.id }}"
                             data-item-name="{{ session.exam_session_name }}"
                             data-delete-url="{% url 'delete_exam_session' session.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                         <a href="{% url 'detail_exam_session' session.pk %}" class="btn btn-info btn-sm btn-action">
                             <i class="fas fa-eye"></i> View
                         </a>

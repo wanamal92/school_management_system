@@ -36,9 +36,8 @@
             <p><strong>Email:</strong> {{ profile_student.email }}</p>
             <p><strong>Telephone:</strong> {{ profile_student.telephone_number }}</p>
             <p><strong>Class Level:</strong> {{ profile_student.class_level }}</p>
-            <p><strong>Health Issues:</strong> {{ profile_student.health_issues }}</p>
-            <p><strong>Guardian:</strong> {{ profile_student.guardian.first_name }} {{
-                profile_student.guardian.last_name }}</p>
+
+            <p><strong>Guardian:</strong> {{ profile_student.guardian.title }} {{profile_student.guardian.full_name }}</p>
             <p><strong>Address:</strong> {{ profile_student.address }}</p>
         </div>
     </div>

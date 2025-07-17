@@ -65,13 +65,16 @@
                         <a href="{% url 'detail_class' cls.pk %}" class="btn btn-info btn-sm">
                             <i class="fas fa-eye"></i> View
                         </a>
+                        {% if request.user.role == 'admin' %}
                         <a href="{% url 'edit_class' cls.pk %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ cls.id }}"
                             data-item-name="{{ cls.class_name }}" data-delete-url="{% url 'delete_class' cls.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

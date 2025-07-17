@@ -212,19 +212,25 @@ def create_leave_request(request):
             leave_request = form.save(commit=False)
             leave_request.save()
             messages.success(request, "Leave Request created successfully!")
-            # Redirect to leave requests list
-            return redirect('teacher_leave_requests')
+            
+            # Redirect to the appropriate leave request page based on role
+            if request.user.role == 'admin':
+                return redirect('admin_leave_requests')
+            elif request.user.role == 'staff':
+                return redirect('teacher_leave_requests')
         else:
             messages.error(request, "There was an error in creating the leave request.")
     else:
-        form = LeaveRequestForm()
+        
+
+        form = LeaveRequestForm(user=request.user)  
+
     return render(request, 'leaves/create_leave_request.html', {'form': form})
 
 # Update Leave Request
 
 @user_passes_test(is_admin_or_staff)
 @login_required
-@user_passes_test(is_admin)
 def edit_leave_request(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
     if request.method == 'POST':
@@ -232,11 +238,17 @@ def edit_leave_request(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Leave Request updated successfully!")
-            return redirect('list_leave_allocations')
+            
+            if request.user.role == 'admin':
+                
+                return redirect('admin_leave_requests')  
+            elif request.user.role == 'staff':
+                
+                return redirect('teacher_leave_requests')
         else:
             messages.error(request, "There was an error updating the leave request.")
     else:
-        form = LeaveRequestForm(instance=leave_request)
+        form = LeaveRequestForm(instance=leave_request,user=request.user)
     return render(request, 'leaves/edit_leave_request.html', {'form': form})
 
 
@@ -256,6 +268,16 @@ def delete_leave_request(request, pk):
 
         leave_request.delete()  # Delete the leave request
         messages.success(request, "Leave Request deleted successfully!")
-        return redirect('teacher_leave_requests')
+        if request.user.role == 'admin':
+                
+            return redirect('admin_leave_requests')  
+        elif request.user.role == 'staff':
+                
+            return redirect('teacher_leave_requests')
     # Redirect back to leave requests list
-    return redirect('teacher_leave_requests')
+    if request.user.role == 'admin':
+                
+        return redirect('admin_leave_requests')  
+    elif request.user.role == 'staff':
+                
+        return redirect('teacher_leave_requests')

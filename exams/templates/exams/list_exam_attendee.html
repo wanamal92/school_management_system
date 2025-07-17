@@ -72,16 +72,20 @@
                     <td>{{ exam_attendee.exam_marks }}</td>
                     <td>{{ exam_attendee.grade }}</td>
                     <td>
+                         {% if request.user.role == 'admin' or request.user.role == 'staff' %}
                         <a href="{% url 'edit_exam_attendee' exam_attendee.pk %}"
                             class="btn btn-warning btn-sm btn-action">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        {% endif %}
+                        {% if request.user.role == 'admin' %}
                         <button type="button" class="btn btn-sm btn-danger delete-btn"
                             data-item-id="{{ exam_attendee.id }}"
                             data-item-name="{{ exam_attendee.student.full_name }} - {{ exam_attendee.exam.exam_name }}"
                             data-delete-url="{% url 'delete_exam_attendee' exam_attendee.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                         <a href="{% url 'detail_exam_attendee' exam_attendee.pk %}"
                             class="btn btn-info btn-sm btn-action">
                             <i class="fas fa-eye"></i> View

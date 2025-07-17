@@ -59,16 +59,19 @@
                     <td class="duty">{{ teacher_duty.duty.name }}</td>
                     <td class="year">{{ teacher_duty.year }}</td>
                     <td>
+                        {% if request.user.role == 'admin' %}
                         <a href="{% url 'edit_teacher_duty' teacher_duty.pk %}"
                             class="btn btn-warning btn-sm btn-action">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        
                         <button type="button" class="btn btn-sm btn-danger delete-btn"
                             data-item-id="{{ teacher_duty.id }}"
                             data-item-name="{{ teacher_duty.teacher.full_name }} - {{ teacher_duty.duty.name }}"
                             data-delete-url="{% url 'delete_teacher_duty' teacher_duty.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

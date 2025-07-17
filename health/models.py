@@ -22,10 +22,25 @@ class HealthRecord(models.Model):
     # Health fields
     height_cm = models.FloatField()
     weight_kg = models.FloatField()
+    bmi = models.FloatField()
+    status = models.CharField()
     eye_glasses = models.BooleanField(default=False)
     physical_challenge = models.BooleanField(default=False)
     major_diseases = models.BooleanField(default=False)
     regular_checkup_required = models.BooleanField(default=False)
+
+
+    def save(self, *args, **kwargs):
+        height = self.height_cm * self.height_cm
+        self.bmi = self.weight_kg / height
+
+        if self.bmi  < 0.5:
+            self.status = 'Sick'
+    
+        else:
+            self.status = 'Healthy'
+
+        super().save(*args, **kwargs) 
 
     def __str__(self):
         return f"Health Record for {self.student if self.record_type == 'student' else self.teacher}"

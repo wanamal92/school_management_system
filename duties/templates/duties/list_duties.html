@@ -57,10 +57,12 @@
                         <a href="{% url 'edit_duty' duty.pk %}" class="btn btn-warning btn-sm btn-action">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        {% if request.user.role == 'admin' %}
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ duty.id }}"
                             data-item-name="{{ duty.name }}" data-delete-url="{% url 'delete_duty' duty.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

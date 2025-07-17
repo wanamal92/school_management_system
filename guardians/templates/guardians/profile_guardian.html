@@ -31,10 +31,10 @@
             {% endif %}
         </div>
         <div class="col-md-8">
-            <h1>{{ guardian_profile.first_name }} {{ guardian_profile.last_name }}</h1>
+            <h1>{{ guardian_profile.title }} {{ guardian_profile.full_name }}</h1>
             <p><strong>Email:</strong> {{ guardian_profile.email }}</p>
-            <p><strong>Telephone:</strong> {{ guardian_profile.telephone_number }}</p>
-            <p><strong>Mobile:</strong> {{ guardian_profile.telephone_number }}</p>
+            <p><strong>Telephone:</strong> {{ guardian_profile.phone }}</p>
+            <p><strong>Mobile:</strong> {{ guardian_profile.mobile }}</p>
             <p><strong>Address:</strong> {{ guardian_profile.address }}</p>
         </div>
     </div>

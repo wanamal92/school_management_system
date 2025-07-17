@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
 from clases.models import Class
-
+from guardians.models import Guardian
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
@@ -16,7 +16,7 @@ def is_admin_or_staff(user):
 
 
 @login_required
-@user_passes_test(is_admin_or_staff)
+
 def list_students(request):
     # Fetch all students
     students = Student.objects.select_related('user').order_by('full_name')
@@ -112,7 +112,7 @@ def delete_student(request, student_id):
 
 
 @login_required
-@user_passes_test(is_admin_or_staff)
+
 def detail_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     return render(request, 'students/detail_student.html', {'student': student})
@@ -127,3 +127,20 @@ def profile_student(request):
         profile_student = None  # or handle if the profile does not exist
 
     return render(request, 'students/profile_student.html', {'profile_student': profile_student})
+
+@login_required
+def my_childrens(request):
+    # Fetch the student's profile related to the logged-in user
+    try:
+        guardian = Guardian.objects.get(user=request.user)
+        students = Student.objects.filter(guardian=guardian)
+    except Student.DoesNotExist:
+        students = None  # or handle if the profile does not exist
+
+    view_mode = request.GET.get('view', 'list')
+    context = {
+        'students': students,
+        'view_mode': view_mode,
+    }
+
+    return render(request, 'students/list_students.html', context)

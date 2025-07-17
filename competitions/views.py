@@ -5,11 +5,19 @@ from .models import Competition, CompetitionResult
 from .forms import CompetitionForm, CompetitionResultForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from guardians.models import Guardian
+from students.models import Student
 
 # View to list all competitions
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
+
+def is_guardian(user):
+    return user.is_authenticated and user.role == 'guardian'
+
+def is_student(user):
+    return user.is_authenticated and user.role == 'student'
 
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
@@ -81,6 +89,7 @@ def list_competition_results(request):
     paginator = Paginator(results, 10)  # Show 10 students per page
     page_number = request.GET.get('page')
     results_page = paginator.get_page(page_number)
+
     return render(request, 'competitions/list_competition_results.html', {'results': results_page})
 
 # View to create a new competition result
@@ -130,3 +139,29 @@ def delete_competition_result(request, pk):
         messages.success(request, "Competition result deleted successfully.")
         return redirect('list_competition_results')
     return redirect('list_competition_results')
+
+@user_passes_test(is_guardian)
+def my_children_results(request):
+   
+    try:
+        guardian = Guardian.objects.get(user=request.user)  
+        students = Student.objects.filter(guardian=guardian)  
+        results = CompetitionResult.objects.filter(student__in=students)  
+
+    except Student.DoesNotExist:
+        results = None  # or handle if the profile does not exist
+
+    return render(request, 'competitions/list_competition_results.html', {'results':results})
+
+@user_passes_test(is_student)
+def my_results(request):
+   
+    try:
+         
+        student = Student.objects.get(user=request.user)   
+        results = CompetitionResult.objects.filter(student=student)  
+
+    except Student.DoesNotExist:
+        results = None  # or handle if the profile does not exist
+
+    return render(request, 'competitions/list_competition_results.html', {'results':results})

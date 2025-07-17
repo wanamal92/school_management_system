@@ -29,6 +29,11 @@ urlpatterns = [
          views.delete_exam_attendee, name='delete_exam_attendee'),
     path('detail_exam_attendee/<int:pk>/',
          views.detail_exam_attendee, name='detail_exam_attendee'),
+    path('list_exam_my_childrens/', views.my_children_exams,
+         name='my_children_exams'),
+    path('list_my_exam/', views.my_exams,
+         name='my_exams'),
+
 
     path('upload_exam_session_excel/', views.upload_exam_session_excel,
          name='upload_exam_session_excel'),

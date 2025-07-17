@@ -12,10 +12,16 @@ from datetime import datetime
 import os
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
+from guardians.models import Guardian
+from students.models import Student
 
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
+def is_guardian(user):
+    return user.is_authenticated and user.role == 'guardian'
+def is_student(user):
+    return user.is_authenticated and user.role == 'student'
 
 def is_admin_or_staff(user):
     return user.is_authenticated and user.role in ['admin', 'staff']
@@ -184,7 +190,7 @@ def generate_invoice_pdf(request, pk):
     # Organization details (bottom right)
     p.setFont("Helvetica-Bold", 25)
     p.setFillColor(dark_color)
-    p.drawString(140, height - 80, "Sri Ganalaankra Maha Pirivena")
+    p.drawString(140, height - 80, "Sri Gnanalankra Maha Pirivena")
 
     p.setFont("Helvetica", 15)
     p.setFillColor(colors.black)
@@ -289,7 +295,7 @@ def generate_invoice_pdf(request, pk):
     p.setFont("Helvetica", 10)
     p.drawString(50, payment_info_y - 20, "Bank: Sampath Bank")
     p.drawString(50, payment_info_y - 35,
-                 f"Account Name: Sri Ganalaankra Maha Pirivena")
+                 f"Account Name: Sri Gnanalankra Maha Pirivena")
     p.drawString(50, payment_info_y - 50, "Account No.: 1064 5470 0910")
 
     # Payment due date
@@ -361,7 +367,34 @@ def generate_invoice_pdf(request, pk):
     response = HttpResponse(pdf, content_type='application/pdf')
     response[
         'Content-Disposition'] = f'attachment; filename="invoice_{payment.pk}_{payment.student.full_name.replace(" ", "_")}.pdf"'
+
     return response
+
+@user_passes_test(is_guardian)
+def my_childrens_payments(request):
+   
+    try:
+        guardian = Guardian.objects.get(user=request.user)  
+        students = Student.objects.filter(guardian=guardian)  
+        payments = FeePayment.objects.filter(student__in=students)  
+
+    except Student.DoesNotExist:
+        payments = None  # or handle if the profile does not exist
+
+    return render(request, 'fees/list_fee_payments.html', {'payments':payments})
+
+@user_passes_test(is_student)
+def my_payments(request):
+   
+    try:
+
+        student = Student.objects.get(user=request.user) 
+        payments = FeePayment.objects.filter(student=student)  
+
+    except Student.DoesNotExist:
+        payments = None  # or handle if the profile does not exist
+
+    return render(request, 'fees/list_fee_payments.html', {'payments':payments})
 
 # Alternative function if you want to display PDF in browser instead of download
 

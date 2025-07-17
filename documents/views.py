@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 import os
 from django.core.paginator import Paginator
+from django.conf import settings
 
 # Create Document
 def is_admin(user):
@@ -99,23 +100,26 @@ def download_document(request, pk):
 
     # Get the file path of the document
     file_path = document.document_file.path
+    print(f"Trying to download the file from: {file_path}")  # Log the file path for debugging
 
     # Check if the file exists
     if os.path.exists(file_path):
         try:
-            # Return the file as a response for download
+            file_extension = os.path.splitext(file_path)[1]
             # Generate the custom filename
             if document.teacher:
-                # Example format
-                filename = f"{document.teacher.full_name}_{document.document_type}.pdf"
+                filename = f"{document.teacher.full_name}_{document.document_type}{file_extension}"
             elif document.student:
-                # Example format
-                filename = f"{document.student.full_name}_{document.document_type}.pdf"
+                filename = f"{document.student.full_name}_{document.document_type}{file_extension}"
             else:
-                filename = f"{document.document_type}.pdf"
-            return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+                filename = f"{document.document_type}{file_extension}"
+
+            # Use 'open()' properly for FileResponse to handle it
+            response = FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+            return response
         except Exception as e:
-            print(f"Error opening file: {e}")
-            raise Http404("File cannot be opened.")
+            print(f"Error opening file: {e}")  # Log the error message
+            raise Http404(f"Error opening file: {e}")
     else:
+        print(f"File not found at: {file_path}")  # Log file not found message
         raise Http404("File not found.")

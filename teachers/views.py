@@ -347,4 +347,5 @@ def export_teacher_leave_pdf(request):
     # Finish
     c.showPage()
     c.save()
+    
     return response

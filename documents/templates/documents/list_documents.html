@@ -92,6 +92,7 @@
                         <a href="{% url 'edit_document' document.pk %}" class="btn btn-warning btn-sm btn-action">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        {% if request.user.role == 'admin' %}
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ document.id }}"
                             data-item-name="{% if document.user_type == 'teacher' %}{{ document.teacher.full_name }}{% else %}{{ document.student.full_name }}{% endif %}"
                             data-delete-url="{% url 'delete_document' document.id %}">
@@ -100,6 +101,7 @@
                         <a href="{% url 'download_document' document.pk %}" class="btn btn-success btn-sm">
                             <i class="fas fa-download"></i> Download
                         </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

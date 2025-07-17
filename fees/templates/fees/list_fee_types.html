@@ -59,6 +59,7 @@
                     <td class="fee_name">{{ fee_type.name }}</td>
                     <td>{{ fee_type.amount }}</td>
                     <td>
+                        {% if request.user.role == 'admin' %}
                         <a href="{% url 'edit_fee_type' fee_type.pk %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
@@ -67,6 +68,7 @@
                             data-delete-url="{% url 'delete_fee_type' fee_type.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

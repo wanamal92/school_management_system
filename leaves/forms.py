@@ -11,7 +11,9 @@ class LeaveTypeForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Enter leave type name (e.g. Casual Leave, Sick Leave)'}),
         }
+
     def __init__(self, *args, **kwargs):
+        
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
@@ -26,14 +28,15 @@ class LeaveTypeForm(forms.ModelForm):
 
         # Ensure name is not too long (max length is 100 characters in model)
         if len(name) > 100:
-            raise ValidationError("Leave type name cannot be longer than 100 characters.")
+            raise ValidationError(
+                "Leave type name cannot be longer than 100 characters.")
 
         # Ensure the name is unique (no other LeaveType exists with this name)
         if LeaveType.objects.exclude(id=self.instance.id).filter(name=name).exists():
-            raise ValidationError(f"The leave type '{name}' already exists. Please choose a different name.")
+            raise ValidationError(
+                f"The leave type '{name}' already exists. Please choose a different name.")
 
         return name
-
 
 
 class LeaveRequestForm(forms.ModelForm):
@@ -41,14 +44,34 @@ class LeaveRequestForm(forms.ModelForm):
         model = LeaveRequest
         fields = ['teacher', 'leave_type', 'from_date', 'to_date', 'description']
         widgets = {
-            'from_date': forms.DateInput(attrs={'type': 'date'}),
-            'to_date': forms.DateInput(attrs={'type': 'date'}),
+            'teacher': forms.Select(attrs={'class': 'form-control'}),
+            'leave_type': forms.Select(attrs={'class': 'form-control'}),
+            'from_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'to_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),  
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
+        if user:
+            if user.role == 'staff':
+                # Get the teacher object for the logged-in user
+                teacher = Teacher.objects.get(user=user)
+                # Pre-fill the teacher field with the logged-in user's teacher
+                self.fields['teacher'].initial = teacher
+                # Disable the teacher field for staff users
+                # self.fields['teacher'].widget.attrs['disabled'] = 'disabled'
+                # Optionally, limit the queryset to the logged-in user's teacher (if only one teacher should be shown)
+                self.fields['teacher'].queryset = Teacher.objects.filter(user=user)
 
 
     # Custom validation for 'from_date' and 'to_date' to ensure correct range
+
     def clean(self):
         cleaned_data = super().clean()
         from_date = cleaned_data.get('from_date')
@@ -67,10 +90,12 @@ class LeaveRequestForm(forms.ModelForm):
 
         # Ensure description is not too long (optional limit)
         if len(description) < 10:
-            raise ValidationError("Description must be at least 10 characters long.")
+            raise ValidationError(
+                "Description must be at least 10 characters long.")
         if len(description) > 1000:
-            raise ValidationError("Description cannot be longer than 1000 characters.")
-        
+            raise ValidationError(
+                "Description cannot be longer than 1000 characters.")
+
         return description
 
     def save(self, *args, **kwargs):
@@ -82,15 +107,17 @@ class LeaveRequestForm(forms.ModelForm):
             teacher_leave_allocation = leave_request.teacher.leaveallocation
             if leave_request.leave_type.name == "Casual Leave":
                 if teacher_leave_allocation.casual_leave < leave_request.duration:
-                    raise ValidationError("Not enough Casual Leave balance available.")
+                    raise ValidationError(
+                        "Not enough Casual Leave balance available.")
 
             elif leave_request.leave_type.name == "Sick Leave":
                 if teacher_leave_allocation.sick_leave < leave_request.duration:
-                    raise ValidationError("Not enough Sick Leave balance available.")
-        
+                    raise ValidationError(
+                        "Not enough Sick Leave balance available.")
+
         # Save the valid leave request and deduct leave from the teacher's allocation
         leave_request.save()
-        
+
         # Deduct the leave from the teacher's leave allocation
         if leave_request.status == 'Approved':
             if leave_request.leave_type.name == "Casual Leave":
@@ -100,26 +127,8 @@ class LeaveRequestForm(forms.ModelForm):
             teacher_leave_allocation.save()
 
         return leave_request
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
 
 
-
-    def __init__(self, *args, **kwargs):
-        # We need to get the logged-in user from the kwargs
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-
-        if user:
-            # Fetch the teacher instance corresponding to the logged-in user
-            teacher = Teacher.objects.get(user=user)
-            # Set the teacher field to the logged-in teacher and make it read-only
-            self.fields['teacher'].initial = teacher
-            self.fields['teacher'].queryset = Teacher.objects.filter(user=user)  # Limit to the logged-in teacher
-            self.fields['teacher'].widget.attrs['readonly'] = 'readonly'  # Make the teacher field readonly
 
 
 class LeaveAllocationForm(forms.ModelForm):

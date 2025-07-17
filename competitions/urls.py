@@ -16,4 +16,9 @@ urlpatterns = [
          name='edit_competition_result'),
     path('results/delete/<int:pk>/', views.delete_competition_result,
          name='delete_competition_result'),
+
+    path('my-children-results/', views.my_children_results,
+         name='my_children_results'),
+    path('my-results/', views.my_results,
+         name='my_results'),
 ]

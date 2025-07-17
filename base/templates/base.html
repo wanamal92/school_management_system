@@ -63,60 +63,60 @@
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'list_students' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_students' or request.resolver_match.url_name == 'create_student' or request.resolver_match.url_name == 'edit_student' or request.resolver_match.url_name == 'delete_student' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_students' or request.resolver_match.url_name == 'create_student' or request.resolver_match.url_name == 'edit_student' or request.resolver_match.url_name == 'delete_student' or request.resolver_match.url_name == 'detail_student' %}active{% endif %}">
                         <i class="fas fa-user-graduate"></i>Students
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'list_teachers' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_teachers' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_teachers' or request.resolver_match.url_name == 'create_teacher' or request.resolver_match.url_name == 'edit_teacher' or request.resolver_match.url_name == 'delete_teacher' or request.resolver_match.url_name == 'detail_teacher' %}active{% endif %}">
                         <i class="fas fa-chalkboard-teacher"></i>Teachers
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a href="{% url 'list_guardian' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_guardian' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_guardian' or request.resolver_match.url_name == 'create_guardian' or request.resolver_match.url_name == 'edit_guardian' or request.resolver_match.url_name == 'delete_guardian' or request.resolver_match.url_name == 'detail_guardian' %}active{% endif %}">
                         <i class="fas fa-user-shield"></i>Guardians
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a href="{% url 'list_section' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_section' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_section' or request.resolver_match.url_name == 'create_section' or request.resolver_match.url_name == 'edit_section' or request.resolver_match.url_name == 'delete_section'  or request.resolver_match.url_name == 'detail_section'  %}active{% endif %}">
                         <i class="fas fa-columns"></i>Sections
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a href="{% url 'list_class' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_class' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_class' or request.resolver_match.url_name == 'create_class' or request.resolver_match.url_name == 'edit_class' or request.resolver_match.url_name == 'delete_class' or request.resolver_match.url_name == 'detail_class'  %}active{% endif %}">
                         <i class="fas fa-chalkboard"></i>Classes
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a href="{% url 'list_subject' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_subject' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_subject' or request.resolver_match.url_name == 'create_subject' or request.resolver_match.url_name == 'edit_subject' or request.resolver_match.url_name == 'delete_subject' or request.resolver_match.url_name == 'detail_subject'  %}active{% endif %}">
                         <i class="fas fa-book"></i>Subjects
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'list_prefects' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_prefects' %}active{% endif %}">
-                        <i class="fas fa-book"></i>Prefects
+                        class="nav-link {% if request.resolver_match.url_name == 'list_prefects' or request.resolver_match.url_name == 'create_prefect' or request.resolver_match.url_name == 'edit_prefect' or request.resolver_match.url_name == 'delete_prefect'  %}active{% endif %}">
+                        <i class="fas fa-crown"></i>Prefects
                     </a>
                 </div>
 
                 <div class="nav-item">
                     <a href="{% url 'list_health_records' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_health_records' or request.resolver_match.url_name == 'create_health_record'  %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_health_records' or request.resolver_match.url_name == 'create_health_record' or request.resolver_match.url_name == 'edit_health_record' or request.resolver_match.url_name == 'delete_health_record'   %}active{% endif %}">
                         <i class="fas fa-stethoscope"></i>Health Records
                     </a>
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'list_documents' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_documents' or request.resolver_match.url_name == 'create_document' or request.resolver_match.url_name == 'edit_document' or request.resolver_match.url_name == 'delete_document' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_documents' or request.resolver_match.url_name == 'create_document' or request.resolver_match.url_name == 'edit_document' or request.resolver_match.url_name == 'delete_document' or request.resolver_match.url_name == 'download_document'  %}active{% endif %}">
                         <i class="fas fa-file-pdf"></i>Documents
                     </a>
                 </div>
@@ -222,7 +222,7 @@
                 </div>
                 <div class="accordion-nav">
                     <button class="accordion-header" data-bs-toggle="collapse" data-bs-target="#leavesSubmenu"
-                        aria-expanded="{% if request.resolver_match.url_name == 'teacher_leave_requests' or request.resolver_match.url_name == 'create_leave_request' or request.resolver_match.url_name == 'admin_leave_requests' or request.resolver_match.url_name == 'approve_reject_leave' or request.resolver_match.url_name == 'leave_allocation' or request.resolver_match.url_name == 'create_leave_allocation' or request.resolver_match.url_name == 'update_leave_allocation' or request.resolver_match.url_name == 'list_leave_types' or request.resolver_match.url_name == 'create_leave_type' %}true{% else %}false{% endif %}">
+                        aria-expanded="{% if request.resolver_match.url_name == 'teacher_leave_requests' or request.resolver_match.url_name == 'create_leave_request' or request.resolver_match.url_name == 'admin_leave_requests' or request.resolver_match.url_name == 'approve_reject_leave' or request.resolver_match.url_name == 'list_leave_allocations' or request.resolver_match.url_name == 'create_leave_allocation' or request.resolver_match.url_name == 'edit_leave_allocation' or request.resolver_match.url_name == 'list_leave_types' or request.resolver_match.url_name == 'create_leave_type' or request.resolver_match.url_name == 'edit_leave_type' %}true{% else %}false{% endif %}">
                         <span><i class="fas fa-calendar-alt accordion-icon"></i>Leaves</span>
                         <i class="fas fa-chevron-down chevron"></i>
                     </button>
@@ -234,7 +234,7 @@
                             Leave Requests
                         </a>
                         <a href="{% url 'list_leave_allocations' %}"
-                            class="sub-nav-link {% if request.resolver_match.url_name == 'leave_allocation' %}active{% endif %}">
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_leave_allocations' %}active{% endif %}">
                             Leaves Allocations
                         </a>
                         <a href="{% url 'list_leave_types' %}"
@@ -270,10 +270,112 @@
                 {% elif request.user.role == 'staff' %}
                 <div class="nav-item">
                     <a href="{% url 'list_students' %}"
-                        class="nav-link {% if request.resolver_match.url_name == 'list_students' or request.resolver_match.url_name == 'create_student' or request.resolver_match.url_name == 'edit_student' or request.resolver_match.url_name == 'delete_student' %}active{% endif %}">
+                        class="nav-link {% if request.resolver_match.url_name == 'list_students' or request.resolver_match.url_name == 'create_student' or request.resolver_match.url_name == 'edit_student' or request.resolver_match.url_name == 'delete_student' or request.resolver_match.url_name == 'detail_student' %}active{% endif %}">
                         <i class="fas fa-user-graduate"></i>Students
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="{% url 'list_teachers' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_teachers' or request.resolver_match.url_name == 'create_teacher' or request.resolver_match.url_name == 'edit_teacher' or request.resolver_match.url_name == 'delete_teacher' or request.resolver_match.url_name == 'detail_teacher' %}active{% endif %}">
+                        <i class="fas fa-chalkboard-teacher"></i>Teachers
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="{% url 'list_guardian' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_guardian' or request.resolver_match.url_name == 'create_guardian' or request.resolver_match.url_name == 'edit_guardian' or request.resolver_match.url_name == 'delete_guardian' or request.resolver_match.url_name == 'detail_guardian' %}active{% endif %}">
+                        <i class="fas fa-user-shield"></i>Guardians
+                    </a>
+                </div>
+
+
+
+                <div class="nav-item">
+                    <a href="{% url 'list_class' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_class' or request.resolver_match.url_name == 'create_class' or request.resolver_match.url_name == 'edit_class' or request.resolver_match.url_name == 'delete_class' or request.resolver_match.url_name == 'detail_class'  %}active{% endif %}">
+                        <i class="fas fa-chalkboard"></i>Classes
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="{% url 'list_subject' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_subject' or request.resolver_match.url_name == 'create_subject' or request.resolver_match.url_name == 'edit_subject' or request.resolver_match.url_name == 'delete_subject' or request.resolver_match.url_name == 'detail_subject'  %}active{% endif %}">
+                        <i class="fas fa-book"></i>Subjects
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'list_teacher_qualifications' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_teacher_qualifications' or request.resolver_match.url_name == 'create_teacher_qualification' or request.resolver_match.url_name == 'edit_teacher_qualification' or request.resolver_match.url_name == 'delete_teacher_qualification' %}active{% endif %}">
+                        <i class="fas fa-certificate"></i>Qualifications
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'list_prefects' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_prefects' or request.resolver_match.url_name == 'create_prefect' or request.resolver_match.url_name == 'edit_prefect' or request.resolver_match.url_name == 'delete_prefect'  %}active{% endif %}">
+                        <i class="fas fa-crown"></i>Prefects
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="{% url 'list_teacher_duties' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_teacher_duties' or request.resolver_match.url_name == 'create_teacher_duty' or request.resolver_match.url_name == 'edit_teacher_duty' or request.resolver_match.url_name == 'delete_teacher_duty' %}active{% endif %}">
+                        <i class="fas fa-tasks"></i>Duties
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'list_health_records' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'list_health_records' or request.resolver_match.url_name == 'create_health_record' or request.resolver_match.url_name == 'edit_health_record' or request.resolver_match.url_name == 'delete_health_record'   %}active{% endif %}">
+                        <i class="fas fa-stethoscope"></i>Health Records
+                    </a>
+                </div>
+
+
+
+                <div class="accordion-nav">
+                    <button class="accordion-header" data-bs-toggle="collapse" data-bs-target="#competitionsSubmenu"
+                        aria-expanded="{% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}true{% else %}false{% endif %}">
+                        <span><i class="fas fa-trophy accordion-icon"></i>Competitions</span>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' or request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}show{% endif %}"
+                        id="competitionsSubmenu">
+
+                        <a href="{% url 'list_competitions' %}"
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_competitions' or request.resolver_match.url_name == 'create_competition' or request.resolver_match.url_name == 'edit_competition' or request.resolver_match.url_name == 'delete_competition' %}active{% endif %}">
+                            Competitions
+                        </a>
+                        <a href="{% url 'list_competition_results' %}"
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_competition_results' or request.resolver_match.url_name == 'create_competition_result' or request.resolver_match.url_name == 'edit_competition_result' or request.resolver_match.url_name == 'delete_competition_result' %}active{% endif %}">
+                            Competition Results
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="accordion-nav">
+                    <button class="accordion-header" data-bs-toggle="collapse" data-bs-target="#examsSubmenu"
+                        aria-expanded="{% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}true{% else %}false{% endif %}">
+                        <span><i class="fas fa-clipboard-check accordion-icon"></i>Exams</span>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="collapse accordion-content {% if request.resolver_match.url_name == 'list_exam_session' or request.resolver_match.url_name == 'create_exam_session' or request.resolver_match.url_name == 'list_exam' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'list_exam_attendee' or request.resolver_match.url_name == 'create_exam_attendee' %}show{% endif %}"
+                        id="examsSubmenu">
+
+                        <a href="{% url 'list_exam_session' %}"
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_exam_session' %}active{% endif %}">
+                            Exam Sessions
+                        </a>
+                        <a href="{% url 'list_exam' %}"
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_exam' %}active{% endif %}">
+                            Exams
+                        </a>
+                        <a href="{% url 'list_exam_attendee' %}"
+                            class="sub-nav-link {% if request.resolver_match.url_name == 'list_exam_attendee' %}active{% endif %}">
+                            Exam Attendees
+                        </a>
+                    </div>
+                </div>
+
                 <div class="nav-item">
                     <a href="{% url 'profile_teacher' %}"
                         class="nav-link {% if request.resolver_match.url_name == 'profile_teacher' %}active{% endif %}">
@@ -289,8 +391,26 @@
 
                 {% elif request.user.role == 'guardian' %}
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-child"></i>My Children
+                    <a href="{% url 'my_childrens' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'my_childrens' or request.resolver_match.url_name == 'detail_student'  %}active{% endif %}">
+                        <i class="fas fa-child"></i>Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'my_children_exams' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'my_children_exams' or request.resolver_match.url_name == 'detail_exam_attendee'  %}active{% endif %}">
+                        <i class="fas fa-clipboard-check"></i>Exam Marks
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'my_children_results' %}" class="nav-link {% if request.resolver_match.url_name == 'my_children_results' %}active{% endif %}">
+                        <i class="fas fa-trophy"></i>competitions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'my_childrens_payments' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'my_childrens_payments' %}active{% endif %}">
+                        <i class="fas fa-money-check"></i>Payments
                     </a>
                 </div>
                 <div class="nav-item">
@@ -302,8 +422,19 @@
 
                 {% elif request.user.role == 'student' %}
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-book"></i>My Marks
+                    <a href="{% url 'my_exams' %}" class="nav-link {% if request.resolver_match.url_name == 'my_exams' %}active{% endif %}">
+                        <i class="fas fa-clipboard-check"></i>My Exam Marks
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'my_results' %}" class="nav-link {% if request.resolver_match.url_name == 'my_results' %}active{% endif %}">
+                        <i class="fas fa-trophy"></i>competitions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'my_payments' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'my_payments' %}active{% endif %}">
+                        <i class="fas fa-money-check"></i>Payments
                     </a>
                 </div>
                 <div class="nav-item">
@@ -377,7 +508,7 @@
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/delete_modal.js' %}"></script>
 
-    
+
 
 
 </body>

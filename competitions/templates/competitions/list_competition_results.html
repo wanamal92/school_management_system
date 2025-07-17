@@ -3,10 +3,11 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Competition Results</h2>
-
+    {% if request.user.role == 'admin' or request.user.role == 'staff' %}
     <a href="{% url 'create_competition_result' %}" class="btn btn-primary mb-3">
         <i class="fas fa-plus-circle"></i> Add Result
     </a>
+    {% endif %}
 
 
 
@@ -59,14 +60,18 @@
                     <td class="year">{{ result.year }}</td>
                     <td>{{ result.get_result_display }}</td>
                     <td>
+                        {% if request.user.role == 'admin' or request.user.role == 'staff' %}
                         <a href="{% url 'edit_competition_result' result.pk %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
+                        {% endif %}
+                        {% if request.user.role == 'admin' %}
                         <button type="button" class="btn btn-danger btn-sm delete-btn" data-item-id="{{ result.id }}"
                             data-item-name="{{ result.student.full_name }}"
                             data-delete-url="{% url 'delete_competition_result' result.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

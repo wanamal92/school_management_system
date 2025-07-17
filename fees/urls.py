@@ -17,4 +17,7 @@ urlpatterns = [
 
     path('fee-payments/invoice/<int:pk>/', views.generate_invoice_pdf,
          name='generate_invoice_pdf'),  # New URL for PDF download
+
+     path('my-children-fee-payments/', views.my_childrens_payments, name='my_childrens_payments'),
+     path('my-fee-payments/', views.my_payments, name='my_payments'),
 ]

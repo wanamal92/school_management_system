@@ -57,6 +57,8 @@
                     <th>Teacher / Student</th>
                     <th>Height (cm)</th>
                     <th>Weight (kg)</th>
+                    <th>BMI</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -73,7 +75,10 @@
                     </td>
                     <td>{{ record.height_cm }}</td>
                     <td>{{ record.weight_kg }}</td>
+                    <td>{{ record.bmi }}</td>
+                    <td>{{ record.status }}</td>
                     <td>
+                        {% if request.user.role == 'admin' %}
                         <a href="{% url 'update_health_record' record.pk %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
@@ -82,6 +87,7 @@
                             data-delete-url="{% url 'delete_health_record' record.id %}">
                             <i class="fas fa-trash-alt"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

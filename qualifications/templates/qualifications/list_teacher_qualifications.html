@@ -60,16 +60,19 @@
                     <td>{{ qualification.institute }}</td>
                     <td>{{ qualification.date_obtained }}</td>
                     <td>
+                        {% if request.user.role == 'admin' %}
                         <a href="{% url 'edit_teacher_qualification' qualification.pk %}"
                             class="btn btn-warning btn-sm">
                             <i class="fas fa-edit me-1"></i> Edit
                         </a>
+                        
                         <button type="button" class="btn btn-sm btn-danger delete-btn"
                             data-item-id="{{ qualification.id }}"
                             data-item-name="{{ qualification.teacher.full_name }} - {{ qualification.qualification.name }}"
                             data-delete-url="{% url 'delete_teacher_qualification' qualification.id %}">
                             <i class="fas fa-trash me-2"></i> Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
